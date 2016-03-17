@@ -3,8 +3,11 @@
  * Download tool voor het Geoportaal.<br>
  * 
  * <pre>
+
 DownloadTool project structuur
 ==============================
+
+---------------------------------------
 Gradle multi project met docker images
 ---------------------------------------
 domain                  // dependencies naar alle andere subprojecten
@@ -20,7 +23,7 @@ geoportaalinterface     // MetadataToDownloadBeanConverter
                         // dependencies naar userinterface.downloadrequester
 queue                   // docker: queue client met beanstalk
                         // dependencies naar subprojects userinterface, downloader
-
+-----------------
 Package structuur
 -----------------
 nl.idgis.downloadtool
@@ -29,8 +32,6 @@ nl.idgis.downloadtool
                             DownloadRequest bean
                             Feedback bean
                             WfsFeatureType, AdditionalData
-                            
-                            database dao classes
                             
     .dao                    // dao class
                             DownloadDao
@@ -43,16 +44,19 @@ nl.idgis.downloadtool
     .queue                  // DownloadQueueClient used by DownloadRequester, FeedbackProvider, Processor
     .geoportaalinterface    // MetadataToDownloadBeanConverter
 
-    
+-------------
 Docker images
 -------------
 downloader          // docker: processor, downloaders, packager
 downloadrequester   // docker: play application
-feedback            // docker: 2 containers met aparte configuratie voor OK en NOK
+feedbackprovider    // docker: 2 containers met aparte configuratie voor OK en NOK feedback queues
 store               // docker: disk volume  
 database            // 
+beanstalk 			// beanstalkd
 
  * </pre>
+ * 
+ *  <img src="DownloadToolSmall.png">
  * 
  * @author Rob
  *
