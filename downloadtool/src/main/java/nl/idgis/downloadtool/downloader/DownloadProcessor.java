@@ -18,7 +18,7 @@ import nl.idgis.downloadtool.queue.FeedbackQueueClient;
  * The result of all downloads is packaged into a single zip file.<br>
  * Every single download has its own name and extension.<br>
  * Two types of downloads:<br>
- * 1. from a WFS with optional conversion (GML -> SHP, GML -> KML, ...)<br>
+ * 1. from a WFS with optional conversion (GML2SHP, GML2KML, ...)<br>
  * 2. additional data without conversion (metadata.xml, stylesheet, pdf, jpg, ...)<br>
  *
  * @author Rob

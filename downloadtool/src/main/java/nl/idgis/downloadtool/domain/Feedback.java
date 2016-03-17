@@ -26,7 +26,7 @@ public class Feedback implements Serializable{
 
 
     /**
-     * @param requestId unique identifier of this downloadrequest.<br>
+     * @param id unique identifier of this downloadrequest.<br>
      * Equal to DownloadRequest.requestId
      */
     public Feedback(String id) {

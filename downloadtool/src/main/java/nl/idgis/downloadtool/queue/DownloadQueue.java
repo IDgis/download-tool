@@ -28,7 +28,7 @@ public interface DownloadQueue {
 	 * The parameter is the same as received from the receiveDownloadRequest() method.
 	 * @param downloadRequest
 	 * @throws Exception when the downloadrequest was already deleted from the queue
-	 * @see getDownloadRequest()
+	 * @see #receiveDownloadRequest()
 	 */
 	void deleteDownloadRequest(DownloadRequest downloadRequest) throws Exception;
 
