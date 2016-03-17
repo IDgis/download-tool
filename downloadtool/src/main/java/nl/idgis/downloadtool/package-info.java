@@ -10,6 +10,7 @@ Gradle multi project met docker images
 domain                  // dependencies naar alle andere subprojecten
 dao                     // dependencies naar subproject userinterface
 downloader              // docker: processor, downloaders, packager
+						// dependencies: idgis.commons.convert, idgis.commons.cache,  
 userinterface
     downloadrequester   // docker: play applicatie
                         // configuratie: view (tekst, logo, i18n)
