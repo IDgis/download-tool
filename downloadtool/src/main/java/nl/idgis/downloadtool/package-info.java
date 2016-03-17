@@ -40,7 +40,7 @@ nl.idgis.downloadtool
         .downloadrequester  // Play controller
         .feedback           // Feedbackprovider
     .downloader             // Processor, WFS downloader, converter, packager
-    .queue                  // QueueClient used by DownloadRequester, FeedbackProvider, Processor
+    .queue                  // DownloadQueueClient used by DownloadRequester, FeedbackProvider, Processor
     .geoportaalinterface    // MetadataToDownloadBeanConverter
 
     

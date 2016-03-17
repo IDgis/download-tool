@@ -1,7 +1,6 @@
 package nl.idgis.downloadtool.downloader;
 
 import java.util.Random;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import nl.idgis.downloadtool.domain.DownloadRequest;
 import nl.idgis.downloadtool.domain.Feedback;
 import nl.idgis.downloadtool.queue.DownloadQueue;
-import nl.idgis.downloadtool.queue.QueueClient;
+import nl.idgis.downloadtool.queue.DownloadQueueClient;
+import nl.idgis.downloadtool.queue.FeedbackQueue;
+import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 
 /**
  * The DownloadProcessor receives a DownloadRequest bean, performs downloads and sends a Feedback bean.<br>
@@ -28,12 +29,29 @@ public class DownloadProcessor {
 	
 	// TODO autowire
 	DownloadQueue queueClient;
+	FeedbackQueue feedbackQueue, errorFeedbackQueue;
+	
+	// TODO get from configuration
+	String downloadQueueName, feedbackQueueName, errorFeedbackQueueName;
 	
     public DownloadProcessor() {
         super();
-        queueClient = new QueueClient();
+        queueClient = new DownloadQueueClient(downloadQueueName);
+        feedbackQueue = new FeedbackQueueClient(feedbackQueueName);
+        errorFeedbackQueue = new FeedbackQueueClient(errorFeedbackQueueName);
     }
-
+    
+    public void setDownloadQueueClient(DownloadQueue queueClient){
+    	this.queueClient = queueClient;
+    }
+    
+    public void setFeedbackQueue(FeedbackQueue queueClient){
+    	this.feedbackQueue = queueClient;
+    }
+    
+    public void setErrorFeedbackQueue(FeedbackQueue queueClient){
+    	this.errorFeedbackQueue = queueClient;
+    }
     
     /**
      * Perform downloads using parameter as input, then send feedback.<br>
@@ -56,8 +74,8 @@ public class DownloadProcessor {
     	
     	sleep(new Random().nextInt(2000));
     	
-    	if ((new Random().nextInt(10) % 3) == 0){
-    		throw  new IllegalArgumentException("the wfs url could not be parsed!");
+    	if (downloadRequest == null){
+    		throw new IllegalArgumentException("downloadrequest is null");
     	}
     }
 
@@ -65,6 +83,28 @@ public class DownloadProcessor {
 		try {
 			Thread.sleep(milli);
 		} catch (InterruptedException e) {
+		}
+	}
+
+	public void processDownloadRequest() {
+		DownloadRequest downloadRequest = queueClient.receiveDownloadRequest();
+		
+		Feedback feedback = new Feedback(downloadRequest==null?null:downloadRequest.getRequestId());
+		try {
+			performDownload(downloadRequest);
+			feedback.setResultCode("OK");
+			feedbackQueue.sendFeedback(feedback);
+		} catch (Exception e1) {
+			log.debug(e1.getMessage());
+			feedback.setResultCode(e1.getMessage());
+			errorFeedbackQueue.sendFeedback(feedback);
+		}
+		
+		try {
+			queueClient.deleteDownloadRequest(downloadRequest);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -88,24 +128,12 @@ public class DownloadProcessor {
 		for (int i = 0; i < 5; i++) {
 			log.debug("download nr \t" + i);
 			
-	    	DownloadRequest downloadRequest = dlp.queueClient.getDownloadRequest();
-	    	Feedback feedback = new Feedback(downloadRequest.getRequestId());
-	    	
-	    	try {
-				dlp.performDownload(downloadRequest);
-				feedback.setResultCode("OK");
-				dlp.queueClient.sendFeedback(feedback);
-			} catch (Exception e1) {
-				e1.printStackTrace();
-				feedback.setResultCode(e1.getMessage());
-				dlp.queueClient.sendErrorFeedback(feedback);
-			}
-	        
-	        dlp.queueClient.deleteDownloadRequest(downloadRequest);
+	    	dlp.processDownloadRequest();
 		}
         
 		log.info("end loop ");
     	
     }
+
 }
 

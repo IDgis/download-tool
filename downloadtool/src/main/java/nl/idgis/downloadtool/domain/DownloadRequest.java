@@ -56,4 +56,9 @@ public class DownloadRequest implements Serializable {
         this.download = download;
     }
 
+	@Override
+	public String toString() {
+		return "DownloadRequest [requestId=" + requestId + ", convertToMimetype=" + convertToMimetype + "]";
+	}
+
 }
