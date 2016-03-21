@@ -49,12 +49,13 @@ public class FeedbackQueueClient implements FeedbackQueue {
 	@Override
 	public void sendFeedback(Feedback feedback){
 		log.debug("send on " + this.beanstalkTubeName + " : " + feedback);
+		// TODO beanstalk code
 		this.feedback = feedback;
 	}
 
 	@Override
 	public Feedback receiveFeedback() {
-		// TODO Auto-generated method stub
+		// TODO beanstalk code
 		// PSEUDO-CODE
 		// get from feedback queue
 		Feedback feedback = this.feedback;

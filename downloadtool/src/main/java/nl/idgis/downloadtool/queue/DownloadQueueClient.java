@@ -77,8 +77,8 @@ public class DownloadQueueClient implements DownloadQueue {
 		log.debug("send downloadrequest " + downloadRequest);
 		// TODO beanstalk code
 		this.jobId = UUID.randomUUID().toString();
-		jobs.put(downloadRequest, this.jobId);
 		
+		jobs.put(downloadRequest, this.jobId);
 	}
 
 }

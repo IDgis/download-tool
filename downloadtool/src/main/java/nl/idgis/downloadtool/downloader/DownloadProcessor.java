@@ -31,14 +31,8 @@ public class DownloadProcessor {
 	DownloadQueue queueClient;
 	FeedbackQueue feedbackQueue, errorFeedbackQueue;
 	
-	// TODO get from configuration
-	String downloadQueueName, feedbackQueueName, errorFeedbackQueueName;
-	
     public DownloadProcessor() {
         super();
-        queueClient = new DownloadQueueClient(downloadQueueName);
-        feedbackQueue = new FeedbackQueueClient(feedbackQueueName);
-        errorFeedbackQueue = new FeedbackQueueClient(errorFeedbackQueueName);
     }
     
     public void setDownloadQueueClient(DownloadQueue queueClient){
@@ -72,6 +66,9 @@ public class DownloadProcessor {
          *    putToPackager(downloadFromSource(download.URI));
          */
     	
+    	
+    	
+    	
     	sleep(new Random().nextInt(2000));
     	
     	if (downloadRequest == null){
@@ -86,6 +83,17 @@ public class DownloadProcessor {
 		}
 	}
 
+    /*
+     * PSEUDO-CODE
+     *    lees uit queue
+     *       downloadRequest Bean = requestQueue.reserveJob();
+     *    initialize downloads and converters and packager   
+     *       performDownload(downloadRequest Bean);
+     *    put feedback into queue (OK queue or NOK queue depending on outcome)
+     *       feedbackQueue.put(feedback Bean);
+     *    end queue job
+     *       requestQueue.deleteJob();   
+     */
 	public void processDownloadRequest() {
 		DownloadRequest downloadRequest = queueClient.receiveDownloadRequest();
 		
@@ -109,20 +117,7 @@ public class DownloadProcessor {
 	}
 
 	public static void main(String... args){
-        /*
-         * PSEUDO-CODE
-         * forever {
-         *    lees uit queue
-         *       downloadRequest Bean = requestQueue.reserveJob();
-         *    initialize downloads and converters and packager   
-         *       performDownload(downloadRequest Bean);
-         *    put feedback into queue (OK queue or NOK queue depending on outcome)
-         *       feedbackQueue.put(feedback Bean);
-         *    end queue job
-         *       requestQueue.deleteJob();   
-         * }
-         */
-		DownloadProcessor dlp = new DownloadProcessor();
+		DownloadProcessor dlp = new DownloadProcessor();	
 		log.info("start loop ");
 		
 		for (int i = 0; i < 5; i++) {
