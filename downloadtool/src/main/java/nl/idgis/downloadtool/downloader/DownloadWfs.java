@@ -40,11 +40,14 @@ public class DownloadWfs implements DownloadSource {
 	public static String newLine = System.getProperty("line.separator");
 	private static final Log log = LogFactory.getLog(DownloadWfs.class);
 	
+	private int maxFeatures = 0;
+	
 	private URI uri;
 	private HttpEntity entity;
 	private CloseableHttpResponse response; 
 	private CloseableHttpClient httpclient;
 	private HttpPost httpPost;
+	
 
 	/**
 	 * Constructor that builds a WFS request.
@@ -54,8 +57,21 @@ public class DownloadWfs implements DownloadSource {
 	 * @throws URISyntaxException
 	 */
 	public DownloadWfs(WfsFeatureType wfsFeatureType) throws MalformedURLException,
+	UnsupportedEncodingException, URISyntaxException {
+		this(wfsFeatureType, 0);
+	}
+	
+	/**
+	 * Constructor that builds a WFS request.
+	 * @param wfsFeatureType containing all information for the building the WFS request
+	 * @param maxFeatures nr of features to download, 0 is unrestricted
+	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
+	 * @throws URISyntaxException
+	 */
+	public DownloadWfs(WfsFeatureType wfsFeatureType, int maxFeatures) throws MalformedURLException,
 			UnsupportedEncodingException, URISyntaxException {
-
+		this.maxFeatures = maxFeatures;
 		String serviceUrl = correctServiceUrl(wfsFeatureType.getServiceUrl());
 		uri = new URL(serviceUrl).toURI();
 
@@ -97,6 +113,14 @@ public class DownloadWfs implements DownloadSource {
 		return uri;
 	}
 	
+	public int getMaxFeatures() {
+		return maxFeatures;
+	}
+
+	public void setMaxFeatures(int maxFeatures) {
+		this.maxFeatures = maxFeatures;
+	}
+
 	private CloseableHttpClient getHttpClient(String serviceUrl, String userAuth, String pwAuth) {
 		CloseableHttpClient httpClient;
 		if (userAuth == null || pwAuth == null || userAuth.isEmpty() || pwAuth.isEmpty()) {
@@ -148,16 +172,27 @@ public class DownloadWfs implements DownloadSource {
 					  + " xmlns:wfs=\"http://www.opengis.net/wfs\""
 					  + " xmlns:ogc=\"http://www.opengis.net/ogc\" \n");
 		}
+		// attributes
 		sb.append(" service=\"WFS\"\n"); 
-		sb.append(" version=\"" + version + "\"\n"); 
-		sb.append(" outputFormat=\"" + wfsFormaat + "\">\n"); 
+		sb.append(" version=\"" + version + "\"\n");
+		if (maxFeatures > 0){
+			if (version.indexOf("2.0") > -1){
+				// WFS version 2.0.x
+				sb.append(" count=\"" + maxFeatures + "\"\n"); 			
+			} else {
+				// WFS version 1.1.0
+				sb.append(" maxFeatures=\"" + maxFeatures + "\"\n"); 
+			}
+		}
+		sb.append(" outputFormat=\"" + wfsFormaat + "\">\n"); // last attribute
 		sb.append(" <wfs:Query \n");
-		String typeNames = version.equals("2.0.0")?"typeNames":"typeName";
+		String typeNames = (version.indexOf("2.0") > -1)?"typeNames":"typeName";
 		if (typePrefix==null || typePrefix.isEmpty()){
 			sb.append(" " + typeNames + "=\""+typeName+"\"\n");
 		} else {
 			sb.append(" " + typeNames + "=\"" + typePrefix+":"+typeName+"\"");
-			sb.append(" xmlns:"+typePrefix+"=\""+typeNameSpace+"\" \n");
+			if (typeNameSpace != null && !typeNameSpace.isEmpty())
+				sb.append(" xmlns:"+typePrefix+"=\""+typeNameSpace+"\" \n");
 		}
 		sb.append(" srsName=\""+crs+"\">\n");
 		// make wfs filter 
