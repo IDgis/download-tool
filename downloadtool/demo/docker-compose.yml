@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+  beanstalk:
+    image: schickling/beanstalkd
+    restart: always
+
+  downloader:
+    image: downloadtool-downloader
+    restart: always
+    environment:
+      BEANSTALK_HOST: beanstalk
+    
