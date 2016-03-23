@@ -4,6 +4,7 @@
 bin/
 build/
 .settings
+.vagrant
 
 # Ignore Gradle GUI config
 gradle-app.setting
