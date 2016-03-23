@@ -10,4 +10,5 @@ services:
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
+      ZIP_CACHEPATH : /var/temp
     

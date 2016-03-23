@@ -19,7 +19,7 @@ public class TestDownloadQueue {
 	
 	@Before
 	public void setUp() throws Exception {
-        queueClient = new DownloadQueueClient("downloadrequest");
+        queueClient = new DownloadQueueClient("localhost", "downloadrequest");
 
 	}
 

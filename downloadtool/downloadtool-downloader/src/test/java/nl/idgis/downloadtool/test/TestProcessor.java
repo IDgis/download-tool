@@ -37,7 +37,7 @@ import nl.idgis.downloadtool.queue.FeedbackQueue;
 public class TestProcessor  extends EasyMockSupport {
 
 	@TestSubject
-	private DownloadProcessor downloadProcessor = new DownloadProcessor(System.getProperty("user.dir"));
+	private DownloadProcessor downloadProcessor = new DownloadProcessor(System.getProperty("user.home"));
 
 	@Mock
 	private DownloadQueue queueClientMock;

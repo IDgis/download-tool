@@ -41,10 +41,11 @@ import nl.idgis.downloadtool.queue.FeedbackQueue;
 public class DownloadProcessor {
 	private static final Logger log = LoggerFactory.getLogger(DownloadProcessor.class);
 
-	private static final String ZIPCACHEPATH = "ZIP_CACHE_PATH";
+	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
+	private static final String ZIPCACHEPATH = "ZIP_CACHEPATH";
 	
-	DownloadQueue queueClient;
-	FeedbackQueue feedbackQueue, errorFeedbackQueue;
+	private DownloadQueue queueClient;
+	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 	
 	String cachePath;
 	
@@ -227,11 +228,16 @@ public class DownloadProcessor {
 	public static void main(String... args){
 		String path = System.getenv(ZIPCACHEPATH);
 		if(path == null) {
-			path = System.getProperty("user.dir");
+			path = System.getProperty("user.home");
+		}
+		String host = System.getenv(BEANSTALK_HOST);
+		if(host == null) {
+			host = "localhost";
 		}
 		
 		log.info("start loop " + path);
-		DownloadProcessor dlp = new DownloadProcessor(path);	
+		DownloadProcessor dlp = new DownloadProcessor(path);
+		
 		
 		for (int i = 0; i < 5; i++) {
 			log.debug("download nr \t" + i);
