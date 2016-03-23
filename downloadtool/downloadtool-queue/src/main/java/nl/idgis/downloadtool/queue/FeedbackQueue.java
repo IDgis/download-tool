@@ -12,7 +12,7 @@ import nl.idgis.downloadtool.domain.Feedback;
 public interface FeedbackQueue {
 
 	/**
-	 * Send to feedback success queue.
+	 * Send to feedback queue.
 	 * @param feedback
 	 */
 	void sendFeedback(Feedback feedback);

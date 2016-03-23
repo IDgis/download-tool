@@ -3,6 +3,7 @@
  */
 package nl.idgis.downloadtool.downloader;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -63,7 +64,7 @@ public class DownloadFile implements DownloadSource {
 	}
 
 	@Override
-	public InputStream open() throws Exception {
+	public InputStream open() throws IOException {
 		response = httpclient.execute(httpGet);
 	
 		log.debug("Http response: " + response.getStatusLine());
@@ -73,7 +74,7 @@ public class DownloadFile implements DownloadSource {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		try {
 			// After doing something useful with the response body,
 			// ensure it is fully consumed:

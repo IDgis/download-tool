@@ -17,12 +17,12 @@ public class Feedback implements Serializable{
     /**
      * requestId is uniek Id van dit download verzoek, wordt gebruikt bij terugmeldingen
      */
-    String requestId;
+    private String requestId;
     
     /**
      * Result code
      */
-    String resultCode;
+    private String resultCode;
 
 
     /**

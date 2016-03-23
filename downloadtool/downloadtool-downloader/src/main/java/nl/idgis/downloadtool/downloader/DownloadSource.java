@@ -24,11 +24,11 @@ public interface DownloadSource {
 	 * @return inputstream
 	 * @throws IOException
 	 */
-	public InputStream open() throws Exception;
+	public InputStream open() throws IOException;
 	
 	/**
 	 * Close the source.
 	 * @throws Exception
 	 */
-	public void close() throws Exception;
+	public void close() throws IOException;
 }

@@ -73,6 +73,8 @@ project(':downloadtool-downloader') {
         compile project(':downloadtool-queue')
 
     	compile 'org.apache.httpcomponents:httpclient:4.3.1'
+	    compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
+	    compile 'nl.idgis.commons:commons-convert:0.0.15-SNAPSHOT'
 	    compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
     }
     
