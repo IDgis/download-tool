@@ -22,7 +22,9 @@ import nl.idgis.downloadtool.domain.DownloadRequest;
 import nl.idgis.downloadtool.domain.Feedback;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
+import nl.idgis.downloadtool.queue.DownloadQueueClient;
 import nl.idgis.downloadtool.queue.FeedbackQueue;
+import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 
 /**
  * The DownloadProcessor receives a DownloadRequest bean, performs downloads and sends a Feedback bean.<br>
@@ -41,6 +43,9 @@ public class DownloadProcessor {
 
 	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
 	private static final String ZIPCACHEPATH = "ZIP_CACHEPATH";
+	private static final String BEANSTALK_DOWNLOAD_QUEUE = "BEANSTALK_DOWNLOAD_QUEUE";
+	private static final String BEANSTALK_FEEDBACKOK_QUEUE = "BEANSTALK_FEEDBACKOK_QUEUE";
+	private static final String BEANSTALK_FEEDBACKERROR_QUEUE = "BEANSTALK_FEEDBACKERROR_QUEUE";
 	
 	private DownloadQueue queueClient;
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
@@ -232,20 +237,40 @@ public class DownloadProcessor {
 		if(host == null) {
 			host = "localhost";
 		}
+		String downloadQueueTubeName = System.getenv(BEANSTALK_DOWNLOAD_QUEUE);
+		if(downloadQueueTubeName == null) {
+			downloadQueueTubeName = "downloadTube";
+		}
+		String feedbackOkTubeName = System.getenv(BEANSTALK_FEEDBACKOK_QUEUE);
+		if(feedbackOkTubeName == null) {
+			feedbackOkTubeName = "feedbackOkTube";
+		}
+		String feedbackErrorTubeName = System.getenv(BEANSTALK_FEEDBACKERROR_QUEUE);
+		if(feedbackErrorTubeName == null) {
+			feedbackErrorTubeName = "feedbackErrorTube";
+		}
 		
-		log.info("start loop " + path);
-		DownloadProcessor dlp = new DownloadProcessor(path);
-		
-		
-		for (int i = 0; i < 5; i++) {
-			log.debug("download nr \t" + i);
+		try {
+			log.info("start loop " + path);
+			DownloadProcessor dlp = new DownloadProcessor(path);
+			// setup queue clients
+			DownloadQueueClient downloadQueueClient = new DownloadQueueClient(host, downloadQueueTubeName);
+			FeedbackQueueClient feedbackOkQueueClient = new FeedbackQueueClient(host, feedbackOkTubeName); 
+			FeedbackQueueClient feedbackErrorQueueClient = new FeedbackQueueClient(host, feedbackErrorTubeName); 
 			
-	    	dlp.processDownloadRequest();
+			dlp.setDownloadQueueClient(downloadQueueClient);
+			dlp.setFeedbackQueue(feedbackOkQueueClient);
+			dlp.setErrorFeedbackQueue(feedbackErrorQueueClient);
+			
+			for (;;) {
+				log.debug("processDownloadRequest");
+				dlp.processDownloadRequest();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.info("end loop ");
 		}
         
-		log.info("end loop ");
-    	
     }
 
 }
-
