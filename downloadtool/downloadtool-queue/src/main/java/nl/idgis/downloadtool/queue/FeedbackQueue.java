@@ -19,10 +19,18 @@ public interface FeedbackQueue {
 
 	/**
 	 * Receive from the feedback queue.<br>
-	 * Whether this is the feedback success or feedback error queue must be set by means of configuration.<br>
-	 * It is assumed after this call the received feedback is removed from the queue as well. 
+	 * Whether this is a feedback success or feedback error queue must be set by means of configuration.<br>
 	 * @return Feedback
 	 */
 	Feedback receiveFeedback();
 	
+	/**
+	 * The feedback has processed and can be removed from the request queue.<br>
+	 * The parameter is the same object as received from the receiveFeedback() method.
+	 * @param feedback
+	 * @throws Exception when the feedback was already deleted from the queue
+	 * @see #receiveFeedback()
+	 */
+	void deleteFeedback(Feedback feedback) throws Exception;
+
 }

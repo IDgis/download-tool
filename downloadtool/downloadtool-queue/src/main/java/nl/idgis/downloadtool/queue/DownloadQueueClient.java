@@ -3,7 +3,6 @@ package nl.idgis.downloadtool.queue;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +78,29 @@ public class DownloadQueueClient implements DownloadQueue {
 	}
 
 	/* (non-Javadoc)
+	 * @see nl.idgis.downloadtool.queue.DownloadQueue#sendDownloadRequest(nl.idgis.downloadtool.domain.DownloadRequest)
+	 */
+	@Override
+	public void sendDownloadRequest(DownloadRequest downloadRequest) {
+		log.debug("send downloadrequest " + downloadRequest);
+		/*
+		 * convert downloadrequest to json string
+		 */
+		
+		String json = gson.toJson(downloadRequest);
+		/* 
+		 * send json to queue
+		 */
+		try {
+			Long jobId = producer.putJob(0, 0, 1, json.getBytes("utf-8"));
+			log.debug("sent json '" + json + "', jobId: " + jobId);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/* (non-Javadoc)
 	 * @see nl.idgis.downloadtool.queue.DownloadQueue#getDownloadRequest()
 	 */
 	@Override
@@ -96,7 +118,7 @@ public class DownloadQueueClient implements DownloadQueue {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		log.debug("downloadrequest received: '" + json + "', jobId: " + jobId);
+		log.debug("json received: '" + json + "', jobId: " + jobId);
 
 		/*
 		 * convert message to DownloadRequest object
@@ -129,27 +151,4 @@ public class DownloadQueueClient implements DownloadQueue {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see nl.idgis.downloadtool.queue.DownloadQueue#sendDownloadRequest(nl.idgis.downloadtool.domain.DownloadRequest)
-	 */
-	@Override
-	public void sendDownloadRequest(DownloadRequest downloadRequest) {
-		log.debug("send downloadrequest " + downloadRequest);
-		/*
-		 * convert downloadrequest to json string
-		 */
-		
-		String json = gson.toJson(downloadRequest);
-		/* 
-		 * send json to queue
-		 */
-		try {
-			Long jobId = producer.putJob(0, 0, 1, json.getBytes("utf-8"));
-			log.debug("sent downloadrequest '" + json + "', jobId: " + jobId);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 }
