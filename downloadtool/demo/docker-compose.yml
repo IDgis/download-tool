@@ -10,5 +10,23 @@ services:
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
+      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+      BEANSTALK_FEEDBACKOK_QUEUE: feedbackOkTube
+      BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
       ZIP_CACHEPATH : /var/temp
     
+  feedbackOK:
+    image: downloadtool-feedback
+    restart: always
+    environment:
+      BEANSTALK_HOST: beanstalk
+      BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
+      
+  feedbackERROR:
+    image: downloadtool-feedback
+    restart: always
+    environment:
+      BEANSTALK_HOST: beanstalk
+      BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
+      
+  

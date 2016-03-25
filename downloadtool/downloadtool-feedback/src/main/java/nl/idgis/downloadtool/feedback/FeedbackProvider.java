@@ -66,7 +66,7 @@ public class FeedbackProvider {
 		}
 		String feedbackTubeName = System.getenv(BEANSTALK_FEEDBACK_QUEUE);
 		if(feedbackTubeName == null) {
-			feedbackTubeName = "feedbackTube";
+			feedbackTubeName = "feedbackOkTube";
 		}
 		
 		try {

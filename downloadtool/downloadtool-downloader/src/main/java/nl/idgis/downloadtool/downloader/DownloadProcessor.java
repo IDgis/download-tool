@@ -239,7 +239,7 @@ public class DownloadProcessor {
 		}
 		String downloadQueueTubeName = System.getenv(BEANSTALK_DOWNLOAD_QUEUE);
 		if(downloadQueueTubeName == null) {
-			downloadQueueTubeName = "downloadTube";
+			downloadQueueTubeName = "downloadRequestTube";
 		}
 		String feedbackOkTubeName = System.getenv(BEANSTALK_FEEDBACKOK_QUEUE);
 		if(feedbackOkTubeName == null) {
