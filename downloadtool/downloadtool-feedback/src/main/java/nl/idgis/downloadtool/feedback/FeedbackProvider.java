@@ -3,9 +3,16 @@
  */
 package nl.idgis.downloadtool.feedback;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.idgis.commons.utils.Mail;
+import nl.idgis.downloadtool.dao.DownloadDao;
+import nl.idgis.downloadtool.domain.DownloadRequestInfo;
+import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.Feedback;
 import nl.idgis.downloadtool.queue.FeedbackQueue;
 import nl.idgis.downloadtool.queue.FeedbackQueueClient;
@@ -19,37 +26,111 @@ public class FeedbackProvider {
 
 	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
 	private static final String BEANSTALK_FEEDBACK_QUEUE = "BEANSTALK_FEEDBACK_QUEUE";
+
+	private static final String SMTP_HOST = "SMTP_HOST";
+
+	private static final String SMTP_PORT = "SMTP_PORT";
+
+	private static final String SMTP_FROMADDRESS = "SMTP_FROMADDRESS";
+
+	private static final String EMAIL_MESSAGE_TEMPLATE = "EMAIL_MESSAGE_TEMPLATE";
+
+	private static final String EMAIL_SUBJECT_TEMPLATE = "EMAIL_SUBJECT_TEMPLATE";
 	
 	private FeedbackQueue feedbackQueue;
+	private DownloadDao downloadDao;
+	
+	private String smtpHost;
+	private int smtpPort;
+	private String subjectTemplate, msgTemplate, fromAddress;
 
-	public FeedbackProvider(FeedbackQueue feedbackQueue) {
+	public FeedbackProvider(FeedbackQueue feedbackQueue, DownloadDao downloadDao) {
 		super();
 		this.feedbackQueue = feedbackQueue;
+		this.downloadDao = downloadDao;
 	}
 
     public void setFeedbackQueue(FeedbackQueue queueClient){
     	this.feedbackQueue = queueClient;
     }
     
-	private void processFeedback() throws Exception {
+	public String getSmtpHost() {
+		return smtpHost;
+	}
+
+	public void setSmtpHost(String smtpHost) {
+		this.smtpHost = smtpHost;
+	}
+
+	public int getSmtpPort() {
+		return smtpPort;
+	}
+
+	public void setSmtpPort(int smtpPort) {
+		this.smtpPort = smtpPort;
+	}
+
+	public String getSubjectTemplate() {
+		return subjectTemplate;
+	}
+
+	public void setSubjectTemplate(String subjectTemplate) {
+		this.subjectTemplate = subjectTemplate;
+	}
+
+	public String getMsgTemplate() {
+		return msgTemplate;
+	}
+
+	public void setMsgTemplate(String msgTemplate) {
+		this.msgTemplate = msgTemplate;
+	}
+
+	public String getFromAddress() {
+		return fromAddress;
+	}
+
+	public void setFromAddress(String fromAddress) {
+		this.fromAddress = fromAddress;
+	}
+
+	public void processFeedback() throws Exception {
 		/*
 		 * get feedback from queue
 		 */
 		Feedback feedback = feedbackQueue.receiveFeedback();
 		log.debug("Feedback received: " + feedback);
 
+		/*
+		 * put feedback in db
+		 */
+		DownloadResultInfo downloadResultInfo = new DownloadResultInfo(feedback);
+		downloadDao.createDownloadResultInfo(downloadResultInfo);
+		
 		/* 
 		 * assemble email from:
 		 *   - database data using feedback.getRequestId()
 		 *   - email templates from configuration 
 		 */
-		// TODO assemble email
-		
-		/*
-		 * send email
-		 */
-		//TODO send email
-		
+		DownloadRequestInfo downloadRequestInfo = downloadDao.readDownloadRequestInfo(feedback.getRequestId());
+		if (downloadRequestInfo != null){
+			// TODO assemble email
+			Map<String,Object> placeholders = new HashMap<String,Object>();
+			placeholders.put("username", downloadRequestInfo.getUserName());
+			placeholders.put("featuretype", downloadRequestInfo.getDownload().getFt().getName());
+			String subject = Mail.createMsg(placeholders, subjectTemplate);
+			String msg = Mail.createMsg(placeholders, msgTemplate);
+			
+			/*
+			 * send email
+			 */
+			//TODO send email and log exceptions 
+			log.debug("Send email: " + subject);
+			// Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+		} else {
+			// not to be expected but no action
+			log.debug("not found requestinfo in db for id: " + feedback.getRequestId());
+		}
 		/*
 		 * delete feedback item from queue
 		 */
@@ -60,6 +141,9 @@ public class FeedbackProvider {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/*
+		 * Get environment vars
+		 */
 		String host = System.getenv(BEANSTALK_HOST);
 		if(host == null) {
 			host = "localhost";
@@ -68,13 +152,41 @@ public class FeedbackProvider {
 		if(feedbackTubeName == null) {
 			feedbackTubeName = "feedbackOkTube";
 		}
+		String smtpHost = System.getenv(SMTP_HOST);
+		if(smtpHost == null) {
+			smtpHost = "localhost";
+		}
+		String smtpPortStr = System.getenv(SMTP_PORT);
+		if(smtpPortStr == null) {
+			smtpPortStr = "25";
+		}
+		int smtpPort= Integer.parseInt(smtpPortStr);
+
+		String smtpFromAddress = System.getenv(SMTP_FROMADDRESS);
+		if(smtpFromAddress == null) {
+			smtpFromAddress = "mail@idgis.nl";
+		}
+		String msgTemplate = System.getenv(EMAIL_MESSAGE_TEMPLATE);
+		if(msgTemplate == null) {
+			msgTemplate = "There is a downloadlink available for ${username} concerning ${featuretype}";
+		}
+		String subjectTemplate = System.getenv(EMAIL_SUBJECT_TEMPLATE);
+		if(subjectTemplate == null) {
+			subjectTemplate = "Geoportaal downloader: ${featuretype} is available for download";
+		}
 		
 		try {
 			log.info("start loop ");
 			
-			// setup queue client
 			FeedbackQueueClient feedbackQueueClient = new FeedbackQueueClient(host, feedbackTubeName); 
-			FeedbackProvider fbp = new FeedbackProvider(feedbackQueueClient);
+			DownloadDao downloadDao = new DownloadDao();
+			// setup provider
+			FeedbackProvider fbp = new FeedbackProvider(feedbackQueueClient, downloadDao);
+			fbp.setSmtpHost(smtpHost);
+			fbp.setSmtpPort(smtpPort);
+			fbp.setFromAddress(smtpFromAddress);
+			fbp.setMsgTemplate(msgTemplate);
+			fbp.setSubjectTemplate(subjectTemplate);
 			
 			for (;;) {
 				log.debug("processFeedback");
@@ -82,7 +194,7 @@ public class FeedbackProvider {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info("end loop ");
+			log.info("end loop: " + e.getMessage());
 		}
 
 	}
