@@ -1,7 +1,6 @@
 package nl.idgis.downloadtool.downloader;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.idgis.commons.cache.Cache;
-import nl.idgis.commons.cache.FileCache;
 import nl.idgis.commons.cache.ZippedCache;
 import nl.idgis.commons.convert.Convert;
 import nl.idgis.commons.convert.ConverterFactory;

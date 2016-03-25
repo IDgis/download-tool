@@ -19,6 +19,8 @@ import org.easymock.MockType;
 import org.easymock.TestSubject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
@@ -35,7 +37,8 @@ import nl.idgis.downloadtool.queue.FeedbackQueue;
  */
 @RunWith(EasyMockRunner.class)
 public class TestProcessor  extends EasyMockSupport {
-
+	private static final Logger log = LoggerFactory.getLogger(TestProcessor.class);
+	
 	@TestSubject
 	private DownloadProcessor downloadProcessor = new DownloadProcessor(System.getProperty("user.home"));
 
@@ -66,6 +69,7 @@ public class TestProcessor  extends EasyMockSupport {
 	 */
 	@Test
 	public void testPerformDownload() {
+		log.debug("testPerformDownload");
 		try {
 			downloadProcessor.performDownload(null);
 			fail("Exception expected");
