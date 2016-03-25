@@ -57,18 +57,7 @@ project(':downloadtool-queue') {
     }
 }
 
-project(':downloadtool-feedback') {
-    dependencies {
-        compile project(':downloadtool-dao')
-        compile project(':downloadtool-domain')
-        compile project(':downloadtool-queue')
-        
-        compile 'com.dinstone:beanstalkc:2.2.0'
-    }
-
-}
-
-project(':downloadtool-downloader') {
+project(':downloadtool-downloadrequest') {
 	apply plugin: 'application'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
@@ -77,17 +66,11 @@ project(':downloadtool-downloader') {
         compile project(':downloadtool-dao')
         compile project(':downloadtool-domain')
         compile project(':downloadtool-queue')
-
-		compile 'com.dinstone:beanstalkc:2.2.0'
-    	compile 'org.apache.httpcomponents:httpclient:4.3.1'
-	    
-	    compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
-	    compile 'nl.idgis.commons:commons-convert:0.0.15-SNAPSHOT'
-	    compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
+        
+        compile 'com.dinstone:beanstalkc:2.2.0'
     }
-    
-    mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
-    
+    mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
+   
 	task copyTar(type: Copy) {
 		dependsOn distTar
 		from "${project.buildDir}/distributions/${project.name}.tar"
@@ -108,6 +91,88 @@ project(':downloadtool-downloader') {
 		inputDir = project.file('build/docker')
 		tag = "${project.name}"
 	}
+
 }
+
+project(':downloadtool-feedback') {
+	apply plugin: 'application'
+	apply plugin: 'eclipse'
+	apply plugin: 'com.bmuschko.docker-remote-api'
+
+    dependencies {
+        compile project(':downloadtool-dao')
+        compile project(':downloadtool-domain')
+        compile project(':downloadtool-queue')
+        
+        compile 'com.dinstone:beanstalkc:2.2.0'
+    }
+    mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
+
+   	task copyTar(type: Copy) {
+		dependsOn distTar
+		from "${project.buildDir}/distributions/${project.name}.tar"
+		into "${project.buildDir}/docker"
+	}
+	
+	task createDockerfile(type: Dockerfile) {
+		dependsOn copyTar
+		destFile = project.file('build/docker/Dockerfile')
+		from 'java'
+		copyFile "${project.name}.tar", '/opt'
+		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
+		defaultCommand "/opt/${project.name}/bin/${project.name}"
+	}
+	
+	task buildImage(type: DockerBuildImage) {
+		dependsOn createDockerfile
+		inputDir = project.file('build/docker')
+		tag = "${project.name}"
+	}
+}
+
+project(':downloadtool-downloader') {
+	apply plugin: 'application'
+	apply plugin: 'eclipse'
+	apply plugin: 'com.bmuschko.docker-remote-api'
+
+
+    dependencies {
+        compile project(':downloadtool-dao')
+        compile project(':downloadtool-domain')
+        compile project(':downloadtool-queue')
+
+		compile 'com.dinstone:beanstalkc:2.2.0'
+    	compile 'org.apache.httpcomponents:httpclient:4.3.1'
+	    
+	    compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
+	    compile 'nl.idgis.commons:commons-convert:0.0.15-SNAPSHOT'
+	    compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
+    }
+    
+    mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
+    
+    task copyTar(type: Copy) {
+		dependsOn distTar
+		from "${project.buildDir}/distributions/${project.name}.tar"
+		into "${project.buildDir}/docker"
+	}
+	
+	task createDockerfile(type: Dockerfile) {
+		dependsOn copyTar
+		destFile = project.file('build/docker/Dockerfile')
+		from 'java'
+		copyFile "${project.name}.tar", '/opt'
+		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
+		defaultCommand "/opt/${project.name}/bin/${project.name}"
+	}
+	
+	task buildImage(type: DockerBuildImage) {
+		dependsOn createDockerfile
+		inputDir = project.file('build/docker')
+		tag = "${project.name}"
+	}
+    
+}    
+
 
 defaultTasks 'clean', 'build', 'buildImage'

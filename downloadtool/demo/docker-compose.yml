@@ -29,4 +29,10 @@ services:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
       
+  downloadrequest:
+    image: downloadtool-downloadrequest
+    restart: always
+    environment:
+      BEANSTALK_HOST: beanstalk
+      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
   
