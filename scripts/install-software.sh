@@ -18,4 +18,4 @@ if [[ ! -e /usr/local/bin/docker-compose ]]; then
 	
 fi
 
-cp /vagrant/scripts/beanstalkd-settings /etc/default/beanstalkd
+cp /download-tool/scripts/beanstalkd-settings /etc/default/beanstalkd
