@@ -132,4 +132,157 @@ public class TestProcessor  extends EasyMockSupport {
 		verify(errorFeedbackQueueMock);
 	}
 
+	private DownloadRequest makeRequestStrooizout(String mimetype, String extension) {
+		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
+		Download download = new Download();
+		download.setName("strooiroutes" + mimetype);
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("B2_Strooiroutes_preventief_Provincie");
+		ft.setExtension(extension);
+		ft.setServiceUrl("http://acc-services.geodataoverijssel.nl/geoserver/B22_wegen/wfs");
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype(mimetype);
+		download.setFt(ft);
+		AdditionalData additionalDataLayer = new AdditionalData();
+		additionalDataLayer.setName("strooiroutes");
+		additionalDataLayer.setExtension("lyr");
+		additionalDataLayer
+				.setUrl("http://gisopenbaar.overijssel.nl/GeoPortal/MIS4GIS/lyr/strooiroutes%20provincie_arc.lyr");
+		AdditionalData additionalDataMetadata = new AdditionalData();
+		additionalDataMetadata.setName("metadata");
+		additionalDataMetadata.setExtension("xml");
+		additionalDataMetadata.setUrl(
+				"http://acc-metadata.geodataoverijssel.nl/metadata/dataset/cd349c2f-b2fe-4ed6-b2b9-a00639ebcebb.xml");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalDataLayer);
+		additionalDataList.add(additionalDataMetadata);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		downloadRequest.setConvertToMimetype(mimetype);
+		return downloadRequest;
+	}
+
+	@Test
+	public void testStrooiroutesKML() throws Exception {
+		DownloadRequest downloadRequest = makeRequestStrooizout("KML", "kml");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	@Test
+	public void testStrooiroutesSHP() throws Exception {
+		DownloadRequest downloadRequest = makeRequestStrooizout("SHAPE-ZIP", "zip");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	/**
+	 * Fill wfsMimetype with null to test correct behaviour in processor.
+	 * @param extension
+	 * @return
+	 */
+	private DownloadRequest makeRequestRayongrenzen(String extension) {
+		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
+		Download download = new Download();
+		download.setName("Rayongrenzen" + "_" + extension);
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("B1_Rayongrenzen_eenheid_WK");
+		ft.setExtension(extension);
+		ft.setServiceUrl("http://test-services.geodataoverijssel.nl/geoserver/B14_bestuurlijke_grenzen/wfs");
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype(null);
+		download.setFt(ft);
+		AdditionalData additionalDataLayer = new AdditionalData();
+		additionalDataLayer.setName("Rayongrenzen");
+		additionalDataLayer.setExtension("lyr");
+		additionalDataLayer
+				.setUrl("http://gisopenbaar.overijssel.nl/GeoPortal/MIS4GIS/lyr/rayonwk_polygon.lyr");
+		AdditionalData additionalDataMetadata = new AdditionalData();
+		additionalDataMetadata.setName("metadata");
+		additionalDataMetadata.setExtension("xml");
+		additionalDataMetadata.setUrl(
+				"http://test-metadata.geodataoverijssel.nl/metadata/dataset/7e03c460-f8b1-4ada-97e7-1ad2dfe98be8.xml");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalDataLayer);
+		additionalDataList.add(additionalDataMetadata);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		return downloadRequest;
+	}
+
+
+	@Test
+	public void testRayongrenzenGML3() throws Exception {
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("gml");
+		downloadRequest.setConvertToMimetype("gml32");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	@Test
+	public void testRayongrenzenDXF() throws Exception {
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("zip");
+		downloadRequest.setConvertToMimetype("DXF-ZIP");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	@Test
+	public void testRayongrenzenXXX() throws Exception {
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("xxx");
+		downloadRequest.setConvertToMimetype("XXX");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		errorFeedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(errorFeedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(errorFeedbackQueueMock);
+	}
+
+	
+	
+	
 }

@@ -86,8 +86,7 @@ public class DownloadWfs implements DownloadSource {
 
 	@Override
 	public InputStream open() throws IOException {
-			response = httpclient.execute(httpPost);
-	
+		response = httpclient.execute(httpPost);
 		log.debug("Http response: " + response.getStatusLine());
 		entity = response.getEntity();
 		// do something useful with the response body

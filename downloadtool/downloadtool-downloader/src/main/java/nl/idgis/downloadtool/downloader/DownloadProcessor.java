@@ -40,7 +40,9 @@ import nl.idgis.downloadtool.queue.FeedbackQueueClient;
  */
 public class DownloadProcessor {
 	private static final Logger log = LoggerFactory.getLogger(DownloadProcessor.class);
-
+	
+	private static final int BUF_SIZE = 4096;
+	
 	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
 	private static final String ZIPCACHEPATH = "ZIP_CACHEPATH";
 	private static final String BEANSTALK_DOWNLOAD_QUEUE = "BEANSTALK_DOWNLOAD_QUEUE";
@@ -89,7 +91,7 @@ public class DownloadProcessor {
     		/*
     		 * Download Wfs data and put into temporary cache.
     		 * Reason for a temp cache is that the converter closes the cache stream
-    		 * and no further item can be put into it afterwards. 
+    		 * and no further item (AdditionalData) can be put into it afterwards. 
     		 */
     		WfsFeatureType ft = download.getFt();
     		// temporary cache for the wfs data
@@ -145,6 +147,9 @@ public class DownloadProcessor {
 		
 		long featureCount = -1;
 		OutputStream dstStream = downloadCache.writeItem(ft.getName() + "." + ft.getExtension());
+		if (ft.getWfsMimetype() == null || ft.getWfsMimetype().isEmpty()){
+			ft.setWfsMimetype(convertToMimetype);
+		}
 		DownloadSource source = new DownloadWfs(ft);
 		ConverterFactory converterFactory = new ConverterFactory();
 		/*
@@ -152,7 +157,7 @@ public class DownloadProcessor {
 		 */
 		BufferedInputStream srcStream = new BufferedInputStream(source.open());
 		// test if at http 200 OK an exceptionreport is send instead of the expected content
-		// testExceptionReport(fromStream);			
+		testExceptionReport(srcStream);			
 		
 		/*
 		 * Start download and conversion from Wfs 
@@ -200,11 +205,12 @@ public class DownloadProcessor {
 		try {
 			long featureCount = performDownload(downloadRequest);
 			feedback.setResultCode("OK");
+			log.debug("Feedback OK: " + feedback);
 			feedbackQueue.sendFeedback(feedback);
 		} catch (Exception e1) {
-			log.debug("Exception: " + e1);
 			e1.printStackTrace();
 			feedback.setResultCode(e1.getMessage());
+			log.debug("Feedback NOK: " + feedback);
 			errorFeedbackQueue.sendFeedback(feedback);
 		}
 		
@@ -227,6 +233,43 @@ public class DownloadProcessor {
 		}
 		return total;
 	}
+
+	/**
+	 * Test if the stream contains an exception report instead of an expected feature collection.
+	 * @param fromStream stream to test for content "ExceptionReport"
+	 * @return true if stream was read and reset, false if the stream has to be reopened
+	 * @throws IOException if stream could not be read
+	 * @throws UnsupportedEncodingException
+	 * @throws Exception containing an ExceptionReport if one occurred
+	 */
+	private boolean testExceptionReport(BufferedInputStream fromStream) throws IOException, UnsupportedEncodingException,
+	IllegalArgumentException {
+		int bytesRead = BUF_SIZE - 2; 
+		boolean markSupported = fromStream.markSupported();
+		if (markSupported){ 
+			fromStream.mark(bytesRead);
+			log.debug("Inputstream mark supported, test if ExceptionReport is send and reset stream");
+		}else{
+			log.debug("Inputstream mark/reset not supported, read stream for ExceptionReport and reopen stream");
+		}
+		byte[] b = new byte [bytesRead];
+		fromStream.read(b);
+		String s = new String(b, "UTF-8");
+		// remove x00 bytes at the end
+		s = s.substring(0, s.lastIndexOf(">") + 1);
+		if (s.indexOf("ExceptionReport")>0){
+			log.debug("found an ExceptionReport: ");
+			throw new IllegalArgumentException("ExceptionReport: " + s);
+		}else if (s.indexOf("FeatureCollection")>0){
+			log.trace("found a FeatureCollection: ");
+		}else{
+			// do nothing, in future there may be KML or other formats read from the source
+		}
+		if (markSupported) 
+			fromStream.reset();
+		return markSupported;
+	}
+
 	
 	public static void main(String... args){
 		String path = System.getenv(ZIPCACHEPATH);
