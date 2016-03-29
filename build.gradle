@@ -87,6 +87,16 @@ configure([
 	}
 }
 
+allprojects {
+	afterEvaluate { project ->
+		if(project.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
+			project.docker {
+				url = "http://${dockerHost}:2375"
+			}
+		}
+	}
+}
+
 project(':dao') {
 	dependencies {
 		compile project(':domain')
