@@ -18,8 +18,27 @@ subprojects {
 	
 	group = 'nl.idgis.downloadtool'
 	repositories {
-		jcenter()
+		maven {
+			name = "geotoolkit"
+			url "http://maven.geotoolkit.org/"
+		}
 		mavenCentral()
+		maven {
+			name "idgis-public"
+			url "http://nexus.idgis.eu/content/groups/public/"
+			credentials {
+				username nexusUser 
+				password nexusPassword
+			}
+		}
+		maven {
+			name "idgis-restricted"
+			url "http://nexus.idgis.eu/content/groups/restricted/"
+			credentials {
+				username nexusUser 
+				password nexusPassword
+			}
+		}
 	}
 	
 	dependencies {
@@ -34,7 +53,7 @@ subprojects {
 project(':dao') {
 	dependencies {
 		compile project(':domain')
-		compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
+		compile 'nl.idgis.commons:commons-utils:0.0.14'
 	
 	}
 }
@@ -92,7 +111,7 @@ project(':feedback') {
 		compile project(':dao')
 		compile project(':domain')
 		compile project(':queue')		
-		compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'	
+		compile 'nl.idgis.commons:commons-utils:0.0.14'	
 		compile 'com.dinstone:beanstalkc:2.2.0'
 	}
 
@@ -132,9 +151,9 @@ project(':downloader') {
 		compile project(':queue')
 		compile 'com.dinstone:beanstalkc:2.2.0'
 		compile 'org.apache.httpcomponents:httpclient:4.3.1'
-		compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
-		compile 'nl.idgis.commons:commons-convert:0.0.15-SNAPSHOT'
-		compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
+		compile 'nl.idgis.commons:commons-cache:0.0.14'
+		compile 'nl.idgis.commons:commons-convert:0.0.14'
+		compile 'nl.idgis.commons:commons-utils:0.0.14'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
