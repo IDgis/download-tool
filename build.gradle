@@ -50,6 +50,37 @@ subprojects {
 	}
 }
 
+configure([
+	project(':request'),
+	project(':feedback'),
+	project(':downloader')]) {
+	
+	apply plugin: 'application'
+	apply plugin: 'eclipse'
+	apply plugin: 'com.bmuschko.docker-remote-api'
+	
+	task copyTar(type: Copy) {
+		dependsOn distTar
+		from "${project.buildDir}/distributions/${project.name}.tar"
+		into "${project.buildDir}/docker"
+	}
+
+	task createDockerfile(type: Dockerfile) {
+		dependsOn copyTar
+		destFile = project.file('build/docker/Dockerfile')
+		from 'java'
+		copyFile "${project.name}.tar", '/opt'
+		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
+		defaultCommand "/opt/${project.name}/bin/${project.name}"
+	}
+
+	task buildImage(type: DockerBuildImage) {
+		dependsOn createDockerfile
+		inputDir = project.file('build/docker')
+		tag = "${project.name}"
+	}
+}
+
 project(':dao') {
 	dependencies {
 		compile project(':domain')
@@ -67,9 +98,6 @@ project(':queue') {
 }
 
 project(':request') {
-	apply plugin: 'application'
-	apply plugin: 'eclipse'
-	apply plugin: 'com.bmuschko.docker-remote-api'
 
 	dependencies {
 		compile project(':dao')
@@ -79,33 +107,9 @@ project(':request') {
 	}
 	
 	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
-
-	task copyTar(type: Copy) {
-		dependsOn distTar
-		from "${project.buildDir}/distributions/${project.name}.tar"
-		into "${project.buildDir}/docker"
-	}
-	
-	task createDockerfile(type: Dockerfile) {
-		dependsOn copyTar
-		destFile = project.file('build/docker/Dockerfile')
-		from 'java'
-		copyFile "${project.name}.tar", '/opt'
-		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
-		defaultCommand "/opt/${project.name}/bin/${project.name}"
-	}
-	
-	task buildImage(type: DockerBuildImage) {
-		dependsOn createDockerfile
-		inputDir = project.file('build/docker')
-		tag = "${project.name}"
-	}
 }
 
 project(':feedback') {
-	apply plugin: 'application'
-	apply plugin: 'eclipse'
-	apply plugin: 'com.bmuschko.docker-remote-api'
 
 	dependencies {
 		compile project(':dao')
@@ -116,34 +120,9 @@ project(':feedback') {
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
-
-	task copyTar(type: Copy) {
-		dependsOn distTar
-		from "${project.buildDir}/distributions/${project.name}.tar"
-		into "${project.buildDir}/docker"
-	}
-	
-	task createDockerfile(type: Dockerfile) {
-		dependsOn copyTar
-		destFile = project.file('build/docker/Dockerfile')
-		from 'java'
-		copyFile "${project.name}.tar", '/opt'
-		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
-		defaultCommand "/opt/${project.name}/bin/${project.name}"
-	}
-	
-	task buildImage(type: DockerBuildImage) {
-		dependsOn createDockerfile
-		inputDir = project.file('build/docker')
-		tag = "${project.name}"
-	}
 }
 
 project(':downloader') {
-	apply plugin: 'application'
-	apply plugin: 'eclipse'
-	apply plugin: 'com.bmuschko.docker-remote-api'
-
 
 	dependencies {
 		compile project(':dao')
@@ -157,27 +136,6 @@ project(':downloader') {
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
-
-	task copyTar(type: Copy) {
-		dependsOn distTar
-		from "${project.buildDir}/distributions/${project.name}.tar"
-		into "${project.buildDir}/docker"
-	}
-	
-	task createDockerfile(type: Dockerfile) {
-		dependsOn copyTar
-		destFile = project.file('build/docker/Dockerfile')
-		from 'java'
-		copyFile "${project.name}.tar", '/opt'
-		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
-		defaultCommand "/opt/${project.name}/bin/${project.name}"
-	}
-	
-	task buildImage(type: DockerBuildImage) {
-		dependsOn createDockerfile
-		inputDir = project.file('build/docker')
-		tag = "${project.name}"
-	}
 }
 
 defaultTasks 'clean', 'build', 'buildImage'
