@@ -1,4 +1,3 @@
-build.commands=org.eclipse.jdt.core.javabuilder
 connection.arguments=
 connection.gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
 connection.gradle.user.home=null
@@ -6,5 +5,4 @@ connection.java.home=null
 connection.jvm.arguments=
 connection.project.dir=
 eclipse.preferences.version=1
-natures=org.eclipse.jdt.core.javanature
 project.path=\:
