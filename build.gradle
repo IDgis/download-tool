@@ -55,6 +55,12 @@ configure([
 	project(':feedback'),
 	project(':downloader')]) {
 	
+	dependencies {
+		compile project(':dao')
+		compile project(':domain')
+		compile project(':queue')
+	}
+	
 	apply plugin: 'application'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
@@ -98,25 +104,14 @@ project(':queue') {
 }
 
 project(':request') {
-
-	dependencies {
-		compile project(':dao')
-		compile project(':domain')
-		compile project(':queue')
-		compile 'com.dinstone:beanstalkc:2.2.0'
-	}
 	
 	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
 }
 
 project(':feedback') {
 
-	dependencies {
-		compile project(':dao')
-		compile project(':domain')
-		compile project(':queue')		
+	dependencies {		
 		compile 'nl.idgis.commons:commons-utils:0.0.14'	
-		compile 'com.dinstone:beanstalkc:2.2.0'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
@@ -125,10 +120,6 @@ project(':feedback') {
 project(':downloader') {
 
 	dependencies {
-		compile project(':dao')
-		compile project(':domain')
-		compile project(':queue')
-		compile 'com.dinstone:beanstalkc:2.2.0'
 		compile 'org.apache.httpcomponents:httpclient:4.3.1'
 		compile 'nl.idgis.commons:commons-cache:0.0.14'
 		compile 'nl.idgis.commons:commons-convert:0.0.14'
