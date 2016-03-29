@@ -39,3 +39,6 @@ services:
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+      
+  db:
+    build: db
