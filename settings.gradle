@@ -1,5 +1,1 @@
-
-rootProject.name = 'downloadtool'
-include 'downloadtool-domain', 'downloadtool-dao', 
-   'downloadtool-queue' , 'downloadtool-feedback', 'downloadtool-downloader',
-   'downloadtool-downloadrequest'
+include 'domain', 'dao', 'queue' , 'feedback', 'downloader', 'request'

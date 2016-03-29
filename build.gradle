@@ -43,31 +43,31 @@ subprojects {
 	
 }
 
-project(':downloadtool-dao') {
+project(':dao') {
     dependencies {
-        compile project(':downloadtool-domain')
+        compile project(':domain')
         compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
 	
     }
 }
 
-project(':downloadtool-queue') {
+project(':queue') {
     dependencies {
-        compile project(':downloadtool-domain')
+        compile project(':domain')
         compile 'com.google.code.gson:gson:2.5'
         compile 'com.dinstone:beanstalkc:2.2.0'
     }
 }
 
-project(':downloadtool-downloadrequest') {
+project(':request') {
 	apply plugin: 'application'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
 
     dependencies {
-        compile project(':downloadtool-dao')
-        compile project(':downloadtool-domain')
-        compile project(':downloadtool-queue')
+        compile project(':dao')
+        compile project(':domain')
+        compile project(':queue')
         
         compile 'com.dinstone:beanstalkc:2.2.0'
     }
@@ -96,15 +96,15 @@ project(':downloadtool-downloadrequest') {
 
 }
 
-project(':downloadtool-feedback') {
+project(':feedback') {
 	apply plugin: 'application'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
 
     dependencies {
-        compile project(':downloadtool-dao')
-        compile project(':downloadtool-domain')
-        compile project(':downloadtool-queue')
+        compile project(':dao')
+        compile project(':domain')
+        compile project(':queue')
         
         compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'
 	
@@ -134,16 +134,16 @@ project(':downloadtool-feedback') {
 	}
 }
 
-project(':downloadtool-downloader') {
+project(':downloader') {
 	apply plugin: 'application'
 	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
 
 
     dependencies {
-        compile project(':downloadtool-dao')
-        compile project(':downloadtool-domain')
-        compile project(':downloadtool-queue')
+        compile project(':dao')
+        compile project(':domain')
+        compile project(':queue')
 
 		compile 'com.dinstone:beanstalkc:2.2.0'
     	compile 'org.apache.httpcomponents:httpclient:4.3.1'
