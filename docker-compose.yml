@@ -6,7 +6,7 @@ services:
     restart: always
 
   downloader:
-    image: downloadtool-downloader
+    image: downloader
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
@@ -15,42 +15,30 @@ services:
       BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
       ZIP_CACHEPATH : /tmp/cache
     volumes:
-    - ./cache:/tmp/cache/       
+    - ./cache:/tmp/cache/
     
-  feedbackOK:
-    image: downloadtool-feedback
+  feedback_ok:
+    image: feedback
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
       SMTP_HOST: mail
       
-  feedbackERROR:
-    image: downloadtool-feedback
+  feedback_error:
+    image: feedback
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
       SMTP_HOST: mail
       
-  downloadrequest:
-    image: downloadtool-downloadrequest
+  request:
+    image: request
     restart: always
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-  
-  mail:
-    image: tvial/docker-mailserver
-    hostname: solcon.nl
-    domainname: idgis.nl
-    # your FQDN will be 'mail.domain.com'
-    ports:
-    - "25:25"
-    - "143:143"
-    - "587:587"
-    - "993:993"
-    volumes:
-    - ./spamassassin:/tmp/spamassassin/
-    - ./postfix:/tmp/postfix/
-  
+      
+  db:
+    build: db

@@ -1,0 +1,132 @@
+
+buildscript {
+	repositories {
+		jcenter()
+		mavenCentral()
+	}
+
+	dependencies {
+		classpath 'com.bmuschko:gradle-docker-plugin:2.6.5'
+	}
+}
+
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+
+subprojects {
+	apply plugin: 'java'
+	
+	group = 'nl.idgis.downloadtool'
+	repositories {
+		maven {
+			name = "geotoolkit"
+			url "http://maven.geotoolkit.org/"
+		}
+		mavenCentral()
+		maven {
+			name "idgis-public"
+			url "http://nexus.idgis.eu/content/groups/public/"
+			credentials {
+				username nexusUser 
+				password nexusPassword
+			}
+		}
+		maven {
+			name "idgis-restricted"
+			url "http://nexus.idgis.eu/content/groups/restricted/"
+			credentials {
+				username nexusUser 
+				password nexusPassword
+			}
+		}
+	}
+	
+	dependencies {
+		compile 'org.slf4j:slf4j-api:1.7.14'
+		compile 'org.slf4j:slf4j-log4j12:1.7.14'
+
+		testCompile 'junit:junit:4.12'
+		testCompile 'org.easymock:easymock:3.4'
+	}
+}
+
+configure([
+	project(':request'),
+	project(':feedback'),
+	project(':downloader')]) {
+	
+	dependencies {
+		compile project(':dao')
+		compile project(':domain')
+		compile project(':queue')
+	}
+	
+	apply plugin: 'application'
+	apply plugin: 'eclipse'
+	apply plugin: 'com.bmuschko.docker-remote-api'
+	
+	task copyTar(type: Copy) {
+		dependsOn distTar
+		from "${project.buildDir}/distributions/${project.name}.tar"
+		into "${project.buildDir}/docker"
+	}
+
+	task createDockerfile(type: Dockerfile) {
+		dependsOn copyTar
+		destFile = project.file('build/docker/Dockerfile')
+		from 'java'
+		copyFile "${project.name}.tar", '/opt'
+		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
+		defaultCommand "/opt/${project.name}/bin/${project.name}"
+	}
+
+	task buildImage(type: DockerBuildImage) {
+		dependsOn createDockerfile
+		inputDir = project.file('build/docker')
+		tag = "${project.name}"
+	}
+}
+
+project(':dao') {
+	dependencies {
+		compile project(':domain')
+		compile 'nl.idgis.commons:commons-utils:0.0.14'
+	
+	}
+}
+
+project(':queue') {
+	dependencies {
+		compile project(':domain')
+		compile 'com.google.code.gson:gson:2.5'
+		compile 'com.dinstone:beanstalkc:2.2.0'
+	}
+}
+
+project(':request') {
+	
+	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
+}
+
+project(':feedback') {
+
+	dependencies {		
+		compile 'nl.idgis.commons:commons-utils:0.0.14'	
+	}
+
+	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
+}
+
+project(':downloader') {
+
+	dependencies {
+		compile 'org.apache.httpcomponents:httpclient:4.3.1'
+		compile 'nl.idgis.commons:commons-cache:0.0.14'
+		compile 'nl.idgis.commons:commons-convert:0.0.14'
+		compile 'nl.idgis.commons:commons-utils:0.0.14'
+	}
+
+	mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
+}
+
+defaultTasks 'clean', 'build', 'buildImage'
