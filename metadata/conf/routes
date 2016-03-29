@@ -1,0 +1,1 @@
+GET		/download/*id		controllers.Download.get(id: String)

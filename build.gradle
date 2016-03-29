@@ -14,9 +14,9 @@ import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 
 subprojects {
-	apply plugin: 'java'
 	
 	group = 'nl.idgis.downloadtool'
+	
 	repositories {
 		maven {
 			name = "geotoolkit"
@@ -40,30 +40,98 @@ subprojects {
 			}
 		}
 	}
+}
+
+// java projects
+configure([
+	project(':dao'),
+	project(':domain'),
+	project(':queue'),
+	project(':request'),
+	project(':feedback'),
+	project(':downloader')]) {
+	
+	apply plugin: 'java'
 	
 	dependencies {
 		compile 'org.slf4j:slf4j-api:1.7.14'
 		compile 'org.slf4j:slf4j-log4j12:1.7.14'
-
+		
 		testCompile 'junit:junit:4.12'
 		testCompile 'org.easymock:easymock:3.4'
 	}
+}	
+
+// play projects
+configure([
+	project(':metadata')]) {
+	
+	apply plugin: 'play'
+	apply plugin: 'com.bmuschko.docker-remote-api'
+	
+	repositories {
+		jcenter()
+		maven {
+			name "typesafe-maven-release"
+			url "https://repo.typesafe.com/typesafe/maven-releases"
+		}
+		ivy {
+			name "typesafe-ivy-release"
+			url "https://repo.typesafe.com/typesafe/ivy-releases"
+			layout "ivy"
+		}
+	}
+	
+	model {
+		components {
+			play {
+				platform play: '2.4.6', scala: '2.11', java: '1.8'
+				injectedRoutesGenerator = true
+			}
+		}
+		
+		tasks {
+			copyTar(Copy) {
+				dependsOn createPlayBinaryTarDist
+				from "${project.buildDir}/distributions/playBinary.tar"
+				into "${project.buildDir}/docker"
+			}
+			
+			createDockerfile(Dockerfile) {
+				dependsOn copyTar
+				destFile = project.file('build/docker/Dockerfile')
+				from 'java'
+				copyFile "playBinary.tar", '/opt'
+				runCommand "cd /opt; tar -xvf playBinary.tar; rm playBinary.tar; chmod u+x playBinary/bin/playBinary"
+				exposePort 9000
+				defaultCommand "/opt/playBinary/bin/playBinary"
+			}
+			
+			buildImage(DockerBuildImage) {
+				dependsOn createDockerfile
+				inputDir = project.file('build/docker')
+				tag = "${project.name}"
+			}
+		}
+	}
+	
 }
 
+// application projects
 configure([
 	project(':request'),
 	project(':feedback'),
 	project(':downloader')]) {
+	
+	apply plugin: 'application'
+	apply plugin: 'eclipse'
+	apply plugin: 'com.bmuschko.docker-remote-api'
 	
 	dependencies {
 		compile project(':dao')
 		compile project(':domain')
 		compile project(':queue')
 	}
-	
-	apply plugin: 'application'
-	apply plugin: 'eclipse'
-	apply plugin: 'com.bmuschko.docker-remote-api'
 	
 	task copyTar(type: Copy) {
 		dependsOn distTar
@@ -87,6 +155,7 @@ configure([
 	}
 }
 
+// configure docker plugin
 allprojects {
 	afterEvaluate { project ->
 		if(project.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
@@ -94,6 +163,12 @@ allprojects {
 				url = "http://${dockerHost}:2375"
 			}
 		}
+	}
+}
+
+project('metadata') {
+	dependencies {
+		play project(':domain')
 	}
 }
 
