@@ -128,9 +128,14 @@ public class FeedbackProvider {
 			/*
 			 * send email
 			 */
-			//TODO send email and log exceptions 
-			log.debug("Send email: " + subject);
-			// Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+			log.debug("Send email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
+			 try {
+				Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.debug("Exception while trying to send email: " + e.getMessage());
+			}
 		} else {
 			// not to be expected but no action
 			log.debug("not found requestinfo in db for id: " + feedback.getRequestId());
@@ -188,7 +193,7 @@ public class FeedbackProvider {
 		}
 		String dbUrl = System.getenv(DB_URL);
 		if (dbUrl==null){
-			dbUrl = "jdbc:postgresql://db:5432/download";
+			dbUrl = "jdbc:postgresql://localhost:5432/download";
 		}
 		
 		try {

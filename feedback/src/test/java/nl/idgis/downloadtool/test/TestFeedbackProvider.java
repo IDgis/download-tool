@@ -67,7 +67,7 @@ public class TestFeedbackProvider   extends EasyMockSupport{
 		additionalDataList.add(additionalData);
 		download.setAdditionalData(additionalDataList);
 		downloadRequestInfo = 
-			new DownloadRequestInfo(requestId, "uuid", "userName", "userEmailAddress", "userFormat", download) ;
+			new DownloadRequestInfo(requestId, "uuid", "user", "user@email.nl", "KML", download) ;
 	}
 
 	@Test
