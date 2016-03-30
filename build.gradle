@@ -169,6 +169,8 @@ allprojects {
 project('metadata') {
 	dependencies {
 		play project(':domain')
+		play 'org.webjars:webjars-play_2.11:2.4.0-2'
+		play 'nl.idgis.geoportaal:md-stylesheets:1.0.4'
 	}
 }
 
