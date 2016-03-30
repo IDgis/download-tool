@@ -7,7 +7,7 @@ create table test(id serial, test text);
 create table result_info(
 	id serial,
 	request_id text,
-	response_time timestamp;
+	response_time timestamp,
 	response_code text
 );
 
@@ -20,5 +20,4 @@ create table request_info(
 	user_name text,
 	user_emailaddress text,
 	user_format text
-	
 );
