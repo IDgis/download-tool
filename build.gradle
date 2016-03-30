@@ -12,6 +12,7 @@ buildscript {
 
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import org.gradle.plugins.ide.eclipse.model.SourceFolder
 
 subprojects {
 	
@@ -52,6 +53,7 @@ configure([
 	project(':downloader')]) {
 	
 	apply plugin: 'java'
+	apply plugin: 'eclipse'
 	
 	dependencies {
 		compile 'org.slf4j:slf4j-api:1.7.14'
@@ -66,8 +68,10 @@ configure([
 configure([
 	project(':metadata')]) {
 	
+	apply plugin: 'java-base'
 	apply plugin: 'play'
 	apply plugin: 'com.bmuschko.docker-remote-api'
+	apply plugin: 'eclipse'
 	
 	repositories {
 		jcenter()
@@ -115,6 +119,19 @@ configure([
 		}
 	}
 	
+	eclipse {
+		classpath {
+			plusConfigurations += [ configurations.play ]
+			plusConfigurations += [ configurations.playTest ]
+
+			file {
+				beforeMerged { classpath ->
+					classpath.entries += [
+					new SourceFolder("app", null)]
+				}
+			}
+		}
+	}
 }
 
 // application projects
@@ -124,7 +141,6 @@ configure([
 	project(':downloader')]) {
 	
 	apply plugin: 'application'
-	apply plugin: 'eclipse'
 	apply plugin: 'com.bmuschko.docker-remote-api'
 	
 	dependencies {
