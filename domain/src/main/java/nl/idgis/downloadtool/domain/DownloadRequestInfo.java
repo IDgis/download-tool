@@ -1,7 +1,6 @@
 package nl.idgis.downloadtool.domain;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 /**
  * Represents the download_request_job table in the downloadBean database.<br>
@@ -11,25 +10,29 @@ import java.util.List;
  */
 public class DownloadRequestInfo {
 
-    long id; // unique pk
+	private long id; // unique pk
     
-    String requestId; // unique logische sleutel (uuid)
+	private String requestId; // unique logische sleutel (uuid)
     
-    Timestamp requestTime; // not null
+	private Timestamp requestTime; // not null
     
-    Download download; //json  of jsonb ?
+	private Download download; //json  of jsonb ?
     
     /* 
      * items from form
      */
-    String uuid; // identifies the dataset 
+	private String uuid; // identifies the dataset 
     
-    String userName;
+	private String userName;
     
-    String userEmailAddress;
+	private String userEmailAddress;
     
-    String userFormat; // mime type the user wants to receive the data in (shp, kml, gml or dxf)
+	private String userFormat; // mime type the user wants to receive the data in (shp, kml, gml or dxf)
 
+	public DownloadRequestInfo() {
+		super();
+	}
+    
 	public DownloadRequestInfo(String requestId, String uuid, String userName, String userEmailAddress, String userFormat, Download download) {
 		super();
 		this.requestId = requestId; 
@@ -87,6 +90,6 @@ public class DownloadRequestInfo {
 	public void setUserFormat(String userFormat) {
 		this.userFormat = userFormat;
 	}
-    
+
     
 }
