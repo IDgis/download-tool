@@ -3,6 +3,7 @@
  */
 package nl.idgis.downloadtool.downloadrequest;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,10 +11,13 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequest;
+import nl.idgis.downloadtool.domain.DownloadRequestInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
+import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
 
 /**
@@ -25,8 +29,20 @@ public class DownloadRequestController {
 
 	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
 	private static final String BEANSTALK_DOWNLOAD_QUEUE = "BEANSTALK_DOWNLOAD_QUEUE";
+
+	private static final String DB_URL = "DB_URL";
+	private static final String DB_USER = "DB_USER";
+	private static final String DB_PW = "DB_PW";
 	
-//	private DownloadQueue queueClient;
+	private DownloadDao downloadDao;
+	
+	private DownloadQueue queueClient;
+
+	public DownloadRequestController(DownloadQueue queueClient, DownloadDao downloadDao) {
+		super();
+		this.queueClient = queueClient;
+		this.downloadDao = downloadDao;
+	}
 
 	/**
 	 * temporary test method to inject DownloadRequests every few seconds.
@@ -41,19 +57,32 @@ public class DownloadRequestController {
 		if(downloadQueueTubeName == null) {
 			downloadQueueTubeName = "downloadRequestTube";
 		}
+		String dbUser = System.getenv(DB_USER);
+		if (dbUser==null){
+			dbUser = "postgres";
+		}
+		String dbPassword = System.getenv(DB_PW);
+		if (dbPassword==null){
+			dbPassword = "postgres";
+		}
+		String dbUrl = System.getenv(DB_URL);
+		if (dbUrl==null){
+			dbUrl = "jdbc:postgresql://localhost:5432/download";
+		}
+		
 		
 		try {
 			log.info("start loop ");
 			
 			// setup queue client
-			DownloadQueueClient downloadQueueClient = new DownloadQueueClient(host, downloadQueueTubeName);
-			DownloadRequestController fbp = new DownloadRequestController();
+			DownloadQueue queueClient = new DownloadQueueClient(host, downloadQueueTubeName);
+			DownloadDao downloadDao = new DownloadDao(dbUrl, dbUser, dbPassword);
 			
 			for (;;) {
 				Thread.sleep(10000);
 				
-				String uuid = UUID.randomUUID().toString();
-				DownloadRequest downloadRequest = new DownloadRequest(uuid);
+				String requestId = UUID.randomUUID().toString();
+				DownloadRequest downloadRequest = new DownloadRequest(requestId);
 				log.debug("processDownloadRequest " + downloadRequest);
 				
 				Download download = new Download();
@@ -75,8 +104,17 @@ public class DownloadRequestController {
 				download.setAdditionalData(additionalDataList);
 				downloadRequest.setDownload(download);
 				downloadRequest.setConvertToMimetype("KML");
+
+				try {
+					DownloadRequestInfo requestInfo = new DownloadRequestInfo(
+							requestId, UUID.randomUUID().toString(), "rjstek", "rs@idgis.nl", "KML", download);
+					downloadDao.createDownloadRequestInfo(requestInfo);
+				} catch (SQLException e) {
+					e.printStackTrace();
+					log.debug("Exception while inserting requestInfo into db: " + e.getMessage());
+				}
 				
-				downloadQueueClient.sendDownloadRequest(downloadRequest);
+				queueClient.sendDownloadRequest(downloadRequest);
 				
 			}
 		} catch (Exception e) {
