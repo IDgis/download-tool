@@ -4,14 +4,14 @@ create database download;
 
 create table test(id serial, test text);
 
-create tabel result_info(
+create table result_info(
 	id serial,
 	request_id text,
 	response_time timestamp;
 	response_code text
 );
 
-create tabel request_info(
+create table request_info(
 	id serial,
 	request_id text,
 	request_time timestamp,
