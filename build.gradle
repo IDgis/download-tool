@@ -195,7 +195,8 @@ project(':dao') {
 	dependencies {
 		compile project(':domain')
 		compile 'nl.idgis.commons:commons-utils:0.0.14'
-	
+		compile 'org.postgresql:postgresql:9.4.1208.jre7'
+		compile 'com.google.code.gson:gson:2.5'
 	}
 }
 

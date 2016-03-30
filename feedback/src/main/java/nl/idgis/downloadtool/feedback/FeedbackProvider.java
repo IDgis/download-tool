@@ -27,6 +27,10 @@ public class FeedbackProvider {
 	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
 	private static final String BEANSTALK_FEEDBACK_QUEUE = "BEANSTALK_FEEDBACK_QUEUE";
 
+	private static final String DB_URL = "DB_URL";
+	private static final String DB_USER = "DB_USER";
+	private static final String DB_PW = "DB_PW";
+	
 	private static final String SMTP_HOST = "SMTP_HOST";
 
 	private static final String SMTP_PORT = "SMTP_PORT";
@@ -124,9 +128,14 @@ public class FeedbackProvider {
 			/*
 			 * send email
 			 */
-			//TODO send email and log exceptions 
-			log.debug("Send email: " + subject);
-			// Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+			log.debug("Send email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
+			 try {
+				Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				log.debug("Exception while trying to send email: " + e.getMessage());
+			}
 		} else {
 			// not to be expected but no action
 			log.debug("not found requestinfo in db for id: " + feedback.getRequestId());
@@ -174,12 +183,24 @@ public class FeedbackProvider {
 		if(subjectTemplate == null) {
 			subjectTemplate = "Geoportaal downloader: ${featuretype} is available for download";
 		}
+		String dbUser = System.getenv(DB_USER);
+		if (dbUser==null){
+			dbUser = "postgres";
+		}
+		String dbPassword = System.getenv(DB_PW);
+		if (dbPassword==null){
+			dbPassword = "postgres";
+		}
+		String dbUrl = System.getenv(DB_URL);
+		if (dbUrl==null){
+			dbUrl = "jdbc:postgresql://localhost:5432/download";
+		}
 		
 		try {
 			log.info("start loop ");
 			
-			FeedbackQueueClient feedbackQueueClient = new FeedbackQueueClient(host, feedbackTubeName); 
-			DownloadDao downloadDao = new DownloadDao();
+			FeedbackQueueClient feedbackQueueClient = new FeedbackQueueClient(host, feedbackTubeName);
+			DownloadDao downloadDao = new DownloadDao(dbUrl, dbUser, dbPassword);
 			// setup provider
 			FeedbackProvider fbp = new FeedbackProvider(feedbackQueueClient, downloadDao);
 			fbp.setSmtpHost(smtpHost);
