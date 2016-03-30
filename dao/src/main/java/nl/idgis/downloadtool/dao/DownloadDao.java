@@ -5,6 +5,7 @@ package nl.idgis.downloadtool.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -47,6 +48,7 @@ public class DownloadDao {
 		this.dbUrl = connectionStr; 
 		this.dbUser = user;          
 		this.dbPw = pw;  
+		log.debug("dbUrl" +dbUrl);
 		
 		gson = new Gson();
 
@@ -58,12 +60,23 @@ public class DownloadDao {
 	
 	public void createDownloadRequestInfo(DownloadRequestInfo downloadRequestInfo) throws SQLException {
 		Connection conn = null;
-		Statement stmt = null;
-		downloadRequestInfo.setRequestTime(DateTimeUtils.now());
+		PreparedStatement stmt = null;
 		try {
 			conn = getConnection();
+			String sql;
+			sql = "INSERT INTO request_info (request_id, request_time, download, user_name, user_emailaddress, user_format)  "+
+				"VALUES(?, now(), ?, ?, ?, ?);";
+			log.debug("createDownloadRequestInfo sql: " + sql); 
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, downloadRequestInfo.getRequestId());
+			String json = gson.toJson(downloadRequestInfo.getDownload());
+			stmt.setString(2, json);
+			stmt.setString(3, downloadRequestInfo.getUserName());
+			stmt.setString(4, downloadRequestInfo.getUserEmailAddress());
+			stmt.setString(5, downloadRequestInfo.getUserFormat());
 			
-			
+			int count = stmt.executeUpdate();
+			log.debug("createDownloadRequestInfo insert #records: " + count); 
 		} catch (SQLException e) {
 			throw e;
 		} finally {
@@ -91,28 +104,16 @@ public class DownloadDao {
 			stmt = conn.createStatement();
 			String sql;
 			sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
+			log.debug("readDownloadRequestInfo sql: " + sql); 
 			ResultSet rs = stmt.executeQuery(sql);
-			int rowcount = 0;
-			if (rs.last()) {
-			  rowcount = rs.getRow();
-			  rs.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
-			}
-			if (rowcount == 1) {
-				Timestamp requestTime = null;
-				String json = null;
-				String uuid = null;
-				String userName = null;
-				String userEmailaddress = null;
-				String userFormat = null;
-
-				while (rs.next()) {
-					requestTime = rs.getTimestamp("request_time");
-					json = rs.getString("download");
-					uuid = rs.getString("uuid");
-					userName = rs.getString("user_name");
-					userEmailaddress = rs.getString("user_emailaddress");
-					userFormat = rs.getString("user_format");
-				}
+			if (rs.next()) {
+				Timestamp requestTime = rs.getTimestamp("request_time");
+				log.debug("readDownloadRequestInfo requestTime: " + requestTime); 
+				String json = rs.getString("download");
+				String uuid = rs.getString("uuid");
+				String userName = rs.getString("user_name");
+				String userEmailaddress = rs.getString("user_emailaddress");
+				String userFormat = rs.getString("user_format");
 				downloadRequestInfo = new DownloadRequestInfo();
 				downloadRequestInfo.setRequestId(requestId);
 				downloadRequestInfo.setRequestTime(requestTime);
@@ -144,11 +145,17 @@ public class DownloadDao {
 	
 	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException{
 		Connection conn = null;
-		Statement stmt = null;
-		downloadResultInfo.setResponseTime(DateTimeUtils.now());
+		PreparedStatement stmt = null;
 		try {
 			conn = getConnection();
-			
+			String sql;
+			sql = "INSERT INTO result_info (request_id, response_time, response_code) VALUES(?, now(), ?);";
+			log.debug("createDownloadResultInfo sql: " + sql); 
+			stmt = conn.prepareStatement(sql);
+			stmt.setString(1, downloadResultInfo.getRequestId());
+			stmt.setString(2, downloadResultInfo.getResponseCode());
+			int count = stmt.executeUpdate();
+			log.debug("createDownloadResultInfo insert #records: " + count); 
 		} catch (SQLException e) {
 			throw e;
 		} finally {
@@ -175,20 +182,13 @@ public class DownloadDao {
 			conn = getConnection();
 			stmt = conn.createStatement();
 			String sql;
-			sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
+			sql = "SELECT * FROM result_info WHERE request_id='" + requestId + "'";
+			log.debug("readDownloadResultInfo sql: " + sql); 
 			ResultSet rs = stmt.executeQuery(sql);
-			int rowcount = 0;
-			if (rs.last()) {
-			  rowcount = rs.getRow();
-			  rs.beforeFirst(); // not rs.first() because the rs.next() below will move on, missing the first element
-			}
-			if (rowcount == 1) {
-				Timestamp responseTime = null;
-				String responseCode = null;
-				while (rs.next()) {
-					responseTime = rs.getTimestamp("response_time");
-					responseCode = rs.getString("response_code");
-				}
+			if (rs.next()) {
+				Timestamp responseTime = rs.getTimestamp("response_time");
+				log.debug("readDownloadResultInfo responseTime: " + responseTime); 
+				String responseCode = rs.getString("response_code");
 				downloadResultInfo = new DownloadResultInfo();
 				downloadResultInfo.setRequestId(requestId);
 				downloadResultInfo.setResponseCode(responseCode);

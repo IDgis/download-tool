@@ -24,6 +24,10 @@ services:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
       SMTP_HOST: mail
+      SMTP_PORT: 25
+      DB_USER: postgres
+      DB_PW: postgres
+      DB_URL: "jdbc:postgresql://db:5432/download"
       
   feedback_error:
     image: feedback
@@ -32,6 +36,10 @@ services:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
       SMTP_HOST: mail
+      SMTP_PORT: 25
+      DB_USER: postgres
+      DB_PW: postgres
+      DB_URL: "jdbc:postgresql://db:5432/download"
       
   request:
     image: request
@@ -39,6 +47,9 @@ services:
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+      DB_USER: postgres
+      DB_PW: postgres
+      DB_URL: "jdbc:postgresql://db:5432/download"
       
   db:
     build: db
