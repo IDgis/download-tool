@@ -92,6 +92,12 @@ configure([
 			play {
 				platform play: '2.4.6', scala: '2.11', java: '1.8'
 				injectedRoutesGenerator = true
+				
+				sources {
+					twirlTemplates {
+						defaultImports = TwirlImports.JAVA
+					}
+				}
 			}
 		}
 		
