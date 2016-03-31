@@ -66,7 +66,8 @@ configure([
 
 // play projects
 configure([
-	project(':metadata')]) {
+	project(':metadata'),
+	project(':form')]) {
 	
 	apply plugin: 'java-base'
 	apply plugin: 'play'
@@ -132,6 +133,11 @@ configure([
 			}
 		}
 	}
+	
+	dependencies {
+		play 'org.webjars:webjars-play_2.11:2.4.0-2'
+		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
+	}
 }
 
 // application projects
@@ -185,9 +191,16 @@ allprojects {
 project('metadata') {
 	dependencies {
 		play project(':domain')
-		play 'org.webjars:webjars-play_2.11:2.4.0-2'
-		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
 		play 'nl.idgis.geoportaal:md-stylesheets:1.0.4'
+	}
+}
+
+project('form') {
+	dependencies {
+		play project(':domain')
+		play project(':dao')
+		play project(':queue')
+		play 'org.webjars:bootstrap:3.3.6'
 	}
 }
 

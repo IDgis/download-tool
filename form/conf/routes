@@ -1,0 +1,1 @@
+GET		/webjars/*file		controllers.WebJarAssets.at(file)
