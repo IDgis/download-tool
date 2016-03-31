@@ -1,4 +1,5 @@
-@(webJarAssets: WebJarAssets, title: String, outputFormats: List[models.OutputFormat])
+@(webJarAssets: WebJarAssets, info: DownloadInfo, form: Form[DownloadRequest])
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -18,7 +19,7 @@
 			<h1 class="header">Download bestand</h1>
 		</div>
 		
-		<p class="title">@title</p>
+		<p class="title">@info.title</p>
 		
 		<div class="welcome">
 			<p>Om dit bestand te downloaden vul je onderstaande velden in.</p>
@@ -26,52 +27,64 @@
 			<p>Je krijgt dan een download-link in de mailbox.</p>
 		</div>
 		
-		<form class="form-horizontal" method="post" action="@routes.Form.post()">
-			<div class="form-group format-choice">
-				<label class="col-md-2 control-label">
-					<span>Kies formaat</span>
-				</label>
-				<div class="col-md-8">
-					<div class="checkbox">
-						@for((outputFormat, idx) <- outputFormats.zipWithIndex) {
-		 					<label>
-								<input type="checkbox" name="format" value="@outputFormat.name()" @if(idx == 0) { checked }>
-									<span>
-										<strong>@outputFormat.title()</strong>
-									</span>
-							</label>
-						}
+		@helper.form(action = routes.DownloadForm.post(), 'class -> "form-horizontal") {
+			@defining(form("id")) { idField =>
+				<input type="hidden" id="name" name="name" value="@idField.value">
+			}
+			@defining(form("format")) { formatField =>
+				<div class="form-group format-choice">
+					<label class="col-md-2 control-label">
+						<span>Kies formaat</span>
+					</label>
+					<div class="col-md-8">
+						<div class="checkbox">
+							@for(outputFormat <- info.outputFormats) {
+			 					<label>
+									<input type="radio" name="format" value="@outputFormat.name()" @if(formatField.value == outputFormat.name()) { checked }>
+										<span>
+											<strong>@outputFormat.title</strong>
+										</span>
+								</label>
+							}
+						</div>
+					</div>
+		 		</div>
+		 	}
+		 	
+		 	@defining(form("name")) { nameField =>
+				<div class="form-group ">
+					<label class="col-sm-2 control-label" for="name">Naam</label>
+					<div class="col-sm-8">
+						<input type="text" id="name" name="name" value="@nameField.value" class="form-control" placeholder="Naam" title="Vul naam in"/>
 					</div>
 				</div>
-	 		</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">Naam</label>
+		 	}
+		 	
+		 	@defining(form("email")) { emailField =>
+		 		<div class="form-group ">
+				<label class="col-sm-2 control-label" for="email">E-mailadres</label>
 				<div class="col-sm-8">
-					<input type="text" class="form-control" placeholder="Naam" data-toggle="tooltip" data-placement="top" title="Vul naam in">
+						<input type="email" id="email" name="email" value="@emailField.value" class="form-control" placeholder="E-mailadres" title="Vul e-mailadres in">
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<label class="col-sm-2 control-label">E-mailadres</label>
-				<div class="col-sm-8">
-					<input type="email" class="form-control" name="email" placeholder="E-mailadres" data-toggle="tooltip" data-placement="top" 
-					title="Vul e-mailadres in">
-				</div>
-			</div>
+		 	}
+	 		
 			<div class="form-group">
 	 			<div class="col-sm-offset-2 col-sm-10">
-	 				<button id="download-button" class="button" type="submit" name="file">Download</button>
+	 				<button id="download-button" class="button" type="submit">Download</button>
 	 				<a href="" class="button help-button">
 	 					Help
 	 				</a>
 				</div>
 			</div>
-			<div id="footer">
-				<p>Dit bestand wordt via het Geoportaal van Overijssel beschikbaar gesteld.</p>
-				<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
-				<p>Zijn er suggesties of vragen, neem dan contact op met
-					<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
-				</p>
-			</div>
-		</form>
+		}
+		
+		<div id="footer">
+			<p>Dit bestand wordt via het Geoportaal van Overijssel beschikbaar gesteld.</p>
+			<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
+			<p>Zijn er suggesties of vragen, neem dan contact op met
+				<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
+			</p>
+		</div>
 	</body>
 </html>
