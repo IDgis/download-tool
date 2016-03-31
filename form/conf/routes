@@ -1,1 +1,5 @@
+GET		/download/*id		controllers.Form.get(id: String)
+POST	/download			controllers.Form.post
+
+GET		/assets/*file		controllers.Assets.at(path="/public", file)
 GET		/webjars/*file		controllers.WebJarAssets.at(file)
