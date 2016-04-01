@@ -1,4 +1,4 @@
-@(webJarAssets: WebJarAssets, info: DownloadInfo, form: Form[DownloadRequest])
+@(webJarAssets: WebJarAssets, id: String, info: DownloadInfo, form: Form[DownloadRequest])
 
 @fieldErrors(field: Form.Field) = {
 	@for(error <- field.errors) {
@@ -47,8 +47,7 @@
 			<p>Je krijgt dan een download-link in de mailbox.</p>
 		</div>
 		
-		@helper.form(action = routes.DownloadForm.post(), 'class -> "form-horizontal") {
-			<input type="hidden" id="name" name="name" value='@form("id").value'>
+		@helper.form(action = routes.DownloadForm.post(id), 'class -> "form-horizontal") {
 			@defining(form("format")) { formatField =>
 				<div class="form-group format-choice">
 					<label class="col-md-2 control-label">

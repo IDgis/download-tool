@@ -40,19 +40,19 @@ public class DownloadForm extends Controller {
 	public Result get(String id) {
 		return ok(form.render(
 			webJarAssets,
+			id,
 			info(id), 
 			Form.form(DownloadRequest.class)));
 	}
 	
-	public Result post() {
+	public Result post(String id) {
 		Form<DownloadRequest> downloadForm = 
 			Form.form(DownloadRequest.class).bindFromRequest();
 		
 		if(downloadForm.hasErrors()) {
-			String id = downloadForm.field("id").value();
-			
 			return badRequest(form.render(
 				webJarAssets,
+				id,
 				info(id), 
 				downloadForm));
 		}
