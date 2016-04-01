@@ -63,7 +63,6 @@ div.welcome {
 }
 
 div.format-choice {
-	margin-bottom: 40px;
 	font-size: 18px;
 }
 
@@ -92,4 +91,10 @@ div.format-choice {
 	padding-top: 7px;
 	padding-bottom: 8px;
 	line-height: 20px;
+}
+
+.alert {
+	margin-top: 5px;
+	margin-bottom: 0px
+}
 }

@@ -1,5 +1,25 @@
 @(webJarAssets: WebJarAssets, info: DownloadInfo, form: Form[DownloadRequest])
 
+@fieldErrors(field: Form.Field) = {
+	@for(error <- field.errors) {
+		<div class="alert alert-danger">
+			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			<span class="sr-only">Error:</span>
+			@Messages(error.message)
+		</div>
+	}
+}
+
+@simpleField(field: Form.Field, inputType: String, label: String, placeholder: String, title: String) = {
+	<div class="form-group ">
+		<label class="col-sm-2 control-label" for="@field.name">@label</label>
+		<div class="col-sm-8">
+			<input type="@inputType" id="@field.name" name="@field.name" value="@field.value" class="form-control" placeholder="@placeholder" title="@title">
+			@fieldErrors(field)
+		</div>
+	</div>
+}
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -28,9 +48,7 @@
 		</div>
 		
 		@helper.form(action = routes.DownloadForm.post(), 'class -> "form-horizontal") {
-			@defining(form("id")) { idField =>
-				<input type="hidden" id="name" name="name" value="@idField.value">
-			}
+			<input type="hidden" id="name" name="name" value='@form("id").value'>
 			@defining(form("format")) { formatField =>
 				<div class="form-group format-choice">
 					<label class="col-md-2 control-label">
@@ -47,27 +65,24 @@
 								</label>
 							}
 						</div>
+						@fieldErrors(formatField)
 					</div>
 		 		</div>
 		 	}
 		 	
-		 	@defining(form("name")) { nameField =>
-				<div class="form-group ">
-					<label class="col-sm-2 control-label" for="name">Naam</label>
-					<div class="col-sm-8">
-						<input type="text" id="name" name="name" value="@nameField.value" class="form-control" placeholder="Naam" title="Vul naam in"/>
-					</div>
-				</div>
-		 	}
+		 	@simpleField(
+		 		field = form("name"),
+		 		inputType = "text", 
+		 		label = "Naam",
+		 		placeholder = "Naam",
+		 		title = "Vul naam in")
 		 	
-		 	@defining(form("email")) { emailField =>
-		 		<div class="form-group ">
-				<label class="col-sm-2 control-label" for="email">E-mailadres</label>
-				<div class="col-sm-8">
-						<input type="email" id="email" name="email" value="@emailField.value" class="form-control" placeholder="E-mailadres" title="Vul e-mailadres in">
-					</div>
-				</div>
-		 	}
+		 	@simpleField(
+		 		field = form("email"),
+		 		inputType = "email", 
+		 		label = "E-mailadres",
+		 		placeholder = "E-mailadres",
+		 		title = "Vul e-mailadres in")
 	 		
 			<div class="form-group">
 	 			<div class="col-sm-offset-2 col-sm-10">
