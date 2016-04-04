@@ -1,16 +1,11 @@
-package data;
+package models;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -33,6 +28,10 @@ public class MetadataDocument {
 		ns.put("gmd", "http://www.isotc211.org/2005/gmd");
 		ns.put("gco", "http://www.isotc211.org/2005/gco");
 		return Collections.unmodifiableMap(ns);
+	}
+	
+	public Document getDocument() {
+		return document;
 	}
 	
 	public String getWFSUrl() {
@@ -78,20 +77,6 @@ public class MetadataDocument {
 			} else {
 				return new QName(namespaceURI, localName);
 			}
-		}
-	}
-	
-	public byte[] asBytes() {
-		try {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer t = tf.newTransformer();
-			t.transform(new DOMSource(document), new StreamResult(output));
-			
-			return output.toByteArray();
-		} catch(Exception e) {
-			throw new RuntimeException(e);
 		}
 	}
 }
