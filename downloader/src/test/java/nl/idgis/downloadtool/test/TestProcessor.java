@@ -200,7 +200,7 @@ public class TestProcessor  extends EasyMockSupport {
 	 * @param extension
 	 * @return
 	 */
-	private DownloadRequest makeRequestRayongrenzen(String extension) {
+	private DownloadRequest makeRequestRayongrenzen(String mimetype, String extension) {
 		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
 		Download download = new Download();
 		download.setName("Rayongrenzen" + "_" + extension);
@@ -210,7 +210,7 @@ public class TestProcessor  extends EasyMockSupport {
 		ft.setExtension(extension);
 		ft.setServiceUrl("http://test-services.geodataoverijssel.nl/geoserver/B14_bestuurlijke_grenzen/wfs");
 		ft.setServiceVersion("2.0.0");
-		ft.setWfsMimetype(null);
+		ft.setWfsMimetype(mimetype);
 		download.setFt(ft);
 		AdditionalData additionalDataLayer = new AdditionalData();
 		additionalDataLayer.setName("Rayongrenzen");
@@ -233,7 +233,7 @@ public class TestProcessor  extends EasyMockSupport {
 
 	@Test
 	public void testRayongrenzenGML3() throws Exception {
-		DownloadRequest downloadRequest = makeRequestRayongrenzen("gml");
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("gml32", "gml");
 		downloadRequest.setConvertToMimetype("gml32");
 		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
 		queueClientMock.deleteDownloadRequest(downloadRequest);
@@ -250,7 +250,7 @@ public class TestProcessor  extends EasyMockSupport {
 
 	@Test
 	public void testRayongrenzenDXF() throws Exception {
-		DownloadRequest downloadRequest = makeRequestRayongrenzen("zip");
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("DXF-ZIP", "zip");
 		downloadRequest.setConvertToMimetype("DXF-ZIP");
 		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
 		queueClientMock.deleteDownloadRequest(downloadRequest);
@@ -267,7 +267,7 @@ public class TestProcessor  extends EasyMockSupport {
 
 	@Test
 	public void testRayongrenzenXXX() throws Exception {
-		DownloadRequest downloadRequest = makeRequestRayongrenzen("xxx");
+		DownloadRequest downloadRequest = makeRequestRayongrenzen("XXX", "xxx");
 		downloadRequest.setConvertToMimetype("XXX");
 		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
 		queueClientMock.deleteDownloadRequest(downloadRequest);
