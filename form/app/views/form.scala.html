@@ -20,85 +20,58 @@
 	</div>
 }
 
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta content="text/html" charset="utf-8">
-		<title>Geoportaal Overijssel</title>
-		<link href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet">
-		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
-	</head>
-	<body>
-		<div class="logo">
-			<a href="http://www.overijssel.nl">
-				<img src='@routes.Assets.at("images/logo_overijssel.png")' alt="Responsive image"></img>
-			</a>
-		</div>
-		
-		<div class="titlebar">
-			<h1 class="header">Download bestand</h1>
-		</div>
-		
-		<p class="title">@info.title</p>
-		
-		<div class="welcome">
-			<p>Om dit bestand te downloaden vul je onderstaande velden in.</p>
-			<p>Klik daarna op download.</p>
-			<p>Je krijgt dan een download-link in de mailbox.</p>
-		</div>
-		
-		@helper.form(action = routes.DownloadForm.post(id), 'class -> "form-horizontal") {
-			@defining(form("format")) { formatField =>
-				<div class="form-group format-choice">
-					<label class="col-md-2 control-label">
-						<span>Kies formaat</span>
-					</label>
-					<div class="col-md-8">
-						<div class="checkbox">
-							@for(outputFormat <- info.outputFormats) {
-			 					<label>
-									<input type="radio" name="format" value="@outputFormat.name()" @if(formatField.value == outputFormat.name()) { checked }>
-										<span>
-											<strong>@outputFormat.title</strong>
-										</span>
-								</label>
-							}
-						</div>
-						@fieldErrors(formatField)
+@layout(webJarAssets) {
+	<p class="title">@info.title</p>
+	
+	<div class="welcome">
+		<p>Om dit bestand te downloaden vul je onderstaande velden in.</p>
+		<p>Klik daarna op download.</p>
+		<p>Je krijgt dan een download-link in de mailbox.</p>
+	</div>
+	
+	@helper.form(action = routes.DownloadForm.post(id), 'class -> "form-horizontal") {
+		@defining(form("format")) { formatField =>
+			<div class="form-group format-choice">
+				<label class="col-md-2 control-label">
+					<span>Kies formaat</span>
+				</label>
+				<div class="col-md-8">
+					<div class="checkbox">
+						@for(outputFormat <- info.outputFormats) {
+		 					<label>
+								<input type="radio" name="format" value="@outputFormat.name()" @if(formatField.value == outputFormat.name()) { checked }>
+									<span>
+										<strong>@outputFormat.title</strong>
+									</span>
+							</label>
+						}
 					</div>
-		 		</div>
-		 	}
-		 	
-		 	@simpleField(
-		 		field = form("name"),
-		 		inputType = "text", 
-		 		label = "Naam",
-		 		placeholder = "Naam",
-		 		title = "Vul naam in")
-		 	
-		 	@simpleField(
-		 		field = form("email"),
-		 		inputType = "email", 
-		 		label = "E-mailadres",
-		 		placeholder = "E-mailadres",
-		 		title = "Vul e-mailadres in")
-	 		
-			<div class="form-group">
-	 			<div class="col-sm-offset-2 col-sm-10">
-	 				<button id="download-button" class="button" type="submit">Download</button>
-	 				<a href="" class="button help-button">
-	 					Help
-	 				</a>
+					@fieldErrors(formatField)
 				</div>
+	 		</div>
+	 	}
+	 	
+	 	@simpleField(
+	 		field = form("name"),
+	 		inputType = "text", 
+	 		label = "Naam",
+	 		placeholder = "Naam",
+	 		title = "Vul naam in")
+	 	
+	 	@simpleField(
+	 		field = form("email"),
+	 		inputType = "email", 
+	 		label = "E-mailadres",
+	 		placeholder = "E-mailadres",
+	 		title = "Vul e-mailadres in")
+ 		
+		<div class="form-group">
+ 			<div class="col-sm-offset-2 col-sm-10">
+ 				<button id="download-button" class="button" type="submit">Download</button>
+ 				<a href="" class="button help-button">
+ 					Help
+ 				</a>
 			</div>
-		}
-		
-		<div id="footer">
-			<p>Dit bestand wordt via het Geoportaal van Overijssel beschikbaar gesteld.</p>
-			<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
-			<p>Zijn er suggesties of vragen, neem dan contact op met
-				<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
-			</p>
 		</div>
-	</body>
-</html>
+	}
+}
