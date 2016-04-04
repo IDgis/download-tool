@@ -1,6 +1,7 @@
 GET		/download/*id		controllers.DownloadForm.get(id: String)
-POST	/download/*id		controllers.DownloadForm.post(id: String)
-GET		/help				controllers.DownloadForm.help()
+POST		/download/*id		controllers.DownloadForm.post(id: String)
+GET		/metadata/*id		controllers.Metadata.get(id: String)
+GET		/help			controllers.DownloadForm.help()
 
 GET		/assets/*file		controllers.Assets.at(path="/public", file)
 GET		/webjars/*file		controllers.WebJarAssets.at(file)

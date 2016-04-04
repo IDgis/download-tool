@@ -66,7 +66,6 @@ configure([
 
 // play projects
 configure([
-	project(':metadata'),
 	project(':web')]) {
 	
 	apply plugin: 'java-base'
@@ -194,19 +193,13 @@ allprojects {
 	}
 }
 
-project('metadata') {
-	dependencies {
-		play project(':domain')
-		play 'nl.idgis.geoportaal:md-stylesheets:1.0.4'
-	}
-}
-
 project('web') {
 	dependencies {
 		play project(':domain')
 		play project(':dao')
 		play project(':queue')
 		play 'org.webjars:bootstrap:3.3.6'
+		play 'nl.idgis.geoportaal:md-stylesheets:1.0.4'
 	}
 }
 

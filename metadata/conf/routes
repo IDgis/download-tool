@@ -1,3 +1,0 @@
-GET		/download/*id		controllers.DownloadRequest.get(id: String)
-GET		/metadata/*id		controllers.Metadata.get(id: String)
-GET		/webjars/*file		controllers.WebJarAssets.at(file)
