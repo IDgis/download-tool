@@ -66,7 +66,7 @@ public class MetadataDocument {
 		String name = node.getTextContent();
 		int separatorIdx = name.indexOf(":");
 		if(separatorIdx == -1) {
-			return new QName(XMLConstants.NULL_NS_URI, name);			 
+			return new QName(XMLConstants.NULL_NS_URI, name);
 		} else {
 			String prefix = name.substring(0, separatorIdx);
 			String localName = name.substring(separatorIdx + 1);
@@ -78,5 +78,18 @@ public class MetadataDocument {
 				return new QName(namespaceURI, localName);
 			}
 		}
+	}
+	
+	public String getTitle() {
+		return XPath.selectNode(
+			"/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:citation"
+			+ "/gmd:CI_Citation"
+			+ "/gmd:title"
+			+ "/gco:CharacterString",
+			document,
+			NS).getTextContent();
 	}
 }

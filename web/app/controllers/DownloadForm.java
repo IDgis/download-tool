@@ -13,6 +13,7 @@ import data.MetadataProvider;
 
 import models.DownloadInfo;
 import models.DownloadRequest;
+import models.MetadataDocument;
 import models.OutputFormat;
 
 import play.data.Form;
@@ -31,6 +32,15 @@ public class DownloadForm extends Controller {
 	
 	private final static String STYLESHEET = "datasets/intern/metadata.xsl";
 	
+	private final static List<OutputFormat> FORMATS = 
+			Collections.unmodifiableList(
+				Arrays.asList(
+					new OutputFormat("shp", "SHP"),
+					new OutputFormat("gml21", "GML 2.1"),
+					new OutputFormat("gml32", "GML 3.2"),
+					new OutputFormat("kml", "KML"),
+					new OutputFormat("dxf", "DXF")));
+	
 	private final WebJarAssets webJarAssets;
 	
 	private final MetadataProvider metadataProvider;
@@ -41,77 +51,77 @@ public class DownloadForm extends Controller {
 		this.metadataProvider = metadataProvider;
 	}
 	
-	private DownloadInfo info(String id) {
-		
-		List<OutputFormat> formats = Arrays.asList(
-			new OutputFormat("shp", "SHP"),
-			new OutputFormat("gml21", "GML 2.1"),
-			new OutputFormat("gml32", "GML 3.2"),
-			new OutputFormat("kml", "KML"),
-			new OutputFormat("dxf", "DXF"));
-		
-		return new DownloadInfo(id, Collections.unmodifiableList(formats));
-	}
-	
-	public Result get(String id) {
-		return ok(form.render(
-			webJarAssets,
-			id,
-			info(id), 
-			Form.form(DownloadRequest.class)));
+	public Promise<Result> get(String id) {
+		return metadataProvider.get(id).map(optionalMetadataDocument -> {
+			if(optionalMetadataDocument.isPresent()) {
+				MetadataDocument metadataDocument = optionalMetadataDocument.get();
+				
+				return ok(form.render(
+					webJarAssets,
+					id,
+					new DownloadInfo(
+						metadataDocument.getTitle(), 
+						FORMATS),
+					Form.form(DownloadRequest.class)));
+			} else {
+				return notFound();
+			}
+		});
 	}
 	
 	public Promise<Result> post(String id) {
-		Form<DownloadRequest> downloadForm = 
-			Form.form(DownloadRequest.class).bindFromRequest();
-		
-		if(downloadForm.hasErrors()) {
-			return Promise.pure(
-				badRequest(form.render(
-					webJarAssets,
-					id,
-					info(id), 
-					downloadForm)));
-		}
-		
-		DownloadRequest request = downloadForm.get();
-		
-		return metadataProvider.get(id).map(document -> {
-			if(!document.isPresent()) {
+		return metadataProvider.get(id).map(optionalMetadataDocument -> {
+			if(optionalMetadataDocument.isPresent()) {
+				MetadataDocument metadataDocument = optionalMetadataDocument.get();
+				
+				Form<DownloadRequest> downloadForm =  Form.form(DownloadRequest.class).bindFromRequest();
+					
+				if(downloadForm.hasErrors()) {
+					return badRequest(form.render(
+							webJarAssets,
+							id,
+							new DownloadInfo(
+								metadataDocument.getTitle(), 
+								FORMATS),
+							downloadForm));
+				}
+				
+				DownloadRequest request = downloadForm.get();
+				
+				List<AdditionalData> additionalData = new ArrayList<>();
+
+				AdditionalData stylesheet = new AdditionalData();
+				stylesheet.setName("metadata");
+				stylesheet.setExtension("xsl");
+				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET)).absoluteURL(request()));
+				additionalData.add(stylesheet);
+
+				AdditionalData metadata = new AdditionalData();
+				metadata.setName(id);
+				metadata.setExtension("xml");
+				metadata.setUrl(routes.Metadata.get(id).absoluteURL(request()));
+				additionalData.add(metadata);
+
+				WfsFeatureType ft = new WfsFeatureType();
+				ft.setServiceUrl(metadataDocument.getWFSUrl());
+
+				QName featureTypeName =metadataDocument.getFeatureTypeName();
+				String namespaceURI = featureTypeName.getNamespaceURI();
+
+				ft.setName(featureTypeName.getLocalPart());
+				if(!XMLConstants.NULL_NS_URI.equals(featureTypeName.getNamespaceURI())) {
+					ft.setNamespaceUri(namespaceURI);
+				}
+
+				Download download = new Download();
+				download.setName(id);
+				download.setFt(ft);
+				download.setAdditionalData(additionalData);
+
+				return ok("job created");
+			} else {
 				return notFound();
 			}
-
-			List<AdditionalData> additionalData = new ArrayList<>();
-
-			AdditionalData stylesheet = new AdditionalData();
-			stylesheet.setName("metadata");
-			stylesheet.setExtension("xsl");
-			stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET)).absoluteURL(request()));
-			additionalData.add(stylesheet);
-
-			AdditionalData metadata = new AdditionalData();
-			metadata.setName(id);
-			metadata.setExtension("xml");
-			metadata.setUrl(routes.Metadata.get(id).absoluteURL(request()));
-			additionalData.add(metadata);
-
-			WfsFeatureType ft = new WfsFeatureType();
-			ft.setServiceUrl(document.get().getWFSUrl());
-
-			QName featureTypeName = document.get().getFeatureTypeName();
-			String namespaceURI = featureTypeName.getNamespaceURI();
-
-			ft.setName(featureTypeName.getLocalPart());
-			if(!XMLConstants.NULL_NS_URI.equals(featureTypeName.getNamespaceURI())) {
-				ft.setNamespaceUri(namespaceURI);
-			}
-
-			Download download = new Download();
-			download.setName(id);
-			download.setFt(ft);
-			download.setAdditionalData(additionalData);
-
-			return ok("job created");
 		});
 	}
 	
