@@ -2,6 +2,10 @@ package models;
 
 import java.util.List;
 
+/**
+ * Information about a download. Used to build the the download request form.
+ *
+ */
 public class DownloadInfo {
 	
 	private final String title;

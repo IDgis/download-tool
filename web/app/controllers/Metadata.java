@@ -28,12 +28,20 @@ public class Metadata extends Controller {
 		this.metadataProvider = metadataProvider;
 	}
 	
+	/**
+	 * Retrieves metadata document and correctly set
+	 * the xml-stylesheet processing instruction. 
+	 * 
+	 * @param id metadata document id
+	 * @return http response
+	 */
 	public Promise<Result> get(String id) {
 		return metadataProvider.get(id).map(metadataDocument -> {
 			if(metadataDocument.isPresent()) {
 				Document document = metadataDocument.get().getDocument();
 				
-				// remove existing stylesheet (if any)
+				// remove existing xml-stylesheet processing 
+				// instruction (if any)
 				NodeList children = document.getChildNodes();
 				for(int i = 0; i < children.getLength(); i++) {
 					Node n = children.item(i);
@@ -45,7 +53,7 @@ public class Metadata extends Controller {
 					}
 				}
 				
-				// add stylesheet
+				// add xml-stylesheet processing instruction
 				document.insertBefore(
 					document.createProcessingInstruction(
 						"xml-stylesheet", 

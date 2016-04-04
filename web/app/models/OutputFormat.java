@@ -1,5 +1,9 @@
 package models;
 
+/**
+ * An download output format. Used to build the the download request form. 
+ *
+ */
 public class OutputFormat {
 	
 	private final String name, title;

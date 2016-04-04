@@ -51,6 +51,12 @@ public class DownloadForm extends Controller {
 		this.metadataProvider = metadataProvider;
 	}
 	
+	/**
+	 * Provides a download form for a metadata document.
+	 * 
+	 * @param id metadata document id
+	 * @return http response
+	 */
 	public Promise<Result> get(String id) {
 		return metadataProvider.get(id).map(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
@@ -69,25 +75,46 @@ public class DownloadForm extends Controller {
 		});
 	}
 	
+	/**
+	 * Receives a download request forms and creates a download job 
+	 * based on the form content and a metadata document. 
+	 * 
+	 * @param id metadata document id
+	 * @return http response
+	 */
 	public Promise<Result> post(String id) {
 		return metadataProvider.get(id).map(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
 				MetadataDocument metadataDocument = optionalMetadataDocument.get();
 				
-				Form<DownloadRequest> downloadForm =  Form.form(DownloadRequest.class).bindFromRequest();
+				Form<DownloadRequest> downloadRequestForm =  Form.form(DownloadRequest.class).bindFromRequest();
 					
-				if(downloadForm.hasErrors()) {
+				// check if form is filled in correctly
+				if(downloadRequestForm.hasErrors()) {
 					return badRequest(form.render(
 							webJarAssets,
 							id,
 							new DownloadInfo(
 								metadataDocument.getTitle(), 
 								FORMATS),
-							downloadForm));
+							downloadRequestForm));
 				}
 				
-				DownloadRequest request = downloadForm.get();
+				DownloadRequest downloadRequest = downloadRequestForm.get();
+
+				// specify feature type
+				WfsFeatureType ft = new WfsFeatureType();
+				ft.setServiceUrl(metadataDocument.getWFSUrl());
+
+				QName featureTypeName =metadataDocument.getFeatureTypeName();
+				String namespaceURI = featureTypeName.getNamespaceURI();
+
+				ft.setName(featureTypeName.getLocalPart());
+				if(!XMLConstants.NULL_NS_URI.equals(featureTypeName.getNamespaceURI())) {
+					ft.setNamespaceUri(namespaceURI);
+				}
 				
+				// add metadata document and stylesheet
 				List<AdditionalData> additionalData = new ArrayList<>();
 
 				AdditionalData stylesheet = new AdditionalData();
@@ -102,22 +129,16 @@ public class DownloadForm extends Controller {
 				metadata.setUrl(routes.Metadata.get(id).absoluteURL(request()));
 				additionalData.add(metadata);
 
-				WfsFeatureType ft = new WfsFeatureType();
-				ft.setServiceUrl(metadataDocument.getWFSUrl());
-
-				QName featureTypeName =metadataDocument.getFeatureTypeName();
-				String namespaceURI = featureTypeName.getNamespaceURI();
-
-				ft.setName(featureTypeName.getLocalPart());
-				if(!XMLConstants.NULL_NS_URI.equals(featureTypeName.getNamespaceURI())) {
-					ft.setNamespaceUri(namespaceURI);
-				}
-
 				Download download = new Download();
 				download.setName(id);
 				download.setFt(ft);
 				download.setAdditionalData(additionalData);
+				
+				// TODO: put a download job in the queue
+				
+				// TODO: store information about this job in the database
 
+				// TODO: create job created feedback page (based on mockup)
 				return ok("job created");
 			} else {
 				return notFound();

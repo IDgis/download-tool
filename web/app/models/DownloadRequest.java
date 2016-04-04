@@ -2,6 +2,10 @@ package models;
 
 import play.data.validation.Constraints;
 
+/**
+ * A filled in download request.
+ *
+ */
 public class DownloadRequest {	
 	
 	@Constraints.Required

@@ -10,6 +10,10 @@ import play.Configuration;
 import play.libs.ws.WSClient;
 import play.libs.F.Promise;
 
+/**
+ * A component responsible for retrieving metadata documents.
+ *
+ */
 public class MetadataProvider {
 	
 	private final Configuration config; 
@@ -22,6 +26,12 @@ public class MetadataProvider {
 		this.ws = ws;
 	}
 	
+	/**
+	 * Get metadata document.
+	 * 
+	 * @param id metadata document id
+	 * @return retrieved metadata document or empty
+	 */
 	public Promise<Optional<MetadataDocument>> get(String id) {		
 		return ws.url(config.getString("metadata.url") + id + ".xml")
 			.setFollowRedirects(true)

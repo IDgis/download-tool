@@ -12,7 +12,11 @@ import org.w3c.dom.Node;
 
 import play.libs.XPath;
 
-
+/**
+ * A container for a metadata document. Encapsulates a DOM tree and 
+ * provides the necessary getter to read specific xml elements.
+ *
+ */
 public class MetadataDocument {
 	
 	private final static Map<String, String> NS = namespaces();
