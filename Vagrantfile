@@ -28,6 +28,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Forward the postgres port:
   config.vm.network "forwarded_port", guest: 5432, host: 5440
+  
+  # Forward the play port:
+  config.vm.network "forwarded_port", guest: 9000, host: 9000
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
