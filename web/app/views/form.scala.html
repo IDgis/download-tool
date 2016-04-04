@@ -1,0 +1,85 @@
+@(webJarAssets: WebJarAssets, id: String, info: DownloadInfo, form: Form[DownloadRequest])
+
+@fieldErrors(field: Form.Field) = {
+	@for(error <- field.errors) {
+		<div class="alert alert-danger">
+			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+			<span class="sr-only">Error:</span>
+			@Messages(error.message)
+		</div>
+	}
+}
+
+@simpleField(field: Form.Field, inputType: String, label: String, placeholder: String, title: String) = {
+	<div class="form-group ">
+		<label class="col-sm-2 control-label" for="@field.name">@label</label>
+		<div class="col-sm-8">
+			<input type="@inputType" id="@field.name" name="@field.name" value="@field.value" class="form-control" placeholder="@placeholder" title="@title">
+			@fieldErrors(field)
+		</div>
+	</div>
+}
+
+@layout(webJarAssets) {
+	<p class="title">@info.title</p>
+	
+	<div class="welcome">
+		<p>Om dit bestand te downloaden vul je onderstaande velden in.</p>
+		<p>Klik daarna op download.</p>
+		<p>Je krijgt dan een download-link in de mailbox.</p>
+	</div>
+	
+	@helper.form(action = routes.DownloadForm.post(id), 'class -> "form-horizontal") {
+		@defining(form("format")) { formatField =>
+			<div class="form-group format-choice">
+				<label class="col-md-2 control-label">
+					<span>Kies formaat</span>
+				</label>
+				<div class="col-md-8">
+					<div class="checkbox">
+						@for(outputFormat <- info.outputFormats) {
+		 					<label>
+								<input type="radio" name="format" value="@outputFormat.name()" @if(formatField.value == outputFormat.name()) { checked }>
+									<span>
+										<strong>@outputFormat.title</strong>
+									</span>
+							</label>
+						}
+					</div>
+					@fieldErrors(formatField)
+				</div>
+	 		</div>
+	 	}
+	 	
+	 	@simpleField(
+	 		field = form("name"),
+	 		inputType = "text", 
+	 		label = "Naam",
+	 		placeholder = "Naam",
+	 		title = "Vul naam in")
+	 	
+	 	@simpleField(
+	 		field = form("email"),
+	 		inputType = "email", 
+	 		label = "E-mailadres",
+	 		placeholder = "E-mailadres",
+	 		title = "Vul e-mailadres in")
+ 		
+		<div class="form-group">
+ 			<div class="col-sm-offset-2 col-sm-10">
+ 				<button id="download-button" class="button" type="submit">Download</button>
+ 				<a href="@routes.DownloadForm.help()" class="button help-button">
+ 					Help
+ 				</a>
+			</div>
+		</div>
+		
+		<div id="footer">
+			<p>Dit bestand wordt via het Geoportaal van Overijssel beschikbaar gesteld.</p>
+			<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
+			<p>Zijn er suggesties of vragen, neem dan contact op met
+				<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
+			</p>
+		</div>
+	}
+}

@@ -1,0 +1,24 @@
+@(webJarAssets: WebJarAssets)(content: Html)
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta content="text/html" charset="utf-8">
+		<title>Geoportaal Overijssel</title>
+		<link href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet">
+		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
+	</head>
+	<body>
+		<div class="logo">
+			<a href="http://www.overijssel.nl">
+				<img src='@routes.Assets.at("images/logo_overijssel.png")' alt="Responsive image"></img>
+			</a>
+		</div>
+		
+		<div class="titlebar">
+			<h1 class="header">Download bestand</h1>
+		</div>
+		
+		@content
+	</body>
+</html>

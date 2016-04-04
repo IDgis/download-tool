@@ -1,23 +1,22 @@
-package data;
+package models;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import play.libs.XPath;
 
-
+/**
+ * A container for a metadata document. Encapsulates a DOM tree and 
+ * provides the necessary getter to read specific xml elements.
+ *
+ */
 public class MetadataDocument {
 	
 	private final static Map<String, String> NS = namespaces();
@@ -33,6 +32,10 @@ public class MetadataDocument {
 		ns.put("gmd", "http://www.isotc211.org/2005/gmd");
 		ns.put("gco", "http://www.isotc211.org/2005/gco");
 		return Collections.unmodifiableMap(ns);
+	}
+	
+	public Document getDocument() {
+		return document;
 	}
 	
 	public String getWFSUrl() {
@@ -67,7 +70,7 @@ public class MetadataDocument {
 		String name = node.getTextContent();
 		int separatorIdx = name.indexOf(":");
 		if(separatorIdx == -1) {
-			return new QName(XMLConstants.NULL_NS_URI, name);			 
+			return new QName(XMLConstants.NULL_NS_URI, name);
 		} else {
 			String prefix = name.substring(0, separatorIdx);
 			String localName = name.substring(separatorIdx + 1);
@@ -81,17 +84,16 @@ public class MetadataDocument {
 		}
 	}
 	
-	public byte[] asBytes() {
-		try {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			
-			TransformerFactory tf = TransformerFactory.newInstance();
-			Transformer t = tf.newTransformer();
-			t.transform(new DOMSource(document), new StreamResult(output));
-			
-			return output.toByteArray();
-		} catch(Exception e) {
-			throw new RuntimeException(e);
-		}
+	public String getTitle() {
+		return XPath.selectNode(
+			"/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:citation"
+			+ "/gmd:CI_Citation"
+			+ "/gmd:title"
+			+ "/gco:CharacterString",
+			document,
+			NS).getTextContent();
 	}
 }
