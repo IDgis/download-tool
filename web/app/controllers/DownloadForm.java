@@ -23,6 +23,7 @@ import play.libs.F.Promise;
 
 import views.html.form;
 import views.html.help;
+import views.html.feedback;
 
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
@@ -101,6 +102,13 @@ public class DownloadForm extends Controller {
 				}
 				
 				DownloadRequest downloadRequest = downloadRequestForm.get();
+				
+				// find choosen output format
+				OutputFormat outputFormat = 
+					FORMATS.stream()
+						.filter(format -> format.name().equals(downloadRequest.getFormat()))
+						.findAny()
+						.get();
 
 				// specify feature type
 				WfsFeatureType ft = new WfsFeatureType();
@@ -137,9 +145,12 @@ public class DownloadForm extends Controller {
 				// TODO: put a download job in the queue
 				
 				// TODO: store information about this job in the database
-
-				// TODO: create job created feedback page (based on mockup)
-				return ok("job created");
+				
+				return ok(feedback.render(
+					webJarAssets,
+					metadataDocument.getTitle(),
+					outputFormat,
+					downloadRequest.getEmail()));
 			} else {
 				return notFound();
 			}

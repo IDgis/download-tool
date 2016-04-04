@@ -1,0 +1,31 @@
+@(webJarAssets: WebJarAssets, file: String, outputFormat: OutputFormat, email: String)
+
+@layout(webJarAssets) {
+
+	<p class="title">@file</p>
+	
+	<div class="info">
+		<p>Je download verzoek is in goede orde ontvangen. De download wordt nu voor je klaargezet.</p> <br>
+		
+		<p>
+			<b>Het bestand is:</b> <span>@file</span><br>
+			<b>Het formaat is:</b> <span>@outputFormat.title</span><br>
+			<b>E-mail adres is:</b> <span>@email</span>
+		</p> <br>
+
+		<p>Je krijgt zo snel mogelijk een e-mail met een download-link.<br>
+		
+		Via deze link kun je de download van het bestand uitvoeren. <br> <br>
+		Deze link blijft 24 uur bruikbaar.<br>
+		Je kunt nu dit scherm sluiten.</p> <br>
+	</div>
+	
+	<div id="footer">
+		<p>Dit bestand wordt via het Geoportaal van Overijssel beschikbaar gesteld.</p>
+		<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
+		<p>Zijn er suggesties of vragen, neem dan contact op met
+			<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
+		</p>
+	</div>
+	
+}
