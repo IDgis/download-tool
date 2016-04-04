@@ -1,8 +1,6 @@
 package nl.idgis.downloadtool.domain;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Bean containing feedback information on individual download requests.

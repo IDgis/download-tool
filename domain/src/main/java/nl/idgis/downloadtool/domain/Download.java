@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Bean containing information concerning downloads for a specific dataset/<br>
- * A download exists of a WFS download with conversion and 0 or more additional downloads without conversion step.<br>
+ * A download exists of a WFS download and 0 or more additional downloads.<br>
  * 
  * 
  * @author Rob
@@ -18,6 +18,9 @@ public class Download implements Serializable {
     WfsFeatureType ft; // description of the featuretype to download
     List<AdditionalData> additionalData; // list of non-conversion data
 
+    /**
+     * @return name of the zip file where all individual downloads are packaged
+     */
     public String getName() {
         return name;
     }
@@ -26,6 +29,9 @@ public class Download implements Serializable {
         this.name = name;
     }
 
+    /**
+     * @return the featuretype to download
+     */ 
     public WfsFeatureType getFt() {
         return ft;
     }
@@ -34,6 +40,9 @@ public class Download implements Serializable {
         this.ft = ft;
     }
 
+    /**
+     * @return list of additional non-wfs data to download
+     */
     public List<AdditionalData> getAdditionalData() {
         return additionalData;
     }
