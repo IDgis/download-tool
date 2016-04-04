@@ -73,119 +73,77 @@ public class DownloadProcessor {
     }
     
     /**
-     * Perform downloads using parameter as input, then send feedback.<br>
+     * Perform downloads using downloadRequest as input.<br>
      * @param downloadRequest contains all information concerning the downloads requested.
-     * @return featurecount
      */
-    public long performDownload(DownloadRequest downloadRequest) throws Exception {  	
-    	long featureCount = -1;
-    	
+    public void performDownload(DownloadRequest downloadRequest) throws Exception {  	
     	if (downloadRequest == null){
     		throw new IllegalArgumentException("downloadrequest is null");
     	} else {
     		Download download = downloadRequest.getDownload();
     		if (download == null)
         		throw new IllegalArgumentException("downloadrequest does not contain valid downloads");
-        	
-    		
+
+    		Cache downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
+    		// make sure last cache with the same name is deleted before use
+    		downloadCache.rmCache();
+    		downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
     		/*
-    		 * Download Wfs data and put into temporary cache.
-    		 * Reason for a temp cache is that the converter closes the cache stream
-    		 * and no further item (AdditionalData) can be put into it afterwards. 
+    		 * Download Wfs data and put in downloadCache
     		 */
     		WfsFeatureType ft = download.getFt();
-    		// temporary cache for the wfs data
-    		Cache tempCache = new ZippedCache(cachePath, download.getName() + "_temp.zip");
-    		tempCache.rmCache(); // make sure last cache is deleted before use
-    		tempCache = new ZippedCache(cachePath, download.getName() + "_temp.zip");
-    		featureCount = downloadConvertWfsData(tempCache, ft, downloadRequest.getConvertToMimetype());
-			if (ft.getWfsMimetype().equalsIgnoreCase(downloadRequest.getConvertToMimetype())){
-				log.debug("Converted #bytes: "+ featureCount);
-			} else {
-				log.debug("Converted #features: "+ featureCount);
-			}
-    		tempCache.close();
-    		
-			Cache downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
-			downloadCache.rmCache();// make sure last cache is deleted before use
-			downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
+    		DownloadSource source = new DownloadWfs(ft);
+    		OutputStream downloadCacheOutputStream = downloadData(source, downloadCache, ft.getName(), ft.getExtension()); 
 			/*
-			 * Copy Wfs data to downloadCache
+			 * Download additional data items and put them in downloadCache
 			 */
-			tempCache = new ZippedCache(cachePath, download.getName() + "_temp.zip");
-			List<String> items = tempCache.getItemList();
-			for (String item : items) {
-				InputStream is = tempCache.readItem(item);
-				OutputStream  downloadCacheOutputStream = downloadCache.writeItem(item);
-				// perform the actual copying
-				copyStreams(is, downloadCacheOutputStream);
-				is.close();
-				log.debug("Wfs data to downloadCache: " + item);
-			}
-
-			/*
-			 * Download additional data items and put in downloadCache
-			 */
-			OutputStream  downloadCacheOutputStream = null;
     		List<AdditionalData> additionalData = download.getAdditionalData();
     		for (AdditionalData data : additionalData) {
     			log.debug("Additional item to downloadCache: " + data.getName() + "." + data.getExtension());
-    			downloadCacheOutputStream = downloadAdditionalData(downloadCache, data);
+    			source = new DownloadFile(data);
+    			downloadCacheOutputStream = downloadData(source, downloadCache, data.getName(), data.getExtension());
 			}
-    		
-    		// close downloadcache stream
+    		// close downloadcache stream after all downloads have finished
     		if (downloadCacheOutputStream != null)
     			downloadCacheOutputStream.close();
-    		// close downloadcache
     		downloadCache.close();
     	}
-    	return featureCount;
     }
-
-	private long downloadConvertWfsData(Cache downloadCache, WfsFeatureType ft, String convertToMimetype)
-			throws MalformedURLException, UnsupportedEncodingException, URISyntaxException, IOException {
-		
-		long featureCount = -1;
-		OutputStream dstStream = downloadCache.writeItem(ft.getName() + "." + ft.getExtension());
-		if (ft.getWfsMimetype() == null || ft.getWfsMimetype().isEmpty()){
-			ft.setWfsMimetype(convertToMimetype);
-		}
-		DownloadSource source = new DownloadWfs(ft);
-		ConverterFactory converterFactory = new ConverterFactory();
+    
+	/**
+	 * Download data from a source and copy it into a cache.<br>
+	 * Test for a WFS exceptionreport and raise an exception before starting the copying.
+	 * @param source of the download data (delivers an InputStream which is closed in this method)
+	 * @param downloadCache to write a new item to with content from source
+	 * @param fileName name of the item in the cache
+	 * @param fileExtension extension of the item in the cache
+	 * @return OutputStream of the cache (which is not closed by this method)
+	 * @throws IllegalArgumentException if an exceptionreport was received
+	 * @throws UnsupportedEncodingException
+	 * @throws URISyntaxException
+	 * @throws IOException
+	 */
+	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName, String fileExtension)
+			throws IllegalArgumentException, UnsupportedEncodingException, URISyntaxException, IOException {
 		/*
-		 * Open wfs stream
+		 * Open source stream
 		 */
 		BufferedInputStream srcStream = new BufferedInputStream(source.open());
 		// test if at http 200 OK an exceptionreport is send instead of the expected content
-		testExceptionReport(srcStream);			
-		
+		testExceptionReport(srcStream);
 		/*
-		 * Start download and conversion from Wfs 
+		 * Open destination stream
 		 */
-		Convert converter = converterFactory.getConverter(
-				ft.getWfsMimetype().toLowerCase(), 
-				convertToMimetype.toLowerCase()
-			);
-		log.debug("Start conversion: from " + converter.getInputMimeType() + " to " + converter.getOutputMimeType());
-		try {
-			featureCount = converter.convert(srcStream, dstStream);
-		} catch (Exception e) {
-			throw new IOException(e);
-		}
-		srcStream.close();
-		return featureCount;
-	}
-
-	private OutputStream downloadAdditionalData(Cache downloadCache, AdditionalData data)
-			throws MalformedURLException, UnsupportedEncodingException, URISyntaxException, Exception, IOException {
-		DownloadSource source = new DownloadFile(data);
-		BufferedInputStream srcStream = new BufferedInputStream(source.open());
-		OutputStream dstStream = downloadCache.writeItem(data.getName() + "." + data.getExtension());
+		OutputStream dstStream = downloadCache.writeItem(fileName + "." + fileExtension);
+		/*
+		 * Copy from source to destination
+		 */
 		long byteCount = copyStreams(srcStream, dstStream) ;
-		log.debug("Converted #bytes: "+ byteCount);
+		log.debug("Data '" + fileName + "' #bytes: " + byteCount);
 		srcStream.close();
 		return dstStream;
 	}
+
 
     /*
      * PSEUDO-CODE
@@ -203,7 +161,7 @@ public class DownloadProcessor {
 		
 		Feedback feedback = new Feedback(downloadRequest==null?null:downloadRequest.getRequestId());
 		try {
-			long featureCount = performDownload(downloadRequest);
+			performDownload(downloadRequest);
 			feedback.setResultCode("OK");
 			log.debug("Feedback OK: " + feedback);
 			feedbackQueue.sendFeedback(feedback);
@@ -223,7 +181,7 @@ public class DownloadProcessor {
 	}
 
 	private long copyStreams(InputStream is, OutputStream os)
-			throws Exception {
+			throws IOException {
 		byte[] b = new byte[8192];
 		int read;
 		long total = 0;
