@@ -55,3 +55,11 @@ services:
     build: db
     ports:
     - "5432:5432"
+    
+  web:
+    image: web
+    restart: always
+    ports:
+    - "9000:9000"
+    environment:
+      METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
