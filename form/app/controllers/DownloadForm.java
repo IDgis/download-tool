@@ -15,6 +15,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 
 import views.html.form;
+import views.html.help;
 
 public class DownloadForm extends Controller {
 	
@@ -60,5 +61,9 @@ public class DownloadForm extends Controller {
 		DownloadRequest request = downloadForm.get();
 		
 		return ok("form ok");
+	}
+	
+	public Result help() {
+		return ok(help.render(webJarAssets));
 	}
 }
