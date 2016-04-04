@@ -223,12 +223,17 @@ project(':queue') {
 project(':request') {
 	
 	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
+	
+	dependencies {
+		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
+	}
 }
 
 project(':feedback') {
 
 	dependencies {		
 		compile 'nl.idgis.commons:commons-utils:0.0.14'	
+		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
