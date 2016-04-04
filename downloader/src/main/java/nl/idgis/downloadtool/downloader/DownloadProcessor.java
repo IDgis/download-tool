@@ -74,6 +74,10 @@ public class DownloadProcessor {
     
     /**
      * Perform downloads using downloadRequest as input.<br>
+     * 1. a cache file is opened.<br>
+     * 2. data from wfs is downloaded into the cache.<br>
+     * 3. additional data is downloaded into the cache.<br>
+     * 4. the cache is closed.<br>
      * @param downloadRequest contains all information concerning the downloads requested.
      */
     public void performDownload(DownloadRequest downloadRequest) throws Exception {  	
