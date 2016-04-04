@@ -3,8 +3,9 @@
  */
 package nl.idgis.downloadtool.test;
 
-import static org.easymock.EasyMock.*;
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,6 @@ import nl.idgis.downloadtool.domain.Feedback;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.feedback.FeedbackProvider;
 import nl.idgis.downloadtool.queue.FeedbackQueue;
-import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 
 /**
  * @author Rob

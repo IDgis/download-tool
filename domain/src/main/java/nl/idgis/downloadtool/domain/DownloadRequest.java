@@ -1,7 +1,6 @@
 package nl.idgis.downloadtool.domain;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Bean containing all information to perform a WFS download with additional data.<br>

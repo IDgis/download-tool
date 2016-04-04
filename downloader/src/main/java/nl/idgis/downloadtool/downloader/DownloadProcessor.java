@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -14,8 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import nl.idgis.commons.cache.Cache;
 import nl.idgis.commons.cache.ZippedCache;
-import nl.idgis.commons.convert.Convert;
-import nl.idgis.commons.convert.ConverterFactory;
 import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequest;

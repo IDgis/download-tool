@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 
 import nl.idgis.downloadtool.domain.Download;
-import nl.idgis.downloadtool.domain.DownloadRequest;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
 import nl.idgis.downloadtool.domain.DownloadResultInfo;
-
-import nl.idgis.commons.utils.DateTimeUtils;
 /**
  * @author Rob
  *
