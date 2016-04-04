@@ -67,7 +67,7 @@ configure([
 // play projects
 configure([
 	project(':metadata'),
-	project(':form')]) {
+	project(':web')]) {
 	
 	apply plugin: 'java-base'
 	apply plugin: 'play'
@@ -201,7 +201,7 @@ project('metadata') {
 	}
 }
 
-project('form') {
+project('web') {
 	dependencies {
 		play project(':domain')
 		play project(':dao')

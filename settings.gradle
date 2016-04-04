@@ -1,1 +1,1 @@
-include 'domain', 'dao', 'queue' , 'feedback', 'downloader', 'request', 'metadata', 'form'
+include 'domain', 'dao', 'queue' , 'feedback', 'downloader', 'request', 'metadata', 'web'
