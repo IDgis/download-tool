@@ -14,8 +14,9 @@ public interface DownloadQueue {
 	/**
 	 * Put a download description in the request queue.
 	 * @param downloadRequest
+	 * @return identifier of the queue job
 	 */
-	void sendDownloadRequest(DownloadRequest downloadRequest);
+	Long sendDownloadRequest(DownloadRequest downloadRequest);
 
 	/**
 	 * Get a download description from the request queue. 

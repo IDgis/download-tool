@@ -43,16 +43,17 @@ public class DownloadDao {
 		try {
 			conn = dataSource.getConnection();
 			String sql;
-			sql = "INSERT INTO request_info (request_id, request_time, download, user_name, user_emailaddress, user_format)  "+
-				"VALUES(?, now(), ?, ?, ?, ?);";
+			sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_name, user_emailaddress, user_format)  "+
+				"VALUES(?, now(), ?, ?, ?, ?, ?);";
 			log.debug("createDownloadRequestInfo sql: " + sql); 
 			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, downloadRequestInfo.getRequestId());
+			stmt.setString(2, downloadRequestInfo.getJobId());
 			String json = gson.toJson(downloadRequestInfo.getDownload());
-			stmt.setString(2, json);
-			stmt.setString(3, downloadRequestInfo.getUserName());
-			stmt.setString(4, downloadRequestInfo.getUserEmailAddress());
-			stmt.setString(5, downloadRequestInfo.getUserFormat());
+			stmt.setString(3, json);
+			stmt.setString(4, downloadRequestInfo.getUserName());
+			stmt.setString(5, downloadRequestInfo.getUserEmailAddress());
+			stmt.setString(6, downloadRequestInfo.getUserFormat());
 			
 			int count = stmt.executeUpdate();
 			log.debug("createDownloadRequestInfo insert #records: " + count); 
@@ -89,12 +90,13 @@ public class DownloadDao {
 				Timestamp requestTime = rs.getTimestamp("request_time");
 				log.debug("readDownloadRequestInfo requestTime: " + requestTime); 
 				String json = rs.getString("download");
-				String uuid = rs.getString("uuid");
+				String jobId = rs.getString("job_id");
 				String userName = rs.getString("user_name");
 				String userEmailaddress = rs.getString("user_emailaddress");
 				String userFormat = rs.getString("user_format");
 				downloadRequestInfo = new DownloadRequestInfo();
 				downloadRequestInfo.setRequestId(requestId);
+				downloadRequestInfo.setJobId(jobId);
 				downloadRequestInfo.setRequestTime(requestTime);
 				Download download = gson.fromJson(json, Download.class); 
 				downloadRequestInfo.setDownload(download);

@@ -81,7 +81,8 @@ public class DownloadQueueClient implements DownloadQueue {
 	 * @see nl.idgis.downloadtool.queue.DownloadQueue#sendDownloadRequest(nl.idgis.downloadtool.domain.DownloadRequest)
 	 */
 	@Override
-	public void sendDownloadRequest(DownloadRequest downloadRequest) {
+	public Long sendDownloadRequest(DownloadRequest downloadRequest) {
+		Long jobId = null;
 		log.debug("send downloadrequest " + downloadRequest);
 		/*
 		 * convert downloadrequest to json string
@@ -92,12 +93,12 @@ public class DownloadQueueClient implements DownloadQueue {
 		 * send json to queue
 		 */
 		try {
-			Long jobId = producer.putJob(0, 0, 1, json.getBytes("utf-8"));
+			jobId = producer.putJob(0, 0, 1, json.getBytes("utf-8"));
 			log.debug("sent json '" + json + "', jobId: " + jobId);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		
+		return jobId;
 	}
 	
 	/* (non-Javadoc)

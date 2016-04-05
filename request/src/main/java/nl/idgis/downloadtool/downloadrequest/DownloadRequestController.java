@@ -111,16 +111,17 @@ public class DownloadRequestController {
 				downloadRequest.setDownload(download);
 				downloadRequest.setConvertToMimetype("KML");
 
+				Long jobId = queueClient.sendDownloadRequest(downloadRequest);
 				try {
 					DownloadRequestInfo requestInfo = new DownloadRequestInfo(
-							requestId, UUID.randomUUID().toString(), "rjstek", "rs@idgis.nl", "KML", download);
+							requestId, (jobId==null?"":jobId.toString()), "rjstek", "rs@idgis.nl", "KML", download);
+					requestInfo.setJobId(jobId.toString());
 					downloadDao.createDownloadRequestInfo(requestInfo);
 				} catch (SQLException e) {
 					e.printStackTrace();
 					log.debug("Exception while inserting requestInfo into db: " + e.getMessage());
 				}
 				
-				queueClient.sendDownloadRequest(downloadRequest);
 				
 			}
 		} catch (Exception e) {

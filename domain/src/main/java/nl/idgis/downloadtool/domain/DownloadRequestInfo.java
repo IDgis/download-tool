@@ -21,7 +21,7 @@ public class DownloadRequestInfo {
     /* 
      * items from form
      */
-	private String uuid; // identifies the dataset 
+	private String jobId; // identifies the queue job_id 
     
 	private String userName;
     
@@ -33,10 +33,10 @@ public class DownloadRequestInfo {
 		super();
 	}
     
-	public DownloadRequestInfo(String requestId, String uuid, String userName, String userEmailAddress, String userFormat, Download download) {
+	public DownloadRequestInfo(String requestId, String jobId, String userName, String userEmailAddress, String userFormat, Download download) {
 		super();
 		this.requestId = requestId; 
-		this.uuid = uuid; 
+		this.jobId = jobId; 
 		this.userName = userName; 
 		this.userEmailAddress = userEmailAddress; 
 		this.userFormat = userFormat; 
@@ -57,6 +57,14 @@ public class DownloadRequestInfo {
 
 	public void setRequestTime(Timestamp requestTime) {
 		this.requestTime = requestTime;
+	}
+
+	public String getJobId() {
+		return jobId;
+	}
+
+	public void setJobId(String jobId) {
+		this.jobId = jobId;
 	}
 
 	public Download getDownload() {
