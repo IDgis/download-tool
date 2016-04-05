@@ -63,3 +63,6 @@ services:
     - "9000:9000"
     environment:
       METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
+      DB_USER: postgres
+      DB_PW: postgres
+      DB_URL: "jdbc:postgresql://db:5432/download"

@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,38 +28,20 @@ import nl.idgis.downloadtool.domain.DownloadResultInfo;
 public class DownloadDao {
 	private static final Logger log = LoggerFactory.getLogger(DownloadDao.class);
 
-	private String dbUrl;
-	private String dbUser;
-	private String dbPw;
+	private final DataSource dataSource;
 	
-	private Gson gson = null;
+	private final Gson gson;
 	
-	public DownloadDao(String connectionStr, String user, String pw) {
-		super();
-		try {
-			// Register JDBC driver
-			Class.forName("org.postgresql.Driver");
-		} catch (ClassNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		this.dbUrl = connectionStr; 
-		this.dbUser = user;          
-		this.dbPw = pw;  
-		log.debug("dbUrl" +dbUrl);
-		
+	public DownloadDao(DataSource dataSource) {
+		this.dataSource =dataSource;
 		gson = new Gson();
-
-	}
-	
-	private Connection getConnection() throws SQLException{
-		return DriverManager.getConnection(dbUrl,dbUser,dbPw);
 	}
 	
 	public void createDownloadRequestInfo(DownloadRequestInfo downloadRequestInfo) throws SQLException {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		try {
-			conn = getConnection();
+			conn = dataSource.getConnection();
 			String sql;
 			sql = "INSERT INTO request_info (request_id, request_time, download, user_name, user_emailaddress, user_format)  "+
 				"VALUES(?, now(), ?, ?, ?, ?);";
@@ -95,7 +79,7 @@ public class DownloadDao {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
-			conn = getConnection();
+			conn = dataSource.getConnection();
 			stmt = conn.createStatement();
 			String sql;
 			sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
@@ -142,7 +126,7 @@ public class DownloadDao {
 		Connection conn = null;
 		PreparedStatement stmt = null;
 		try {
-			conn = getConnection();
+			conn = dataSource.getConnection();
 			String sql;
 			sql = "INSERT INTO result_info (request_id, response_time, response_code) VALUES(?, now(), ?);";
 			log.debug("createDownloadResultInfo sql: " + sql); 
@@ -174,7 +158,7 @@ public class DownloadDao {
 		Connection conn = null;
 		Statement stmt = null;
 		try {
-			conn = getConnection();
+			conn = dataSource.getConnection();
 			stmt = conn.createStatement();
 			String sql;
 			sql = "SELECT * FROM result_info WHERE request_id='" + requestId + "'";

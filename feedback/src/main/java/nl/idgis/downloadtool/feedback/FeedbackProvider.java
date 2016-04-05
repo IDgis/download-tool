@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import nl.idgis.commons.utils.Mail;
 import nl.idgis.downloadtool.dao.DownloadDao;
@@ -196,11 +197,17 @@ public class FeedbackProvider {
 			dbUrl = "jdbc:postgresql://localhost:5432/download";
 		}
 		
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl(dbUrl);
+		dataSource.setUsername(dbUser);
+		dataSource.setPassword(dbPassword);
+		
 		try {
 			log.info("start loop ");
 			
 			FeedbackQueueClient feedbackQueueClient = new FeedbackQueueClient(host, feedbackTubeName);
-			DownloadDao downloadDao = new DownloadDao(dbUrl, dbUser, dbPassword);
+			DownloadDao downloadDao = new DownloadDao(dataSource);
 			// setup provider
 			FeedbackProvider fbp = new FeedbackProvider(feedbackQueueClient, downloadDao);
 			fbp.setSmtpHost(smtpHost);

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
@@ -70,13 +71,18 @@ public class DownloadRequestController {
 			dbUrl = "jdbc:postgresql://localhost:5432/download";
 		}
 		
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl(dbUrl);
+		dataSource.setUsername(dbUser);
+		dataSource.setPassword(dbPassword);
 		
 		try {
 			log.info("start loop ");
 			
 			// setup queue client
 			DownloadQueue queueClient = new DownloadQueueClient(host, downloadQueueTubeName);
-			DownloadDao downloadDao = new DownloadDao(dbUrl, dbUser, dbPassword);
+			DownloadDao downloadDao = new DownloadDao(dataSource);
 			
 			for (;;) {
 				Thread.sleep(10000);

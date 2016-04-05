@@ -142,6 +142,7 @@ configure([
 	dependencies {
 		play 'org.webjars:webjars-play_2.11:2.4.0-2'
 		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
+		play 'com.typesafe.play:play-java-jdbc_2.11:2.4.6'
 	}
 }
 
@@ -198,6 +199,7 @@ project('web') {
 		play project(':domain')
 		play project(':dao')
 		play project(':queue')
+		play project(':dao')
 		play 'org.webjars:bootstrap:3.3.6'
 		play 'nl.idgis.geoportaal:md-stylesheets:1.0.4'
 	}
@@ -223,12 +225,17 @@ project(':queue') {
 project(':request') {
 	
 	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
+	
+	dependencies {
+		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
+	}
 }
 
 project(':feedback') {
 
 	dependencies {		
 		compile 'nl.idgis.commons:commons-utils:0.0.14'	
+		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'

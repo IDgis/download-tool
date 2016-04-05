@@ -20,6 +20,7 @@ import play.data.Form;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.libs.F.Promise;
+import play.db.Database;
 
 import views.html.form;
 import views.html.help;
@@ -27,6 +28,7 @@ import views.html.feedback;
 
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
+import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
 
 public class DownloadForm extends Controller {
@@ -46,10 +48,13 @@ public class DownloadForm extends Controller {
 	
 	private final MetadataProvider metadataProvider;
 	
+	private final DownloadDao downloadDao;
+	
 	@Inject
-	public DownloadForm(WebJarAssets webJarAssets,  MetadataProvider metadataProvider) {
+	public DownloadForm(WebJarAssets webJarAssets,  MetadataProvider metadataProvider, Database database) {
 		this.webJarAssets = webJarAssets;
 		this.metadataProvider = metadataProvider;
+		this.downloadDao = new DownloadDao(database.getDataSource());
 	}
 	
 	/**
