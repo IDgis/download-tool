@@ -245,7 +245,9 @@ public class DownloadWfs implements DownloadSource {
 		} else {
 			sb.append("&TYPENAME=" + URLEncoder.encode(typePrefix+":"+typeName, "UTF-8"));
 		}
-		sb.append("&NAMESPACE=xmlns(" + URLEncoder.encode(typeNameSpace, "UTF-8") + ")");
+		if (typeNameSpace != null){
+			sb.append("&NAMESPACE=xmlns(" + URLEncoder.encode(typeNameSpace, "UTF-8") + ")");
+		}
 
 		sb.append("&CRS=" + URLEncoder.encode(crs, "UTF-8"));
 		sb.append("&SRSNAME=" + URLEncoder.encode(crs, "UTF-8"));
