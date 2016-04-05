@@ -7,6 +7,8 @@ build/
 .vagrant
 .classpath
 .project
+feedback/velocity.log
+cache/
 
 # Ignore Gradle GUI config
 gradle-app.setting
