@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
@@ -19,6 +20,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -48,6 +50,7 @@ public class DownloadWfs implements DownloadSource {
 	private CloseableHttpResponse response; 
 	private CloseableHttpClient httpclient;
 	private HttpPost httpPost;
+	private HttpGet httpGet;
 	
 
 	/**
@@ -81,12 +84,12 @@ public class DownloadWfs implements DownloadSource {
 		String pwAuth = null;
 		httpclient = getHttpClient(serviceUrl, userAuth, pwAuth);
 		
-		makePost(wfsFeatureType);
+		makeGet(wfsFeatureType);
 	}
 
 	@Override
 	public InputStream open() throws IOException {
-		response = httpclient.execute(httpPost);
+		response = httpclient.execute(httpGet);
 		log.debug("Http response: " + response.getStatusLine());
 		entity = response.getEntity();
 		// do something useful with the response body
@@ -154,6 +157,22 @@ public class DownloadWfs implements DownloadSource {
 		httpPost.setEntity(entity);
 	}
 
+	private void makeGet(WfsFeatureType wfsFeatureType)
+			throws UnsupportedEncodingException, MalformedURLException, URISyntaxException{
+		String xmlStr = null;
+		
+		String defaultCrs = wfsFeatureType.getCrs()==null?"urn:x-ogc:def:crs:EPSG:28992":wfsFeatureType.getCrs();
+		String defaultVersion = wfsFeatureType.getServiceVersion()==null?"2.0.0":wfsFeatureType.getServiceVersion();
+
+		xmlStr = makeGet(defaultCrs, wfsFeatureType.getFilterExpression(), wfsFeatureType.getNamespacePrefix(), 
+				wfsFeatureType.getNamespaceUri(), wfsFeatureType.getName(), defaultVersion, wfsFeatureType.getWfsMimetype());
+		
+		if (log.isTraceEnabled())
+			log.trace("GetFeature url: " + newLine + xmlStr);
+		uri = new URL(xmlStr).toURI();
+		httpGet = new HttpGet(uri);
+	}
+
 	private String makePostXml(String crs, String filterExpression, 
 			String typePrefix, String typeNameSpace, String typeName, String version, 
 			String wfsFormaat) throws UnsupportedEncodingException {
@@ -213,6 +232,37 @@ public class DownloadWfs implements DownloadSource {
 		return sb.toString();
 	}
 
+	private String makeGet(String crs, String filterExpression, 
+			String typePrefix, String typeNameSpace, String typeName, String version, 
+			String wfsFormaat)
+			throws UnsupportedEncodingException{
+		
+		StringBuilder sb = new StringBuilder(uri.toString());
+		sb.append("REQUEST=GetFeature&service=WFS&version="+version);
+
+		if (typePrefix==null){
+			sb.append("&TYPENAME=" + URLEncoder.encode(typeName, "UTF-8"));
+		} else {
+			sb.append("&TYPENAME=" + URLEncoder.encode(typePrefix+":"+typeName, "UTF-8"));
+		}
+		sb.append("&NAMESPACE=xmlns(" + URLEncoder.encode(typeNameSpace, "UTF-8") + ")");
+
+		sb.append("&CRS=" + URLEncoder.encode(crs, "UTF-8"));
+		sb.append("&SRSNAME=" + URLEncoder.encode(crs, "UTF-8"));
+		// use formaat from fts but replace '+' (=encoded space) with '%20' 
+		if (wfsFormaat != null || wfsFormaat.isEmpty()){
+			sb.append("&OUTPUTFORMAT="
+				+ URLEncoder.encode(wfsFormaat, "UTF-8").replace("+", "%20"));
+		}
+
+		// make wfs filter 
+		if (filterExpression == null || filterExpression.isEmpty()) {
+			// do nothing
+		} else {
+			sb.append("&filter=" + URLEncoder.encode(filterExpression, "UTF-8").replace("+", "%20"));
+		}
+		return sb.toString();
+	}
 	
 	/**
 	 * Correct a given url string and add a protocol at the start and ? or & at the end.
