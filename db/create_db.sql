@@ -16,7 +16,7 @@ create table request_info(
 	request_id text,
 	request_time timestamp,
 	download text,
-	uuid text,
+	job_id text,
 	user_name text,
 	user_emailaddress text,
 	user_format text
