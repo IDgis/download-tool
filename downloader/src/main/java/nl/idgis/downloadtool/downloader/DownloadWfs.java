@@ -142,8 +142,11 @@ public class DownloadWfs implements DownloadSource {
 		HttpEntity entity = null;
 		httpPost = new HttpPost(uri);
 		
-		xmlStr = makePostXml(wfsFeatureType.getCrs(), wfsFeatureType.getFilterExpression(), wfsFeatureType.getNamespacePrefix(), 
-				wfsFeatureType.getNamespaceUri(), wfsFeatureType.getName(), wfsFeatureType.getServiceVersion(), wfsFeatureType.getWfsMimetype());
+		String defaultCrs = wfsFeatureType.getCrs()==null?"urn:x-ogc:def:crs:EPSG:28992":wfsFeatureType.getCrs();
+		String defaultVersion = wfsFeatureType.getServiceVersion()==null?"2.0.0":wfsFeatureType.getServiceVersion();
+
+		xmlStr = makePostXml(defaultCrs, wfsFeatureType.getFilterExpression(), wfsFeatureType.getNamespacePrefix(), 
+				wfsFeatureType.getNamespaceUri(), wfsFeatureType.getName(), defaultVersion, wfsFeatureType.getWfsMimetype());
 		
 		if (log.isTraceEnabled())
 			log.trace("GetFeature xml: " + newLine + xmlStr);

@@ -22,6 +22,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import play.libs.F.Promise;
 import play.db.Database;
+import play.Configuration;
 import play.Logger;
 import play.Logger.ALogger;
 
@@ -61,10 +62,11 @@ public class DownloadForm extends Controller {
 	private static final ALogger log = Logger.of(DownloadForm.class);
 	
 	@Inject
-	public DownloadForm(WebJarAssets webJarAssets,  MetadataProvider metadataProvider, Database database) {
+	public DownloadForm(WebJarAssets webJarAssets,  MetadataProvider metadataProvider, Database database, Configuration config) {
 		this.webJarAssets = webJarAssets;
 		this.metadataProvider = metadataProvider;
 		this.downloadDao = new DownloadDao(database.getDataSource());
+		this.queueClient = new DownloadQueueClient(config.getString("beanstalk.host"), config.getString("beanstalk.queue"));
 	}
 	
 	/**
@@ -131,14 +133,21 @@ public class DownloadForm extends Controller {
 
 				QName featureTypeName =metadataDocument.getFeatureTypeName();
 				String namespaceURI = featureTypeName.getNamespaceURI();
+				String namespacePrefix = featureTypeName.getPrefix();
 
 				ft.setName(featureTypeName.getLocalPart());
-				if(!XMLConstants.NULL_NS_URI.equals(featureTypeName.getNamespaceURI())) {
+				if(!XMLConstants.NULL_NS_URI.equals(namespaceURI)) {
 					ft.setNamespaceUri(namespaceURI);
+				}
+				if(!XMLConstants.DEFAULT_NS_PREFIX.equals(namespacePrefix)) {
+					ft.setNamespacePrefix(namespacePrefix);
 				}
 				// specify mimetype and extension
 				ft.setWfsMimetype(outputFormat.mimeType());
 				ft.setExtension(outputFormat.extension());
+				//specify crs and version
+				ft.setCrs("urn:x-ogc:def:crs:EPSG:28992");
+				ft.setServiceVersion("2.0.0");
 				
 				// add metadata document and stylesheet
 				List<AdditionalData> additionalData = new ArrayList<>();
@@ -163,11 +172,11 @@ public class DownloadForm extends Controller {
 				// TODO: put a download job in the queue
 				log.debug("put a download job in the queue");
 				Long jobId = null;
-//				nl.idgis.downloadtool.domain.DownloadRequest downloadReq = new nl.idgis.downloadtool.domain.DownloadRequest(id);
-//				log.debug("processDownloadRequest " + downloadReq);
-//				downloadReq.setDownload(download);
-//				downloadReq.setConvertToMimetype(outputFormat.mimeType());
-//				jobId = queueClient.sendDownloadRequest(downloadReq);
+				nl.idgis.downloadtool.domain.DownloadRequest downloadReq = new nl.idgis.downloadtool.domain.DownloadRequest(id);
+				log.debug("processDownloadRequest " + downloadReq);
+				downloadReq.setDownload(download);
+				downloadReq.setConvertToMimetype(outputFormat.mimeType());
+				jobId = queueClient.sendDownloadRequest(downloadReq);
 
 				// store information about this job in the database
 				DownloadRequestInfo requestInfo = new DownloadRequestInfo(
