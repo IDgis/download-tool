@@ -14,7 +14,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Provision using a shellscript:
   config.vm.provision :shell, path: "scripts/install-software.sh"
-  config.vm.provision :reload
+  # config.vm.provision :reload
   config.vm.provision :shell, path: "scripts/docker-daemon.sh"
   
   # Forward the Docker daemon port:
@@ -27,7 +27,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "forwarded_port", guest: 11300, host: 11300
 
   # Forward the postgres port:
-  config.vm.network "forwarded_port", guest: 5432, host: 5440
+  config.vm.network "forwarded_port", guest: 5432, host: 5432
   
   # Forward the play port:
   config.vm.network "forwarded_port", guest: 9000, host: 9000

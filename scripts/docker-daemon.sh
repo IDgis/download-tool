@@ -10,4 +10,5 @@ rm -fr /var/lib/docker/devicemapper
 
 adduser vagrant docker
 
+systemctl daemon-reload
 service docker start
