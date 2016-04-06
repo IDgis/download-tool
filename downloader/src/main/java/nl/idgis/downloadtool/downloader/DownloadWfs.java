@@ -12,7 +12,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
@@ -21,9 +20,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -40,6 +36,8 @@ import nl.idgis.downloadtool.domain.WfsFeatureType;
  * 
  */
 public class DownloadWfs implements DownloadSource {
+	private static final String CRS_DEFAULT = "urn:x-ogc:def:crs:EPSG:28992";
+	private static final String WFS_DEFAULT_VERSION = "2.0.0";
 	public static String newLine = System.getProperty("line.separator");
 	private static final Log log = LogFactory.getLog(DownloadWfs.class);
 	
@@ -49,7 +47,6 @@ public class DownloadWfs implements DownloadSource {
 	private HttpEntity entity;
 	private CloseableHttpResponse response; 
 	private CloseableHttpClient httpclient;
-	private HttpPost httpPost;
 	private HttpGet httpGet;
 	
 
@@ -139,30 +136,12 @@ public class DownloadWfs implements DownloadSource {
 		return httpClient;
 	}
 
-	private void makePost(WfsFeatureType wfsFeatureType)
-			throws UnsupportedEncodingException {
-		String xmlStr = null;
-		HttpEntity entity = null;
-		httpPost = new HttpPost(uri);
-		
-		String defaultCrs = wfsFeatureType.getCrs()==null?"urn:x-ogc:def:crs:EPSG:28992":wfsFeatureType.getCrs();
-		String defaultVersion = wfsFeatureType.getServiceVersion()==null?"2.0.0":wfsFeatureType.getServiceVersion();
-
-		xmlStr = makePostXml(defaultCrs, wfsFeatureType.getFilterExpression(), wfsFeatureType.getNamespacePrefix(), 
-				wfsFeatureType.getNamespaceUri(), wfsFeatureType.getName(), defaultVersion, wfsFeatureType.getWfsMimetype());
-		
-		if (log.isTraceEnabled())
-			log.trace("GetFeature xml: " + newLine + xmlStr);
-		entity = new StringEntity(xmlStr, ContentType.APPLICATION_XML);
-		httpPost.setEntity(entity);
-	}
-
 	private void makeGet(WfsFeatureType wfsFeatureType)
 			throws UnsupportedEncodingException, MalformedURLException, URISyntaxException{
 		String xmlStr = null;
 		
-		String defaultCrs = wfsFeatureType.getCrs()==null?"urn:x-ogc:def:crs:EPSG:28992":wfsFeatureType.getCrs();
-		String defaultVersion = wfsFeatureType.getServiceVersion()==null?"2.0.0":wfsFeatureType.getServiceVersion();
+		String defaultCrs = wfsFeatureType.getCrs()==null?CRS_DEFAULT:wfsFeatureType.getCrs();
+		String defaultVersion = wfsFeatureType.getServiceVersion()==null?WFS_DEFAULT_VERSION:wfsFeatureType.getServiceVersion();
 
 		xmlStr = makeGet(defaultCrs, wfsFeatureType.getFilterExpression(), wfsFeatureType.getNamespacePrefix(), 
 				wfsFeatureType.getNamespaceUri(), wfsFeatureType.getName(), defaultVersion, wfsFeatureType.getWfsMimetype());
@@ -171,65 +150,6 @@ public class DownloadWfs implements DownloadSource {
 			log.trace("GetFeature url: " + newLine + xmlStr);
 		uri = new URL(xmlStr).toURI();
 		httpGet = new HttpGet(uri);
-	}
-
-	private String makePostXml(String crs, String filterExpression, 
-			String typePrefix, String typeNameSpace, String typeName, String version, 
-			String wfsFormaat) throws UnsupportedEncodingException {
-		
-		String unescapedFilterExpression = StringEscapeUtils.unescapeXml(filterExpression);
-		
-		StringBuilder sb = new StringBuilder();
-		if (version.equals("2.0.0")){
-			sb.append("<wfs:GetFeature xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-			  + " xsi:schemaLocation=\"http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd\""
-			  + " xmlns:gml=\"http://www.opengis.net/gml\""
-			  + " xmlns:wfs=\"http://www.opengis.net/wfs/2.0\""
-			  + " xmlns:fes=\"http://www.opengis.net/fes/2.0\""
-			  + " xmlns:ogc=\"http://www.opengis.net/ogc\" \n");
-		}else{
-			sb.append("<wfs:GetFeature xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-					  + " xsi:schemaLocation=\"http://www.opengis.net/wfs http://schemas.opengis.net/wfs/1.1.0/wfs.xsd\""
-					  + " xmlns:gml=\"http://www.opengis.net/gml\""
-					  + " xmlns:wfs=\"http://www.opengis.net/wfs\""
-					  + " xmlns:ogc=\"http://www.opengis.net/ogc\" \n");
-		}
-		// attributes
-		sb.append(" service=\"WFS\"\n"); 
-		sb.append(" version=\"" + version + "\"\n");
-		if (maxFeatures > 0){
-			if (version.indexOf("2.0") > -1){
-				// WFS version 2.0.x
-				sb.append(" count=\"" + maxFeatures + "\"\n"); 			
-			} else {
-				// WFS version 1.1.0
-				sb.append(" maxFeatures=\"" + maxFeatures + "\"\n"); 
-			}
-		}
-		sb.append(" outputFormat=\"" + wfsFormaat + "\">\n"); // last attribute
-		sb.append(" <wfs:Query \n");
-		String typeNames = (version.indexOf("2.0") > -1)?"typeNames":"typeName";
-		if (typePrefix==null || typePrefix.isEmpty()){
-			sb.append(" " + typeNames + "=\""+typeName+"\"\n");
-		} else {
-			sb.append(" " + typeNames + "=\"" + typePrefix+":"+typeName+"\"");
-			if (typeNameSpace != null && !typeNameSpace.isEmpty())
-				sb.append(" xmlns:"+typePrefix+"=\""+typeNameSpace+"\" \n");
-		}
-		sb.append(" srsName=\""+crs+"\">\n");
-		// make wfs filter 
-		if (unescapedFilterExpression == null || unescapedFilterExpression.isEmpty()) {
-			// no filter
-		} else {
-				sb.append(" <ogc:Filter>\n");
-				sb.append(" <ogc:And>\n");
-				sb.append(" " + unescapedFilterExpression + "\n");
-				sb.append(" </ogc:And>\n");
-				sb.append(" </ogc:Filter>\n");
-		}
-		sb.append(" </wfs:Query>\n");
-		sb.append(" </wfs:GetFeature>\n");
-		return sb.toString();
 	}
 
 	private String makeGet(String crs, String filterExpression, 

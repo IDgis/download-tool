@@ -38,8 +38,8 @@ public class FeedbackProvider {
 
 	private static final String SMTP_FROMADDRESS = "SMTP_FROMADDRESS";
 	
-	private static final String SMTP_USER = "smtpUser";
-	private static final String SMTP_PASSWORD = "smtpPassword";
+	private static final String SMTP_USER = "SMTP_USER";
+	private static final String SMTP_PASSWORD = "SMTP_PASSWORD";
 
 	private static final String EMAIL_MESSAGE_TEMPLATE = "EMAIL_MESSAGE_TEMPLATE";
 

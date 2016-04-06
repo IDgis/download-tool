@@ -26,6 +26,8 @@ services:
       SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
+      SMTP_USER: "docker-compose.override.yml"
+      SMTP_PASSWORD: "docker-compose.override.yml"
       EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, U kunt bestand $${featuretype}.zip downloaden via de volgende link: $${downloadUrl}. "
       EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel staat gereed"
       DB_USER: postgres
@@ -41,6 +43,8 @@ services:
       SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
+      SMTP_USER: "docker-compose.override.yml"
+      SMTP_PASSWORD: "docker-compose.override.yml"
       EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met $${beheerder}. "
       EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel is niet gelukt"
       DB_USER: postgres
