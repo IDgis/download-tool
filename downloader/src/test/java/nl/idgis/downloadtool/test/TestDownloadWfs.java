@@ -16,7 +16,7 @@ import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.downloader.DownloadWfs;
 
 public class TestDownloadWfs {
-	private static final String URL = "http://httpbin.org/post";
+	private static final String URL = "http://httpbin.org/get";
 	private static final Logger log = LoggerFactory.getLogger(TestDownloadFile.class);
 	DownloadWfs downloadSource;
 	
@@ -26,7 +26,7 @@ public class TestDownloadWfs {
 	}
 
 	@Test
-	public void testPost() {
+	public void testGet() {
 		WfsFeatureType wfsFeatureType = new WfsFeatureType();
 		wfsFeatureType.setCrs("EPSG:28992");
 		wfsFeatureType.setName("ProtectedSites");
@@ -53,7 +53,8 @@ public class TestDownloadWfs {
 				log.debug(result);
 				log.debug("--------------------------------------");
 			}
-			assertTrue("Downloadresponse expected!", result.indexOf("http://schemas.opengis.net/wfs/2.0/wfs.xsd") > -1);
+			assertTrue("Downloadresponse expected!", 
+					result.indexOf("http://httpbin.org/get?REQUEST=GetFeature&service=WFS&version=2.0.0&TYPENAME=ProtectedSites") > -1);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -61,7 +62,7 @@ public class TestDownloadWfs {
 		}
 	}
 
-	@Test
+//	@Test
 	public void testWfs(){
 		// test with Inspire acc AreaManagement
 		WfsFeatureType wfsFeatureType = new WfsFeatureType();

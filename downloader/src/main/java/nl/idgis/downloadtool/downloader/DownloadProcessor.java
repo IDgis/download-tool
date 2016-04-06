@@ -89,25 +89,33 @@ public class DownloadProcessor {
     		// make sure last cache with the same name is deleted before use
     		downloadCache.rmCache();
     		downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
-    		/*
-    		 * Download Wfs data and put in downloadCache
-    		 */
-    		WfsFeatureType ft = download.getFt();
-    		DownloadSource source = new DownloadWfs(ft);
-    		OutputStream downloadCacheOutputStream = downloadData(source, downloadCache, ft.getName(), ft.getExtension()); 
-			/*
-			 * Download additional data items and put them in downloadCache
-			 */
-    		List<AdditionalData> additionalData = download.getAdditionalData();
-    		for (AdditionalData data : additionalData) {
-    			log.debug("Additional item to downloadCache: " + data.getName() + "." + data.getExtension());
-    			source = new DownloadFile(data);
-    			downloadCacheOutputStream = downloadData(source, downloadCache, data.getName(), data.getExtension());
+    		OutputStream downloadCacheOutputStream = null;
+    		try {
+				/*
+				 * Download Wfs data and put in downloadCache
+				 */
+				WfsFeatureType ft = download.getFt();
+				DownloadSource source = new DownloadWfs(ft);
+				downloadCacheOutputStream = downloadData(source, downloadCache, ft.getName(), ft.getExtension()); 
+				/*
+				 * Download additional data items and put them in downloadCache
+				 */
+				List<AdditionalData> additionalData = download.getAdditionalData();
+				for (AdditionalData data : additionalData) {
+					log.debug("Additional item to downloadCache: " + data.getName() + "." + data.getExtension());
+					source = new DownloadFile(data);
+					downloadCacheOutputStream = downloadData(source, downloadCache, data.getName(), data.getExtension());
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+//				downloadCache.rmCache();
+				throw e;
+			} finally {
+				// close downloadcache stream after all downloads have finished
+				if (downloadCacheOutputStream != null)
+					downloadCacheOutputStream.close();
+				downloadCache.close();				
 			}
-    		// close downloadcache stream after all downloads have finished
-    		if (downloadCacheOutputStream != null)
-    			downloadCacheOutputStream.close();
-    		downloadCache.close();
     	}
     }
     

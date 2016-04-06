@@ -62,6 +62,8 @@ services:
     ports:
     - "9000:9000"
     environment:
+      BEANSTALK_HOST: beanstalk
+      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
       METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
       DB_USER: postgres
       DB_PW: postgres
