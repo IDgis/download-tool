@@ -23,7 +23,7 @@ services:
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
-      SMTP_HOST: mail
+      SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
       EMAIL_MESSAGE_TEMPLATE: "Geachte ${userName}, U kunt bestand ${fileName}.zip downloaden via de volgende link: ${downloadUrl}. "
@@ -38,7 +38,7 @@ services:
     environment:
       BEANSTALK_HOST: beanstalk
       BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
-      SMTP_HOST: mail
+      SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
       EMAIL_MESSAGE_TEMPLATE: "Geachte ${userName}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met ${beheerder}. "
