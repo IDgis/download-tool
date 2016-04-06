@@ -85,7 +85,6 @@ public class DownloadRequestController {
 			DownloadDao downloadDao = new DownloadDao(dataSource);
 			
 			for (;;) {
-				Thread.sleep(10000);
 				
 				String requestId = UUID.randomUUID().toString();
 				DownloadRequest downloadRequest = new DownloadRequest(requestId);
@@ -122,7 +121,7 @@ public class DownloadRequestController {
 					log.debug("Exception while inserting requestInfo into db: " + e.getMessage());
 				}
 				
-				
+				Thread.sleep(60000);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
