@@ -57,7 +57,7 @@ public class DownloadForm extends Controller {
 	
 	private final DownloadDao downloadDao;
 	
-	private DownloadQueue queueClient;
+	private final DownloadQueue queueClient;
 	
 	private static final ALogger log = Logger.of(DownloadForm.class);
 	
