@@ -2,8 +2,6 @@ create database download;
 
 \c download
 
-create table test(id serial, test text);
-
 create table result_info(
 	id serial,
 	request_id text,

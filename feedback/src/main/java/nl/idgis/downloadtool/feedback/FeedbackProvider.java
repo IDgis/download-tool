@@ -37,6 +37,9 @@ public class FeedbackProvider {
 	private static final String SMTP_PORT = "SMTP_PORT";
 
 	private static final String SMTP_FROMADDRESS = "SMTP_FROMADDRESS";
+	
+	private static final String SMTP_USER = "smtpUser";
+	private static final String SMTP_PASSWORD = "smtpPassword";
 
 	private static final String EMAIL_MESSAGE_TEMPLATE = "EMAIL_MESSAGE_TEMPLATE";
 
@@ -45,7 +48,7 @@ public class FeedbackProvider {
 	private FeedbackQueue feedbackQueue;
 	private DownloadDao downloadDao;
 	
-	private String smtpHost;
+	private String smtpHost, smtpUser, smtpPassword;
 	private int smtpPort;
 	private String subjectTemplate, msgTemplate, fromAddress;
 
@@ -75,6 +78,22 @@ public class FeedbackProvider {
 		this.smtpPort = smtpPort;
 	}
 
+	public String getSmptUser() {
+		return smtpUser;
+	}
+	
+	public void setSmptUser(String smptUser) {
+		this.smtpUser = smptUser;
+	}
+	
+	public String getSmptPassword() {
+		return smtpPassword;
+	}
+	
+	public void setSmptPassword(String smptPassword) {
+		this.smtpPassword = smptPassword;
+	}
+	
 	public String getSubjectTemplate() {
 		return subjectTemplate;
 	}
@@ -129,9 +148,16 @@ public class FeedbackProvider {
 			/*
 			 * send email
 			 */
-			log.debug("Send email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
 			 try {
-				Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+				if(smtpUser == null || smtpPassword == null || smtpUser.isEmpty() || smtpPassword.isEmpty()) {
+					log.debug("Send email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
+					Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+				} else {
+					// send mail with authentication
+					log.debug("Send authenticated email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
+					Mail.send(smtpUser, smtpPassword, smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+				}
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -176,6 +202,11 @@ public class FeedbackProvider {
 		if(smtpFromAddress == null) {
 			smtpFromAddress = "mail@idgis.nl";
 		}
+		
+		// from docker-compose.override.yml		
+		String smtpUser = System.getenv(SMTP_USER);
+		String smtpPassword = System.getenv(SMTP_PASSWORD);
+		
 		String msgTemplate = System.getenv(EMAIL_MESSAGE_TEMPLATE);
 		if(msgTemplate == null) {
 			msgTemplate = "There is a downloadlink available for ${username} concerning ${featuretype}";
@@ -210,6 +241,8 @@ public class FeedbackProvider {
 			DownloadDao downloadDao = new DownloadDao(dataSource);
 			// setup provider
 			FeedbackProvider fbp = new FeedbackProvider(feedbackQueueClient, downloadDao);
+			fbp.setSmptUser(smtpUser);
+			fbp.setSmptPassword(smtpPassword);
 			fbp.setSmtpHost(smtpHost);
 			fbp.setSmtpPort(smtpPort);
 			fbp.setFromAddress(smtpFromAddress);
