@@ -59,6 +59,8 @@ public class DownloadForm extends Controller {
 	
 	private final DownloadQueue queueClient;
 	
+	private final String hostname;
+	
 	private static final ALogger log = Logger.of(DownloadForm.class);
 	
 	@Inject
@@ -67,6 +69,15 @@ public class DownloadForm extends Controller {
 		this.metadataProvider = metadataProvider;
 		this.downloadDao = new DownloadDao(database.getDataSource());
 		this.queueClient = new DownloadQueueClient(config.getString("beanstalk.host"), config.getString("beanstalk.queue"));
+		
+		String hostname = System.getenv("HOSTNAME");
+		if(hostname == null) {
+			log.warn("HOSTNAME environment variable missing, using 'localhost' instead");
+			this.hostname = "localhost";
+		} else {
+			log.debug("using HOSTNAME environment variable value: " + hostname);
+			this.hostname = hostname;
+		}
 	}
 	
 	/**
@@ -155,13 +166,15 @@ public class DownloadForm extends Controller {
 				AdditionalData stylesheet = new AdditionalData();
 				stylesheet.setName("metadata");
 				stylesheet.setExtension("xsl");
-				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET)).absoluteURL(request()));
+				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
+					.absoluteURL(request().secure(), hostname));
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
 				metadata.setName(id);
 				metadata.setExtension("xml");
-				metadata.setUrl(routes.Metadata.get(id).absoluteURL(request()));
+				metadata.setUrl(routes.Metadata.get(id)
+					.absoluteURL(request().secure(), hostname));
 				additionalData.add(metadata);
 
 				Download download = new Download();
