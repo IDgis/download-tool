@@ -26,8 +26,8 @@ services:
       SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
-      EMAIL_MESSAGE_TEMPLATE: "Geachte ${userName}, U kunt bestand ${fileName}.zip downloaden via de volgende link: ${downloadUrl}. "
-      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag van Geoportaal Overijssel staat gereed "
+      EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, U kunt bestand $${featuretype}.zip downloaden via de volgende link: $${downloadUrl}. "
+      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel staat gereed"
       DB_USER: postgres
       DB_PW: postgres
       DB_URL: "jdbc:postgresql://db:5432/download"
@@ -41,8 +41,8 @@ services:
       SMTP_HOST: mail.your-server.de
       SMTP_PORT: 25
       SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
-      EMAIL_MESSAGE_TEMPLATE: "Geachte ${userName}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met ${beheerder}. "
-      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag van Geoportaal Overijssel is niet gelukt"
+      EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met $${beheerder}. "
+      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel is niet gelukt"
       DB_USER: postgres
       DB_PW: postgres
       DB_URL: "jdbc:postgresql://db:5432/download"
