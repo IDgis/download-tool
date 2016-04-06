@@ -206,7 +206,6 @@ public class FeedbackProvider {
 		// from docker-compose.override.yml		
 		String smtpUser = System.getenv(SMTP_USER);
 		String smtpPassword = System.getenv(SMTP_PASSWORD);
-		log.debug("ENV: smtpUser:" +smtpUser);
 		
 		String msgTemplate = System.getenv(EMAIL_MESSAGE_TEMPLATE);
 		if(msgTemplate == null) {
