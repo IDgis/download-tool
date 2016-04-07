@@ -263,26 +263,6 @@ public class TestProcessor  extends EasyMockSupport {
 		
 		verify(queueClientMock);
 		verify(feedbackQueueMock);
-	}
-
-	@Test
-	public void testRayongrenzenXXX() throws Exception {
-		DownloadRequest downloadRequest = makeRequestRayongrenzen("XXX", "xxx");
-		downloadRequest.setConvertToMimetype("XXX");
-		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
-		queueClientMock.deleteDownloadRequest(downloadRequest);
-		replay(queueClientMock);
-		
-		errorFeedbackQueueMock.sendFeedback(anyObject(Feedback.class));
-		replay(errorFeedbackQueueMock);
-		
-		downloadProcessor.processDownloadRequest();
-		
-		verify(queueClientMock);
-		verify(errorFeedbackQueueMock);
-	}
-
-	
-	
+	}	
 	
 }
