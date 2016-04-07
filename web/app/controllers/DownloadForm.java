@@ -73,11 +73,14 @@ public class DownloadForm extends Controller {
 		String hostname = System.getenv("HOSTNAME");
 		if(hostname == null) {
 			log.warn("HOSTNAME environment variable missing, using 'localhost' instead");
-			this.hostname = "localhost";
+			hostname = "localhost";
 		} else {
 			log.debug("using HOSTNAME environment variable value: " + hostname);
-			this.hostname = hostname;
 		}
+		
+		this.hostname = hostname + ":" + config.getString("play.server.http.port");
+		
+		log.debug("generating absolute urls with hostname: " + this.hostname);
 	}
 	
 	/**
