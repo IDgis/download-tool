@@ -11,6 +11,7 @@ feedback/velocity.log
 cache/
 
 docker-compose.override.yml
+web/logs/application.log 
 
 # Ignore Gradle GUI config
 gradle-app.setting
