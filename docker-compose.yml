@@ -1,80 +1,87 @@
-version: "2"
+beanstalk:
+  image: schickling/beanstalkd
+  restart: always
 
-services:
-  beanstalk:
-    image: schickling/beanstalkd
-    restart: always
-
-  downloader:
-    image: downloader
-    restart: always
-    environment:
-      BEANSTALK_HOST: beanstalk
-      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-      BEANSTALK_FEEDBACKOK_QUEUE: feedbackOkTube
-      BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
-      ZIP_CACHEPATH : /tmp/cache
-    volumes:
+downloader:
+  image: downloader
+  restart: always
+  environment:
+    BEANSTALK_HOST: beanstalk
+    BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+    BEANSTALK_FEEDBACKOK_QUEUE: feedbackOkTube
+    BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
+    ZIP_CACHEPATH: /tmp/cache
+  volumes:
     - ./cache:/tmp/cache/
-    
-  feedback_ok:
-    image: feedback
-    restart: always
-    environment:
-      BEANSTALK_HOST: beanstalk
-      BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
-      SMTP_HOST: mail.your-server.de
-      SMTP_PORT: 25
-      SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
-      SMTP_USER: "docker-compose.override.yml"
-      SMTP_PASSWORD: "docker-compose.override.yml"
-      EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, U kunt bestand $${featuretype}.zip downloaden via de volgende link: $${downloadUrl}. "
-      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel staat gereed"
-      DB_USER: postgres
-      DB_PW: postgres
-      DB_URL: "jdbc:postgresql://db:5432/download"
-      
-  feedback_error:
-    image: feedback
-    restart: always
-    environment:
-      BEANSTALK_HOST: beanstalk
-      BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
-      SMTP_HOST: mail.your-server.de
-      SMTP_PORT: 25
-      SMTP_FROMADDRESS: "noreply@geoportaaloverijssel.nl"
-      SMTP_USER: "docker-compose.override.yml"
-      SMTP_PASSWORD: "docker-compose.override.yml"
-      EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met $${beheerder}. "
-      EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag [$${featuretype}] van Geoportaal Overijssel is niet gelukt"
-      DB_USER: postgres
-      DB_PW: postgres
-      DB_URL: "jdbc:postgresql://db:5432/download"
-      
-  request:
-    image: request
-    restart: always
-    environment:
-      BEANSTALK_HOST: beanstalk
-      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-      DB_USER: postgres
-      DB_PW: postgres
-      DB_URL: "jdbc:postgresql://db:5432/download"
-      
-  db:
-    build: db
-    ports:
-    - "5432:5432"
-    
-  web:
-    image: web
-    restart: always
-    ports:
-    - "9000:9000"
-    environment:
-      BEANSTALK_HOST: beanstalk
-      BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-      METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
-      DB_USER: postgres
-      DB_PW: postgres
-      DB_URL: "jdbc:postgresql://db:5432/download"
+  links:
+    - beanstalk
+
+feedback_ok:
+  image: feedback
+  restart: always
+  environment:
+    BEANSTALK_HOST: beanstalk
+    BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
+    SMTP_HOST: mail.your-server.de
+    SMTP_PORT: 25
+    DB_USER: postgres
+    DB_PW: postgres
+    DB_URL: "jdbc:postgresql://db:5432/download"
+  links:
+    - db
+    - beanstalk
+
+feedback_error:
+  image: feedback
+  restart: always
+  environment:
+    BEANSTALK_HOST: beanstalk
+    BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
+    SMTP_HOST: mail.your-server.de
+    SMTP_PORT: 25
+    DB_USER: postgres
+    DB_PW: postgres
+    DB_URL: "jdbc:postgresql://db:5432/download"
+  links:
+    - db
+    - beanstalk
+
+request:
+  image: request
+  restart: always
+  environment:
+    BEANSTALK_HOST: beanstalk
+    BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+    DB_USER: postgres
+    DB_PW: postgres
+    DB_URL: "jdbc:postgresql://db:5432/download"
+  links:
+    - db
+    - beanstalk
+
+db:
+  build: db
+  expose:
+  - "5432"
+
+web:
+  image: web
+  restart: always
+  environment:
+    BEANSTALK_HOST: beanstalk
+    BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
+    METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
+    DB_USER: postgres
+    DB_PW: postgres
+    DB_URL: "jdbc:postgresql://db:5432/download"
+    APPLICATION_SECRET: FgZvDqfDukyA9ZmhCBmHTmCoahULjzB4nVzfwFDU7A6wyhNTOHtWN
+    ZOOKEEPER_HOST: zookeeper:2181
+    SERVICE_DOMAIN_NAME: test.geoportaaloverijssel.nl
+  external_links:
+    - base-zookeeper:zookeeper
+  links:
+    - db
+    - beanstalk
+  expose:
+    - "9000"
+
