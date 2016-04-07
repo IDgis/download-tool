@@ -155,7 +155,7 @@ public class FeedbackProvider {
 				} else {
 					// send mail with authentication
 					log.debug("Send authenticated email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
-					Mail.send(smtpUser, smtpPassword, smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
+					Mail.send(smtpUser, smtpPassword, smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), smtpUser, subject, msg);
 				}
 
 			} catch (Exception e) {
