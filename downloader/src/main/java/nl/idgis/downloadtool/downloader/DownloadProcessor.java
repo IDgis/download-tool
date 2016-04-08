@@ -178,7 +178,7 @@ public class DownloadProcessor {
 		try {
 			queueClient.deleteDownloadRequest(downloadRequest);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			log.error("Exception when trying to delete message from queue");
 			e.printStackTrace();
 		}
 	}

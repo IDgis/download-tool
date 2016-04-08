@@ -138,20 +138,21 @@ public class FeedbackProvider {
 			/*
 			 * send email
 			 */
-			 try {
-				if(smtpUser == null || smtpPassword == null || smtpUser.isEmpty() || smtpPassword.isEmpty()) {
+			try {
+				if (smtpUser == null || smtpPassword == null || smtpUser.isEmpty() || smtpPassword.isEmpty()) {
 					log.debug("Send email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
 					Mail.send(smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), fromAddress, subject, msg);
 				} else {
 					// send mail with authentication
-					log.debug("Send authenticated email: [" + subject + "] to " + downloadRequestInfo.getUserEmailAddress());
-					Mail.send(smtpUser, smtpPassword, smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(), smtpUser, subject, msg);
+					log.debug("Send authenticated email: [" + subject + "] to "
+							+ downloadRequestInfo.getUserEmailAddress());
+					Mail.send(smtpUser, smtpPassword, smtpHost, smtpPort, downloadRequestInfo.getUserEmailAddress(),
+							smtpUser, subject, msg);
 				}
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
+				log.error("Exception while trying to send email: " + e.getMessage());
 				e.printStackTrace();
-				log.debug("Exception while trying to send email: " + e.getMessage());
 			}
 		} else {
 			// not to be expected but no action
