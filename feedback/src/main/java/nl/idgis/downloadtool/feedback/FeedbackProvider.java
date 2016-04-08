@@ -44,6 +44,8 @@ public class FeedbackProvider {
 	private static final String EMAIL_MESSAGE_TEMPLATE = "EMAIL_MESSAGE_TEMPLATE";
 
 	private static final String EMAIL_SUBJECT_TEMPLATE = "EMAIL_SUBJECT_TEMPLATE";
+
+	private static final String DOWNLOAD_URL = "DOWNLOAD_URL";
 	
 	private FeedbackQueue feedbackQueue;
 	private DownloadDao downloadDao;
@@ -51,6 +53,7 @@ public class FeedbackProvider {
 	private String smtpHost, smtpUser, smtpPassword;
 	private int smtpPort;
 	private String subjectTemplate, msgTemplate, fromAddress;
+	private String downloadUrl;
 
 	public FeedbackProvider(FeedbackQueue feedbackQueue, DownloadDao downloadDao) {
 		super();
@@ -118,6 +121,14 @@ public class FeedbackProvider {
 		this.fromAddress = fromAddress;
 	}
 
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
+
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
+	}
+
 	public void processFeedback() throws Exception {
 		/*
 		 * get feedback from queue
@@ -138,10 +149,11 @@ public class FeedbackProvider {
 		 */
 		DownloadRequestInfo downloadRequestInfo = downloadDao.readDownloadRequestInfo(feedback.getRequestId());
 		if (downloadRequestInfo != null){
-			// TODO assemble email
+			// assemble email
 			Map<String,Object> placeholders = new HashMap<String,Object>();
 			placeholders.put("username", downloadRequestInfo.getUserName());
 			placeholders.put("featuretype", downloadRequestInfo.getDownload().getFt().getName());
+			placeholders.put("downloadLink", downloadUrl + "/" + downloadRequestInfo.getRequestId());
 			String subject = Mail.createMsg(placeholders, subjectTemplate);
 			String msg = Mail.createMsg(placeholders, msgTemplate);
 			
@@ -215,6 +227,10 @@ public class FeedbackProvider {
 		if(subjectTemplate == null) {
 			subjectTemplate = "Geoportaal downloader: ${featuretype} is available for download";
 		}
+		String downloadUrl = System.getenv(DOWNLOAD_URL);
+		if (downloadUrl==null){
+			downloadUrl  = "localhost/downloadLink";
+		}
 		String dbUser = System.getenv(DB_USER);
 		if (dbUser==null){
 			dbUser = "postgres";
@@ -248,6 +264,7 @@ public class FeedbackProvider {
 			fbp.setFromAddress(smtpFromAddress);
 			fbp.setMsgTemplate(msgTemplate);
 			fbp.setSubjectTemplate(subjectTemplate);
+			fbp.setDownloadUrl(downloadUrl);			
 			
 			for (;;) {
 				log.debug("processFeedback");

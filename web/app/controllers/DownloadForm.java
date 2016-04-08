@@ -185,7 +185,7 @@ public class DownloadForm extends Controller {
 				download.setFt(ft);
 				download.setAdditionalData(additionalData);
 				
-				// TODO: put a download job in the queue
+				// put a download job in the queue
 				log.debug("put a download job in the queue");
 				Long jobId = null;
 				nl.idgis.downloadtool.domain.DownloadRequest downloadReq = new nl.idgis.downloadtool.domain.DownloadRequest(id);
@@ -196,7 +196,8 @@ public class DownloadForm extends Controller {
 
 				// store information about this job in the database
 				DownloadRequestInfo requestInfo = new DownloadRequestInfo(
-						id, (jobId==null?"":jobId.toString()), 
+						UUID.randomUUID().toString(), // requestId is unique 
+						(jobId==null?"":jobId.toString()), 
 						downloadRequest.getName(), downloadRequest.getEmail(), outputFormat.mimeType(), 
 						download);
 				log.debug("store information about this job in the database: " + requestInfo.getRequestId());
