@@ -83,8 +83,6 @@ web:
   links:
     - db
     - beanstalk
-  expose:
-    - "9000"
   volumes_from:
     - downloader
 
