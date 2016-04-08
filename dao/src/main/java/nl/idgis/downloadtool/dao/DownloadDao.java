@@ -34,19 +34,15 @@ public class DownloadDao {
 	
 	public DownloadDao(DataSource dataSource) {
 		this.dataSource =dataSource;
-		gson = new Gson();
+		this.gson = new Gson();
 	}
 	
 	public void createDownloadRequestInfo(DownloadRequestInfo downloadRequestInfo) throws SQLException {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		try {
-			conn = dataSource.getConnection();
-			String sql;
-			sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_name, user_emailaddress, user_format)  "+
+		String sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_name, user_emailaddress, user_format)  "+
 				"VALUES(?, now(), ?, ?, ?, ?, ?);";
+		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			log.debug("createDownloadRequestInfo sql: " + sql); 
-			stmt = conn.prepareStatement(sql);
+			
 			stmt.setString(1, downloadRequestInfo.getRequestId());
 			stmt.setString(2, downloadRequestInfo.getJobId());
 			String json = gson.toJson(downloadRequestInfo.getDownload());
@@ -58,32 +54,15 @@ public class DownloadDao {
 			int count = stmt.executeUpdate();
 			log.debug("createDownloadRequestInfo insert #records: " + count); 
 		} catch (SQLException e) {
+			log.error("Exception when executing sql=" + sql);
 			throw e;
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			} // nothing we can do
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			} // end finally try
-
 		}
 	}
 
 	public DownloadRequestInfo readDownloadRequestInfo(String requestId) throws SQLException{
 		DownloadRequestInfo downloadRequestInfo = null;
-		Connection conn = null;
-		Statement stmt = null;
-		try {
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			String sql;
-			sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
+		String sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
+		try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
 			log.debug("readDownloadRequestInfo sql: " + sql); 
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
@@ -106,64 +85,30 @@ public class DownloadDao {
 			}
 			rs.close();
 		} catch (SQLException e) {
+			log.error("Exception when executing sql=" + sql);
 			throw e;
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			} // nothing we can do
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			} // end finally try
-
 		}
 		return downloadRequestInfo;
 	}
 	
 	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException{
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		try {
-			conn = dataSource.getConnection();
-			String sql;
-			sql = "INSERT INTO result_info (request_id, response_time, response_code) VALUES(?, now(), ?);";
+		String sql = "INSERT INTO result_info (request_id, response_time, response_code) VALUES(?, now(), ?);";
+		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			log.debug("createDownloadResultInfo sql: " + sql); 
-			stmt = conn.prepareStatement(sql);
 			stmt.setString(1, downloadResultInfo.getRequestId());
 			stmt.setString(2, downloadResultInfo.getResponseCode());
 			int count = stmt.executeUpdate();
 			log.debug("createDownloadResultInfo insert #records: " + count); 
 		} catch (SQLException e) {
+			log.error("Exception when executing sql=" + sql);
 			throw e;
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			} // nothing we can do
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			} // end finally try
-
 		}
 	}
 	
 	public DownloadResultInfo readDownloadResultInfo(String requestId) throws SQLException{
 		DownloadResultInfo downloadResultInfo = null;
-		Connection conn = null;
-		Statement stmt = null;
-		try {
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			String sql;
-			sql = "SELECT * FROM result_info WHERE request_id='" + requestId + "'";
+		String sql = "SELECT * FROM result_info WHERE request_id='" + requestId + "'";
+		try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
 			log.debug("readDownloadResultInfo sql: " + sql); 
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
@@ -177,20 +122,8 @@ public class DownloadDao {
 			}
 			rs.close();
 		} catch (SQLException e) {
+			log.error("Exception when executing sql=" + sql);
 			throw e;
-		} finally {
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			} // nothing we can do
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			} // end finally try
-
 		}
 		return downloadResultInfo;
 	}
