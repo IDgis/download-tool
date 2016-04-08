@@ -49,21 +49,6 @@ public class TestProcessor  extends EasyMockSupport {
 	@Mock(type = MockType.STRICT, fieldName = "errorFeedbackQueue")
 	private FeedbackQueue errorFeedbackQueueMock;
 	
-	/*
-	
-	@Before
-	public void setUp() throws Exception {
-		downloadProcessor = new DownloadProcessor();
-		// TODO mock when beanstalk code is in place
-		queueClientMock = new DownloadQueueClient("download");
-		feedbackQueueMock = new FeedbackQueueClient("feedbackOK");
-		errorFeedbackQueueMock = new FeedbackQueueClient("feedbackNOK");
-		
-		downloadProcessor.setDownloadQueueClient(queueClientMock);
-		downloadProcessor.setFeedbackQueue(feedbackQueueMock);
-		downloadProcessor.setErrorFeedbackQueue(errorFeedbackQueueMock);
-	}
-*/
 	/**
 	 * Test method for {@link nl.idgis.downloadtool.downloader.DownloadProcessor#performDownload(nl.idgis.downloadtool.domain.DownloadRequest)}.
 	 */
