@@ -30,7 +30,7 @@ feedback_ok:
       U kunt bestand $${featuretype}.zip downloaden via de volgende link: 
       $${downloadlink}. "
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadlink"
+    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
@@ -54,7 +54,7 @@ feedback_error:
         $${responsecode}
       Neem voor meer informatie contact op met Geoportaal Overijssel. "
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadlink"
+    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
