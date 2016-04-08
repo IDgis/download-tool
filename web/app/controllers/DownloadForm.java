@@ -171,14 +171,14 @@ public class DownloadForm extends Controller {
 				stylesheet.setName("metadata");
 				stylesheet.setExtension("xsl");
 				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
-					.absoluteURL(request().secure(), hostname));
+					.absoluteURL(false, hostname));
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
 				metadata.setName(id);
 				metadata.setExtension("xml");
 				metadata.setUrl(routes.Metadata.get(id)
-					.absoluteURL(request().secure(), hostname));
+					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
 
 				Download download = new Download();
