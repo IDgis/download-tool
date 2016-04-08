@@ -185,7 +185,7 @@ public class DownloadForm extends Controller {
 				download.setFt(ft);
 				download.setAdditionalData(additionalData);
 				
-				// TODO: put a download job in the queue
+				// put a download job in the queue
 				log.debug("put a download job in the queue");
 				Long jobId = null;
 				nl.idgis.downloadtool.domain.DownloadRequest downloadReq = new nl.idgis.downloadtool.domain.DownloadRequest(id);
