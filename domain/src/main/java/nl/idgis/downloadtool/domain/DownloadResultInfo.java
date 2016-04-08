@@ -10,22 +10,22 @@ import java.sql.Timestamp;
  */
 public class DownloadResultInfo {
 
-    private long id; // unique pk
-    
-    private String requestId; // unique logische sleutel
-    
-    private Timestamp responseTime; // not null
-    
-    private String responseCode; // not null
+	private long id; // unique pk
 
-    public DownloadResultInfo() {
-    	super();
-    }
-    
+	private String requestId; // unique logische sleutel
+
+	private Timestamp responseTime; // not null
+
+	private String responseCode; // not null
+
+	public DownloadResultInfo() {
+		super();
+	}
+
 	public DownloadResultInfo(Feedback feedback) {
 		super();
 		setRequestId(feedback.getRequestId());
-		setResponseCode(feedback.getResultCode());		
+		setResponseCode(feedback.getResultCode());
 	}
 
 	public String getRequestId() {
@@ -51,6 +51,5 @@ public class DownloadResultInfo {
 	public void setResponseCode(String responseCode) {
 		this.responseCode = responseCode;
 	}
-    
-    
+
 }

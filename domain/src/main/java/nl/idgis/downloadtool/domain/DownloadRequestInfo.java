@@ -11,35 +11,37 @@ import java.sql.Timestamp;
 public class DownloadRequestInfo {
 
 	private long id; // unique pk
-    
+
 	private String requestId; // unique logische sleutel (uuid)
-    
+
 	private Timestamp requestTime; // not null
-    
-	private Download download; //json  of jsonb ?
-    
-    /* 
-     * items from form
-     */
-	private String jobId; // identifies the queue job_id 
-    
+
+	private Download download; // json of jsonb ?
+
+	/*
+	 * items from form
+	 */
+	private String jobId; // identifies the queue job_id
+
 	private String userName;
-    
+
 	private String userEmailAddress;
-    
-	private String userFormat; // mime type the user wants to receive the data in (shp, kml, gml or dxf)
+
+	private String userFormat; // mime type the user wants to receive the data
+								// in (shp, kml, gml or dxf)
 
 	public DownloadRequestInfo() {
 		super();
 	}
-    
-	public DownloadRequestInfo(String requestId, String jobId, String userName, String userEmailAddress, String userFormat, Download download) {
+
+	public DownloadRequestInfo(String requestId, String jobId, String userName, String userEmailAddress,
+			String userFormat, Download download) {
 		super();
-		this.requestId = requestId; 
-		this.jobId = jobId; 
-		this.userName = userName; 
-		this.userEmailAddress = userEmailAddress; 
-		this.userFormat = userFormat; 
+		this.requestId = requestId;
+		this.jobId = jobId;
+		this.userName = userName;
+		this.userEmailAddress = userEmailAddress;
+		this.userFormat = userFormat;
 		this.download = download;
 	}
 
@@ -99,5 +101,4 @@ public class DownloadRequestInfo {
 		this.userFormat = userFormat;
 	}
 
-    
 }
