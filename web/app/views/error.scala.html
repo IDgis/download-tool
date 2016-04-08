@@ -1,0 +1,10 @@
+@(webJarAssets: WebJarAssets, exception: play.api.UsefulException)
+
+@layout(webJarAssets) {
+	<p class="title">500 Interne server fout</p>
+	
+	<div class="welcome">
+		<p>Er ging iets mis bij het verwerken van het verzoek.</p>
+		<p>Foutcode: @@@exception.id</p>
+	</div>
+}
