@@ -25,8 +25,8 @@ import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 public class FeedbackProvider {
 	private static final Logger log = LoggerFactory.getLogger(FeedbackProvider.class);
 	
-	private FeedbackQueue feedbackQueue;
-	private DownloadDao downloadDao;
+	private final FeedbackQueue feedbackQueue;
+	private final DownloadDao downloadDao;
 	
 	private String smtpHost, smtpUser, smtpPassword;
 	private int smtpPort;
@@ -39,10 +39,6 @@ public class FeedbackProvider {
 		this.downloadDao = downloadDao;
 	}
 
-    public void setFeedbackQueue(FeedbackQueue queueClient){
-    	this.feedbackQueue = queueClient;
-    }
-    
 	public String getSmtpHost() {
 		return smtpHost;
 	}

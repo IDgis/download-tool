@@ -38,8 +38,8 @@ public class DownloadQueueClient implements DownloadQueue {
 	 * key is downloadrequest, value is job id.
 	 */
 	private final Map<DownloadRequest, Long> jobs;
-	private JobProducer producer;
-	private JobConsumer consumer;
+	private final JobProducer producer;
+	private final JobConsumer consumer;
 	
 	/**
 	 * Construct a DownloadQueueCLient
@@ -58,8 +58,8 @@ public class DownloadQueueClient implements DownloadQueue {
 		this.producer = factory.createJobProducer(beanstalkTubeName);
 		this.consumer = factory.createJobConsumer(beanstalkTubeName);
 
-		gson = new Gson();
-		jobs = new HashMap<DownloadRequest, Long>();		
+		this.gson = new Gson();
+		this.jobs = new HashMap<DownloadRequest, Long>();		
 	}
 
 	/**
@@ -73,8 +73,8 @@ public class DownloadQueueClient implements DownloadQueue {
 		this.producer = producer;
 		this.consumer = consumer;
 		
-		gson = new Gson();
-		jobs = new HashMap<DownloadRequest, Long>();		
+		this.gson = new Gson();
+		this.jobs = new HashMap<DownloadRequest, Long>();		
 	}
 
 	/* (non-Javadoc)

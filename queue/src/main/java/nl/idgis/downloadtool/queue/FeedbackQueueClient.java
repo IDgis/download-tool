@@ -37,8 +37,8 @@ public class FeedbackQueueClient implements FeedbackQueue {
 	 * key is feedback, value is job id.
 	 */
 	private final Map<Feedback, Long> jobs;
-	private JobProducer producer;
-	private JobConsumer consumer;
+	private final JobProducer producer;
+	private final JobConsumer consumer;
 	
 	/**
 	 * Construct a FeedbackQueueClient
@@ -57,8 +57,8 @@ public class FeedbackQueueClient implements FeedbackQueue {
 		this.producer = factory.createJobProducer(beanstalkTubeName);
 		this.consumer = factory.createJobConsumer(beanstalkTubeName);
 
-		gson = new Gson();
-		jobs = new HashMap<Feedback, Long>();		
+		this.gson = new Gson();
+		this.jobs = new HashMap<Feedback, Long>();		
 	}
 
 	/**
@@ -72,8 +72,8 @@ public class FeedbackQueueClient implements FeedbackQueue {
 		this.producer = producer;
 		this.consumer = consumer;
 		
-		gson = new Gson();
-		jobs = new HashMap<Feedback, Long>();		
+		this.gson = new Gson();
+		this.jobs = new HashMap<Feedback, Long>();		
 	}
 
 	/* (non-Javadoc)

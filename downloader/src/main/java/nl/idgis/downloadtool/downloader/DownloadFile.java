@@ -37,11 +37,11 @@ import nl.idgis.downloadtool.domain.AdditionalData;
 public class DownloadFile implements DownloadSource {
 	private static final Log log = LogFactory.getLog(DownloadFile.class);
 	
-	private URI uri;
+	private final URI uri;
 	private HttpEntity entity;
 	private CloseableHttpResponse response; 
-	private CloseableHttpClient httpclient;
-	private HttpGet httpGet;
+	private final CloseableHttpClient httpclient;
+	private final HttpGet httpGet;
 	
 
 	/**

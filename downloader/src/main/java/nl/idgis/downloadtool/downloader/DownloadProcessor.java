@@ -43,7 +43,7 @@ public class DownloadProcessor {
 	private DownloadQueue queueClient;
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 	
-	String cachePath;
+	private final String cachePath;
 	
     public DownloadProcessor(String cachePath) {
         super();
@@ -148,17 +148,18 @@ public class DownloadProcessor {
 	}
 
 
-    /*
-     * PSEUDO-CODE
-     *    lees uit queue
-     *       downloadRequest Bean = requestQueue.reserveJob();
-     *    initialize downloads and converters and packager   
-     *       performDownload(downloadRequest Bean);
-     *    put feedback into queue (OK queue or NOK queue depending on outcome)
-     *       feedbackQueue.put(feedback Bean);
-     *    end queue job
-     *       requestQueue.deleteJob();   
-     */
+	/**
+	 * Process a downloadrequest.<br>
+	 * Steps:<br>
+	 * <code>
+	 * 1. read downloadrequest from queue.<br>
+	 * 2. perform actual download(s).<br>
+	 * 3. when OK then send result to feedback queue.<br>
+	 * 3. when exception occurs, then send result to feedback error queue.<br>
+	 * the result will contain the exception message as result code.<br>
+	 * 4. remove downloadrequest from queue.<br>
+	 * </code>
+	 */
 	public void processDownloadRequest() {
 		DownloadRequest downloadRequest = queueClient.receiveDownloadRequest();
 		
