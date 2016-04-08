@@ -102,3 +102,11 @@ web:
   volumes_from:
     - downloader
 
+gc:
+  build: gc
+  restart: always
+  environment:
+    ZIP_CACHEPATH: /tmp/cache
+  volumes_from:
+    - downloader
+
