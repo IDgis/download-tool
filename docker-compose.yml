@@ -82,12 +82,13 @@ web:
     DB_URL: "jdbc:postgresql://db:5432/download"
     APPLICATION_SECRET: FgZvDqfDukyA9ZmhCBmHTmCoahULjzB4nVzfwFDU7A6wyhNTOHtWN
     ZOOKEEPER_HOST: zookeeper:2181
-    SERVICE_DOMAIN_NAME: test.geoportaaloverijssel.nl
+    SERVICE_DOMAIN_NAME: localhost
+    ZIP_CACHEPATH: /tmp/cache
   external_links:
     - base-zookeeper:zookeeper
   links:
     - db
     - beanstalk
-  expose:
-    - "9000"
+  volumes_from:
+    - downloader
 
