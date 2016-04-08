@@ -83,10 +83,11 @@ public class DownloadProcessor {
 			if (download == null)
 				throw new IllegalArgumentException("downloadrequest does not contain valid downloads");
 
-			Cache downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
+			// requestId is unique and therefore used as name of the zip file
+			Cache downloadCache = new ZippedCache(cachePath, downloadRequest.getRequestId() + ".zip");
 			// make sure last cache with the same name is deleted before use
 			downloadCache.rmCache();
-			downloadCache = new ZippedCache(cachePath, download.getName() + ".zip");
+			downloadCache = new ZippedCache(cachePath, downloadRequest.getRequestId() + ".zip");
 			OutputStream downloadCacheOutputStream = null;
 			try {
 				/*
