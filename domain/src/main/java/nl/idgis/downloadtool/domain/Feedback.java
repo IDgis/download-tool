@@ -8,45 +8,42 @@ import java.io.Serializable;
  * @author Rob
  *
  */
-public class Feedback implements Serializable{
-    
-    private static final long serialVersionUID = -3600596933670573586L;
- 
-    /**
-     * requestId is uniek Id van dit download verzoek, wordt gebruikt bij terugmeldingen
-     */
-    private String requestId;
-    
-    /**
-     * Result code
-     */
-    private String resultCode;
+public class Feedback implements Serializable {
 
+	private static final long serialVersionUID = -3600596933670573586L;
 
-    /**
-     * @param id unique identifier of this downloadrequest.<br>
-     * Equal to DownloadRequest.requestId
-     */
-    public Feedback(String id) {
-        super();
-        this.requestId = id;
-    }
+	/**
+	 * requestId is uniek Id van dit download verzoek, wordt gebruikt bij
+	 * terugmeldingen
+	 */
+	private String requestId;
 
+	/**
+	 * Result code
+	 */
+	private String resultCode;
 
-    public String getRequestId() {
-        return requestId;
-    }
+	/**
+	 * @param id
+	 *            unique identifier of this downloadrequest.<br>
+	 *            Equal to DownloadRequest.requestId
+	 */
+	public Feedback(String id) {
+		super();
+		this.requestId = id;
+	}
 
+	public String getRequestId() {
+		return requestId;
+	}
 
 	public String getResultCode() {
 		return resultCode;
 	}
 
-
 	public void setResultCode(String resultCode) {
 		this.resultCode = resultCode;
 	}
-
 
 	@Override
 	public String toString() {

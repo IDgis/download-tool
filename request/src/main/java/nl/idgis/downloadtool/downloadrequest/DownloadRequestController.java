@@ -28,13 +28,6 @@ import nl.idgis.downloadtool.queue.DownloadQueueClient;
 public class DownloadRequestController {
 	private static final Logger log = LoggerFactory.getLogger(DownloadRequestController.class);
 
-	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
-	private static final String BEANSTALK_DOWNLOAD_QUEUE = "BEANSTALK_DOWNLOAD_QUEUE";
-
-	private static final String DB_URL = "DB_URL";
-	private static final String DB_USER = "DB_USER";
-	private static final String DB_PW = "DB_PW";
-	
 	private DownloadDao downloadDao;
 	
 	private DownloadQueue queueClient;
@@ -50,23 +43,23 @@ public class DownloadRequestController {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String host = System.getenv(BEANSTALK_HOST);
+		String host = System.getenv("BEANSTALK_HOST");
 		if(host == null) {
 			host = "localhost";
 		}
-		String downloadQueueTubeName = System.getenv(BEANSTALK_DOWNLOAD_QUEUE);
+		String downloadQueueTubeName = System.getenv("BEANSTALK_DOWNLOAD_QUEUE");
 		if(downloadQueueTubeName == null) {
 			downloadQueueTubeName = "downloadRequestTube";
 		}
-		String dbUser = System.getenv(DB_USER);
+		String dbUser = System.getenv("DB_USER");
 		if (dbUser==null){
 			dbUser = "postgres";
 		}
-		String dbPassword = System.getenv(DB_PW);
+		String dbPassword = System.getenv("DB_PW");
 		if (dbPassword==null){
 			dbPassword = "postgres";
 		}
-		String dbUrl = System.getenv(DB_URL);
+		String dbUrl = System.getenv("DB_URL");
 		if (dbUrl==null){
 			dbUrl = "jdbc:postgresql://localhost:5432/download";
 		}
