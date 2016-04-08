@@ -24,28 +24,6 @@ import nl.idgis.downloadtool.queue.FeedbackQueueClient;
  */
 public class FeedbackProvider {
 	private static final Logger log = LoggerFactory.getLogger(FeedbackProvider.class);
-
-	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
-	private static final String BEANSTALK_FEEDBACK_QUEUE = "BEANSTALK_FEEDBACK_QUEUE";
-
-	private static final String DB_URL = "DB_URL";
-	private static final String DB_USER = "DB_USER";
-	private static final String DB_PW = "DB_PW";
-	
-	private static final String SMTP_HOST = "SMTP_HOST";
-
-	private static final String SMTP_PORT = "SMTP_PORT";
-
-	private static final String SMTP_FROMADDRESS = "SMTP_FROMADDRESS";
-	
-	private static final String SMTP_USER = "SMTP_USER";
-	private static final String SMTP_PASSWORD = "SMTP_PASSWORD";
-
-	private static final String EMAIL_MESSAGE_TEMPLATE = "EMAIL_MESSAGE_TEMPLATE";
-
-	private static final String EMAIL_SUBJECT_TEMPLATE = "EMAIL_SUBJECT_TEMPLATE";
-
-	private static final String DOWNLOAD_URL = "DOWNLOAD_URL";
 	
 	private FeedbackQueue feedbackQueue;
 	private DownloadDao downloadDao;
@@ -192,54 +170,54 @@ public class FeedbackProvider {
 		/*
 		 * Get environment vars
 		 */
-		String host = System.getenv(BEANSTALK_HOST);
+		String host = System.getenv("BEANSTALK_HOST");
 		if(host == null) {
 			host = "localhost";
 		}
-		String feedbackTubeName = System.getenv(BEANSTALK_FEEDBACK_QUEUE);
+		String feedbackTubeName = System.getenv("BEANSTALK_FEEDBACK_QUEUE");
 		if(feedbackTubeName == null) {
 			feedbackTubeName = "feedbackOkTube";
 		}
-		String smtpHost = System.getenv(SMTP_HOST);
+		String smtpHost = System.getenv("SMTP_HOST");
 		if(smtpHost == null) {
 			smtpHost = "localhost";
 		}
-		String smtpPortStr = System.getenv(SMTP_PORT);
+		String smtpPortStr = System.getenv("SMTP_PORT");
 		if(smtpPortStr == null) {
 			smtpPortStr = "25";
 		}
 		int smtpPort= Integer.parseInt(smtpPortStr);
 
-		String smtpFromAddress = System.getenv(SMTP_FROMADDRESS);
+		String smtpFromAddress = System.getenv("SMTP_FROMADDRESS");
 		if(smtpFromAddress == null) {
 			smtpFromAddress = "mail@idgis.nl";
 		}
 		
 		// from docker-compose.override.yml		
-		String smtpUser = System.getenv(SMTP_USER);
-		String smtpPassword = System.getenv(SMTP_PASSWORD);
+		String smtpUser = System.getenv("SMTP_USER");
+		String smtpPassword = System.getenv("SMTP_PASSWORD");
 		
-		String msgTemplate = System.getenv(EMAIL_MESSAGE_TEMPLATE);
+		String msgTemplate = System.getenv("EMAIL_MESSAGE_TEMPLATE");
 		if(msgTemplate == null) {
 			msgTemplate = "There is a downloadlink available for ${username} concerning ${featuretype}";
 		}
-		String subjectTemplate = System.getenv(EMAIL_SUBJECT_TEMPLATE);
+		String subjectTemplate = System.getenv("EMAIL_SUBJECT_TEMPLATE");
 		if(subjectTemplate == null) {
 			subjectTemplate = "Geoportaal downloader: ${featuretype} is available for download";
 		}
-		String downloadUrl = System.getenv(DOWNLOAD_URL);
+		String downloadUrl = System.getenv("DOWNLOAD_URL");
 		if (downloadUrl==null){
 			downloadUrl  = "localhost/downloadLink";
 		}
-		String dbUser = System.getenv(DB_USER);
+		String dbUser = System.getenv("DB_USER");
 		if (dbUser==null){
 			dbUser = "postgres";
 		}
-		String dbPassword = System.getenv(DB_PW);
+		String dbPassword = System.getenv("DB_PW");
 		if (dbPassword==null){
 			dbPassword = "postgres";
 		}
-		String dbUrl = System.getenv(DB_URL);
+		String dbUrl = System.getenv("DB_URL");
 		if (dbUrl==null){
 			dbUrl = "jdbc:postgresql://localhost:5432/download";
 		}

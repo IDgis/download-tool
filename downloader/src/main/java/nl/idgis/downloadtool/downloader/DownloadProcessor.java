@@ -39,13 +39,7 @@ public class DownloadProcessor {
 	private static final Logger log = LoggerFactory.getLogger(DownloadProcessor.class);
 	
 	private static final int BUF_SIZE = 4096;
-	
-	private static final String BEANSTALK_HOST = "BEANSTALK_HOST";
-	private static final String ZIPCACHEPATH = "ZIP_CACHEPATH";
-	private static final String BEANSTALK_DOWNLOAD_QUEUE = "BEANSTALK_DOWNLOAD_QUEUE";
-	private static final String BEANSTALK_FEEDBACKOK_QUEUE = "BEANSTALK_FEEDBACKOK_QUEUE";
-	private static final String BEANSTALK_FEEDBACKERROR_QUEUE = "BEANSTALK_FEEDBACKERROR_QUEUE";
-	
+		
 	private DownloadQueue queueClient;
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 	
@@ -239,23 +233,23 @@ public class DownloadProcessor {
 
 	
 	public static void main(String... args){
-		String path = System.getenv(ZIPCACHEPATH);
+		String path = System.getenv("ZIPCACHE_PATH");
 		if(path == null) {
 			path = System.getProperty("user.home");
 		}
-		String host = System.getenv(BEANSTALK_HOST);
+		String host = System.getenv("BEANSTALK_HOST");
 		if(host == null) {
 			host = "localhost";
 		}
-		String downloadQueueTubeName = System.getenv(BEANSTALK_DOWNLOAD_QUEUE);
+		String downloadQueueTubeName = System.getenv("BEANSTALK_DOWNLOAD_QUEUE");
 		if(downloadQueueTubeName == null) {
 			downloadQueueTubeName = "downloadRequestTube";
 		}
-		String feedbackOkTubeName = System.getenv(BEANSTALK_FEEDBACKOK_QUEUE);
+		String feedbackOkTubeName = System.getenv("BEANSTALK_FEEDBACKOK_QUEUE");
 		if(feedbackOkTubeName == null) {
 			feedbackOkTubeName = "feedbackOkTube";
 		}
-		String feedbackErrorTubeName = System.getenv(BEANSTALK_FEEDBACKERROR_QUEUE);
+		String feedbackErrorTubeName = System.getenv("BEANSTALK_FEEDBACKERROR_QUEUE");
 		if(feedbackErrorTubeName == null) {
 			feedbackErrorTubeName = "feedbackErrorTube";
 		}
