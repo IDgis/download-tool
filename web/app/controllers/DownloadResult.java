@@ -13,6 +13,8 @@ import play.db.Database;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import views.html.missing;
+
 import nl.idgis.downloadtool.dao.DownloadDao;
 
 public class DownloadResult extends Controller {
@@ -23,8 +25,12 @@ public class DownloadResult extends Controller {
 	
 	private final DownloadDao downloadDao;
 	
+	private final WebJarAssets webJarAssets;
+	
 	@Inject
-	public DownloadResult(Configuration config, Database database) {
+	public DownloadResult(WebJarAssets webJarAssets, Configuration config, Database database) {
+		this.webJarAssets = webJarAssets;
+		
 		String cachePath = config.getString("cache.path");
 		
 		log.debug("cache.path: " + cachePath);
@@ -50,7 +56,7 @@ public class DownloadResult extends Controller {
 			response().setContentType("application/zip");
 			return ok(file.toFile(), fileName);
 		} else {
-			return notFound();
+			return notFound(missing.render(webJarAssets));
 		}
 	}
 }
