@@ -77,6 +77,7 @@ web:
     APPLICATION_SECRET: FgZvDqfDukyA9ZmhCBmHTmCoahULjzB4nVzfwFDU7A6wyhNTOHtWN
     ZOOKEEPER_HOST: zookeeper:2181
     SERVICE_DOMAIN_NAME: test.geoportaaloverijssel.nl
+    ZIP_CACHEPATH: /tmp/cache
   external_links:
     - base-zookeeper:zookeeper
   links:
@@ -84,4 +85,6 @@ web:
     - beanstalk
   expose:
     - "9000"
+  volumes_from:
+    - downloader
 

@@ -1,0 +1,56 @@
+package controllers;
+
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import javax.inject.Inject;
+
+import play.Configuration;
+import play.Logger;
+import play.Logger.ALogger;
+import play.db.Database;
+import play.mvc.Controller;
+import play.mvc.Result;
+
+import nl.idgis.downloadtool.dao.DownloadDao;
+
+public class DownloadResult extends Controller {
+	
+	private static final ALogger log = Logger.of(DownloadResult.class);
+	
+	private final Path cache;
+	
+	private final DownloadDao downloadDao;
+	
+	@Inject
+	public DownloadResult(Configuration config, Database database) {
+		String cachePath = config.getString("cache.path");
+		
+		log.debug("cache.path: " + cachePath);
+		
+		if(cachePath == null) {
+			throw new IllegalArgumentException("cache.path configuration missing");
+		}
+		
+		cache = FileSystems.getDefault().getPath(cachePath);
+		
+		if(!Files.exists(cache)) {
+			throw new IllegalArgumentException("configured cache location doesn't exists");
+		};
+		
+		downloadDao = new DownloadDao(database.getDataSource());
+	}
+
+	public Result get(String id) {
+		String fileName = id + ".zip";
+		
+		Path file = cache.resolve(fileName);
+		if(Files.exists(file)) {
+			response().setContentType("application/zip");
+			return ok(file.toFile(), fileName);
+		} else {
+			return notFound();
+		}
+	}
+}
