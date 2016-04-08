@@ -196,7 +196,8 @@ public class DownloadForm extends Controller {
 
 				// store information about this job in the database
 				DownloadRequestInfo requestInfo = new DownloadRequestInfo(
-						id, (jobId==null?"":jobId.toString()), 
+						UUID.randomUUID().toString(), // requestId is unique 
+						(jobId==null?"":jobId.toString()), 
 						downloadRequest.getName(), downloadRequest.getEmail(), outputFormat.mimeType(), 
 						download);
 				log.debug("store information about this job in the database: " + requestInfo.getRequestId());
