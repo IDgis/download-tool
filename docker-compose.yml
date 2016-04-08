@@ -24,9 +24,13 @@ feedback_ok:
     BEANSTALK_FEEDBACK_QUEUE: feedbackOkTube
     SMTP_HOST: mail.your-server.de
     SMTP_PORT: 25
-    EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, U kunt bestand $${featuretype}.zip downloaden via de volgende link: $${downloadLink}. "
+    EMAIL_MESSAGE_TEMPLATE: |
+      "Geachte $${username}, 
+      
+      U kunt bestand $${featuretype}.zip downloaden via de volgende link: 
+      $${downloadlink}. "
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadLink"
+    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadlink"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
@@ -42,9 +46,15 @@ feedback_error:
     BEANSTALK_FEEDBACK_QUEUE: feedbackErrorTube
     SMTP_HOST: mail.your-server.de
     SMTP_PORT: 25
-    EMAIL_MESSAGE_TEMPLATE: "Geachte $${username}, Uw download van Geoportaal Overijssel is niet gelukt, neem contact op met Geoportaal Overijssel. "
+    EMAIL_MESSAGE_TEMPLATE: |
+      "Geachte $${username}, 
+      
+      Uw download $${featuretype} van Geoportaal Overijssel is niet gelukt.
+      De foutcode is:
+        $${responsecode}
+      Neem voor meer informatie contact op met Geoportaal Overijssel. "
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadLink"
+    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/downloadlink"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"

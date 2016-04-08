@@ -127,7 +127,8 @@ public class FeedbackProvider {
 			Map<String,Object> placeholders = new HashMap<String,Object>();
 			placeholders.put("username", downloadRequestInfo.getUserName());
 			placeholders.put("featuretype", downloadRequestInfo.getDownload().getFt().getName());
-			placeholders.put("downloadLink", downloadUrl + "/" + downloadRequestInfo.getRequestId());
+			placeholders.put("downloadlink", downloadUrl + "/" + downloadRequestInfo.getRequestId());
+			placeholders.put("responsecode", downloadResultInfo.getResponseCode());
 			String subject = Mail.createMsg(placeholders, subjectTemplate);
 			String msg = Mail.createMsg(placeholders, msgTemplate);
 			
