@@ -14,9 +14,9 @@ import java.util.List;
 public class Download implements Serializable {
     private static final long serialVersionUID = 1012331026914569758L;
 
-    String name; // name of the zip file where all individual downloads are packaged
-    WfsFeatureType ft; // description of the featuretype to download
-    List<AdditionalData> additionalData; // list of non-conversion data
+    private String name; // name of the zip file where all individual downloads are packaged
+    private WfsFeatureType ft; // description of the featuretype to download
+    private List<AdditionalData> additionalData; // list of non-conversion data
 
     /**
      * @return name of the zip file where all individual downloads are packaged

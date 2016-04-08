@@ -17,14 +17,14 @@ public class DownloadRequest implements Serializable {
     /**
      * requestId bevat requestId van dit download verzoek, wordt gebruikt bij terugmeldingen
      */
-    String requestId;
+    private String requestId;
 
     /**
      * Mimetype to convert to e.g. "application/vnd.google-earth.kml+xml"
      */
-    String convertToMimetype; 
+    private String convertToMimetype; 
 
-    Download download;
+    private Download download;
 
     /**
      * @param id unique identifier of this downloadrequest.<br>
