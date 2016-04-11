@@ -64,8 +64,7 @@ feedback_error:
 
 db:
   build: db
-  expose:
-  - "5432"
+  restart: always
 
 web:
   image: web
@@ -86,6 +85,14 @@ web:
   links:
     - db
     - beanstalk
+  volumes_from:
+    - downloader
+
+gc:
+  build: gc
+  restart: always
+  environment:
+    ZIP_CACHEPATH: /tmp/cache
   volumes_from:
     - downloader
 

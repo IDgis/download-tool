@@ -29,6 +29,7 @@ import play.Logger.ALogger;
 import views.html.form;
 import views.html.help;
 import views.html.feedback;
+import views.html.datasetmissing;
 
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
@@ -102,7 +103,7 @@ public class DownloadForm extends Controller {
 						FORMATS),
 					Form.form(DownloadRequest.class)));
 			} else {
-				return notFound();
+				return notFound(datasetmissing.render(webJarAssets, id));
 			}
 		});
 	}
@@ -170,14 +171,14 @@ public class DownloadForm extends Controller {
 				stylesheet.setName("metadata");
 				stylesheet.setExtension("xsl");
 				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
-					.absoluteURL(request().secure(), hostname));
+					.absoluteURL(false, hostname));
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
 				metadata.setName(id);
 				metadata.setExtension("xml");
 				metadata.setUrl(routes.Metadata.get(id)
-					.absoluteURL(request().secure(), hostname));
+					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
 
 				Download download = new Download();
@@ -210,7 +211,7 @@ public class DownloadForm extends Controller {
 					outputFormat,
 					downloadRequest.getEmail()));
 			} else {
-				return notFound();
+				return notFound(datasetmissing.render(webJarAssets, id));
 			}
 		});
 	}
