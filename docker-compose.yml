@@ -62,19 +62,6 @@ feedback_error:
     - db
     - beanstalk
 
-request:
-  image: request
-  restart: always
-  environment:
-    BEANSTALK_HOST: beanstalk
-    BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-    DB_USER: postgres
-    DB_PW: postgres
-    DB_URL: "jdbc:postgresql://db:5432/download"
-  links:
-    - db
-    - beanstalk
-
 db:
   build: db
   restart: always

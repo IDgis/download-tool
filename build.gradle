@@ -48,7 +48,6 @@ configure([
 	project(':dao'),
 	project(':domain'),
 	project(':queue'),
-	project(':request'),
 	project(':feedback'),
 	project(':downloader')]) {
 	
@@ -148,7 +147,6 @@ configure([
 
 // application projects
 configure([
-	project(':request'),
 	project(':feedback'),
 	project(':downloader')]) {
 	
@@ -223,15 +221,6 @@ project(':queue') {
 		compile project(':domain')
 		compile 'com.google.code.gson:gson:2.5'
 		compile 'com.dinstone:beanstalkc:2.2.0'
-	}
-}
-
-project(':request') {
-	
-	mainClassName = 'nl.idgis.downloadtool.downloadrequest.DownloadRequestController'
-	
-	dependencies {
-		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
 	}
 }
 
