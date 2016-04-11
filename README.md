@@ -1,13 +1,13 @@
-
-
 # Download tool voor het Geoportaal.
 
 ## Beschrijving
+
 De downloadtool is onderdeel van het Geoportaal Overijssel.
 Het geeft de mogelijkheid om datasets in verschillende formaten om te laten zetten en samen met metadata in een zip te laten verpakken.
-De zip file kan worden gedownload.
+De zip file kan worden gedownload, hiervoor wordt een mail verstuurd met een download link.
 
 Stappen:
+
 1. Klik bij de gegevens van een dataset op de download link.
 2. Een formulier wordt getoond, vul hier naam en emailadres in en het gewenste formaat (SHP, GML, KML, DXF).
 3. De dataset wordt omgezet in het gewenste formaat en in een zip file verpakt.
