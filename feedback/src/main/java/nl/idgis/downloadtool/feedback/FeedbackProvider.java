@@ -19,8 +19,11 @@ import nl.idgis.downloadtool.queue.FeedbackQueue;
 import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 
 /**
- * @author Rob
+ * The feedback provider polls a beanstalk queue for a Feedback object. 
+ * It then saves the feedback to the database and assembles an email<br>
+ * The queue it listens to and the email content is determined by configuration. 
  *
+ * @author Rob
  */
 public class FeedbackProvider {
 	private static final Logger log = LoggerFactory.getLogger(FeedbackProvider.class);
@@ -103,6 +106,11 @@ public class FeedbackProvider {
 		this.downloadUrl = downloadUrl;
 	}
 
+	/**
+	 * Poll a queue for feedback.<br>
+	 * Save the feedback to the database and send an email.
+	 * @throws Exception
+	 */
 	public void processFeedback() throws Exception {
 		/*
 		 * get feedback from queue
@@ -162,7 +170,8 @@ public class FeedbackProvider {
 	}
 
 	/**
-	 * @param args
+	 * Set the configuration parameters and enter an eternal loop processing feedback.
+	 * @param args not used
 	 */
 	public static void main(String[] args) {
 		/*
