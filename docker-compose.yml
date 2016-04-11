@@ -1,6 +1,12 @@
 beanstalk:
   image: schickling/beanstalkd
   restart: always
+  
+downloader_cache_dv:
+  image: downloader
+  command: ["true"]
+  volumes:
+    - ./cache:/tmp/cache/
 
 downloader:
   image: downloader
@@ -11,10 +17,11 @@ downloader:
     BEANSTALK_FEEDBACKOK_QUEUE: feedbackOkTube
     BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
     ZIP_CACHEPATH: /tmp/cache
-  volumes:
-    - ./cache:/tmp/cache/
+  volumes_from:
+    - downloader_cache_dv
   links:
     - beanstalk
+    - web
 
 feedback_ok:
   image: feedback
@@ -86,7 +93,7 @@ web:
     - db
     - beanstalk
   volumes_from:
-    - downloader
+    - downloader_cache_dv
 
 gc:
   build: gc
@@ -94,5 +101,5 @@ gc:
   environment:
     ZIP_CACHEPATH: /tmp/cache
   volumes_from:
-    - downloader
+    - downloader_cache_dv
 
