@@ -21,6 +21,7 @@ downloader:
     - downloader_cache_dv
   links:
     - beanstalk
+    - web
 
 feedback_ok:
   image: feedback
