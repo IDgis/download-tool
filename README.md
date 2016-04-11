@@ -24,7 +24,6 @@
 
 ###Docker containers en images
 
-```
 | image | container | beschrijving |
 | --- | --- | --- | 
 | beanstalk | schickling/beanstalkd | queue daemon |
@@ -35,4 +34,3 @@
 | web | play application | web formuloier, metadata provider, download proxy | 
 | cache | downloader | disk volume voor tijdelijke opslag zip files | 
 
-```
