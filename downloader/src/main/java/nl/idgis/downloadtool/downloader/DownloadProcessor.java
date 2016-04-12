@@ -253,7 +253,7 @@ public class DownloadProcessor {
 	}
 
 	public static void main(String... args) {
-		String path = System.getenv("ZIPCACHE_PATH");
+		String path = System.getenv("ZIP_CACHEPATH");
 		if (path == null) {
 			path = System.getProperty("user.home");
 		}
