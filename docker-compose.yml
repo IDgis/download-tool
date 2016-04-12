@@ -32,10 +32,10 @@ feedback_ok:
     SMTP_HOST: mail.your-server.de
     SMTP_PORT: 25
     EMAIL_MESSAGE_TEMPLATE: |
-      "Geachte $${username}, 
+      Geachte $${username}, 
       
       U kunt bestand $${featuretype}.zip downloaden via de volgende link: 
-      $${downloadlink}. "
+      $${downloadlink}.
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
     DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
@@ -54,12 +54,12 @@ feedback_error:
     SMTP_HOST: mail.your-server.de
     SMTP_PORT: 25
     EMAIL_MESSAGE_TEMPLATE: |
-      "Geachte $${username}, 
+      Geachte $${username}, 
       
       Uw download $${featuretype} van Geoportaal Overijssel is niet gelukt.
       De foutcode is:
         $${responsecode}
-      Neem voor meer informatie contact op met Geoportaal Overijssel. "
+      Neem voor meer informatie contact op met Geoportaal Overijssel.
     EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
     DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
