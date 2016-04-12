@@ -82,12 +82,15 @@ public class DownloadProcessor {
 			Download download = downloadRequest.getDownload();
 			if (download == null)
 				throw new IllegalArgumentException("downloadrequest does not contain valid downloads");
+			
+			String fileName = downloadRequest.getRequestId() + ".zip";
+			log.debug("creating zip file: {}/{}", cachePath, fileName);
 
 			// requestId is unique and therefore used as name of the zip file
-			Cache downloadCache = new ZippedCache(cachePath, downloadRequest.getRequestId() + ".zip");
+			Cache downloadCache = new ZippedCache(cachePath, fileName);
 			// make sure last cache with the same name is deleted before use
 			downloadCache.rmCache();
-			downloadCache = new ZippedCache(cachePath, downloadRequest.getRequestId() + ".zip");
+			downloadCache = new ZippedCache(cachePath, fileName);
 			OutputStream downloadCacheOutputStream = null;
 			try {
 				/*
@@ -251,29 +254,24 @@ public class DownloadProcessor {
 			fromStream.reset();
 		return markSupported;
 	}
+	
+	private static String getEnv(String name) {
+		String value = System.getenv(name);
+		
+		if(value == null) {
+			throw new IllegalArgumentException(name + " environment variable is missing");
+		}
+			
+		return value;
+	}
 
 	public static void main(String... args) {
-		String path = System.getenv("ZIPCACHE_PATH");
-		if (path == null) {
-			path = System.getProperty("user.home");
-		}
-		String host = System.getenv("BEANSTALK_HOST");
-		if (host == null) {
-			host = "localhost";
-		}
-		String downloadQueueTubeName = System.getenv("BEANSTALK_DOWNLOAD_QUEUE");
-		if (downloadQueueTubeName == null) {
-			downloadQueueTubeName = "downloadRequestTube";
-		}
-		String feedbackOkTubeName = System.getenv("BEANSTALK_FEEDBACKOK_QUEUE");
-		if (feedbackOkTubeName == null) {
-			feedbackOkTubeName = "feedbackOkTube";
-		}
-		String feedbackErrorTubeName = System.getenv("BEANSTALK_FEEDBACKERROR_QUEUE");
-		if (feedbackErrorTubeName == null) {
-			feedbackErrorTubeName = "feedbackErrorTube";
-		}
-
+		String path = getEnv("ZIP_CACHEPATH");		
+		String host = getEnv("BEANSTALK_HOST");
+		String downloadQueueTubeName = getEnv("BEANSTALK_DOWNLOAD_QUEUE");
+		String feedbackOkTubeName = getEnv("BEANSTALK_FEEDBACKOK_QUEUE");
+		String feedbackErrorTubeName = getEnv("BEANSTALK_FEEDBACKERROR_QUEUE");
+		
 		try {
 			log.info("start loop " + path);
 			DownloadProcessor dlp = new DownloadProcessor(path);
