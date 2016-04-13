@@ -7,15 +7,28 @@ buildscript {
 
 	dependencies {
 		classpath 'com.bmuschko:gradle-docker-plugin:2.6.5'
+		classpath 'org.ajoberstar:gradle-git:1.3.2'
 	}
 }
 
 import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import org.gradle.plugins.ide.eclipse.model.SourceFolder
+import org.ajoberstar.grgit.Grgit
+
+apply plugin: 'org.ajoberstar.grgit'
+
+def repo = Grgit.open(project.file('.'))
+def describe = repo.describe()
+if(describe && describe.startsWith('v')) {
+	version = describe.substring(1)
+} else {
+	version = 'latest'
+}
 
 subprojects {
-	
+
+	version = rootProject.version
 	group = 'nl.idgis.downloadtool'
 	
 	repositories {
@@ -88,6 +101,15 @@ configure([
 		testCompile 'junit:junit:4.12'
 		testCompile 'org.easymock:easymock:3.4'
 	}
+	
+	jar {
+		manifest {
+			attributes("Implementation-Title": project.name)
+			if(project.version) {
+				attributes("Implementation-Version": project.version)
+			}
+		}
+	}
 }	
 
 // play projects
@@ -146,11 +168,24 @@ configure([
 			buildImage(DockerBuildImage) {
 				dependsOn createDockerfile
 				inputDir = project.file('build/docker')
-				tag = "${project.name}"
+				tag = "${project.name}:${project.version}"
+			}
+		}
+		
+		distributions {
+			playBinary {
+				tasks.withType(org.gradle.jvm.tasks.Jar) {
+					manifest {
+						attributes("Implementation-Title": project.name)
+						if(project.version) {
+							attributes("Implementation-Version": project.version)
+						}
+					}
+				}
 			}
 		}
 	}
-	
+
 	eclipse {
 		classpath {
 			plusConfigurations += [ configurations.play ]
@@ -188,7 +223,7 @@ configure([
 	
 	task copyTar(type: Copy) {
 		dependsOn distTar
-		from "${project.buildDir}/distributions/${project.name}.tar"
+		from distTar.archivePath
 		into "${project.buildDir}/docker"
 	}
 
@@ -196,15 +231,15 @@ configure([
 		dependsOn copyTar
 		destFile = project.file('build/docker/Dockerfile')
 		from 'java'
-		copyFile "${project.name}.tar", '/opt'
-		runCommand "cd /opt; tar -xvf ${project.name}.tar; rm ${project.name}.tar; chmod u+x ${project.name}/bin/${project.name}"
+		copyFile "${distTar.archiveName}", '/opt'
+		runCommand "cd /opt; tar -xvf ${distTar.archiveName}; rm ${distTar.archiveName}; chmod u+x ${project.name}-${project.version}/bin/${project.name}"
 		defaultCommand "/opt/${project.name}/bin/${project.name}"
 	}
 
 	task buildImage(type: DockerBuildImage) {
 		dependsOn createDockerfile
 		inputDir = project.file('build/docker')
-		tag = "${project.name}"
+		tag = "${project.name}:${project.version}"
 	}
 }
 

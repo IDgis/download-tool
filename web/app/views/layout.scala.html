@@ -14,11 +14,13 @@
 				<img src='@routes.Assets.at("images/logo_overijssel.png")' alt="Responsive image"></img>
 			</a>
 		</div>
-		
+
 		<div class="titlebar">
 			<h1 class="header">Download bestand</h1>
 		</div>
-		
+
 		@content
+
+		<div class="version">download-tool versie: @getClass().getPackage().getImplementationVersion()</div>
 	</body>
 </html>
