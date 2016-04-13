@@ -3,13 +3,13 @@ beanstalk:
   restart: always
   
 downloader_cache_dv:
-  image: downloader
+  image: downloadtool_downloader:0.9.0
   command: ["true"]
   volumes:
     - ./cache:/tmp/cache/
 
 downloader:
-  image: downloader
+  image: downloadtool_downloader
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -24,7 +24,7 @@ downloader:
     - web
 
 feedback_ok:
-  image: feedback
+  image: downloadtool_feedback:0.9.0
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -46,7 +46,7 @@ feedback_ok:
     - beanstalk
 
 feedback_error:
-  image: feedback
+  image: downloadtool_feedback:0.9.0
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -74,7 +74,7 @@ db:
   restart: always
 
 web:
-  image: web
+  image: downloadtool_web:0.9.0
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
