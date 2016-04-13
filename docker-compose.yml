@@ -9,7 +9,7 @@ downloader_cache_dv:
     - ./cache:/tmp/cache/
 
 downloader:
-  image: downloadtool_downloader
+  image: downloadtool_downloader:0.9.0
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
