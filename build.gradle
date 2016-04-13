@@ -54,6 +54,33 @@ configure([
 	apply plugin: 'java'
 	apply plugin: 'eclipse'
 	
+	sourceSets {
+		integration {
+			java {
+				srcDir file('src/integration/java')
+			}
+			
+			resources {
+				srcDir file('src/integration/resources')
+			}
+			
+			compileClasspath = sourceSets.main.output + configurations.integrationCompile
+			runtimeClasspath = output + compileClasspath
+		}
+	}
+	
+	configurations {
+		integrationCompile {
+			extendsFrom compile, testCompile
+		}
+	}
+	
+	task integrationTest(type: Test, group: 'Verification', description: 'Runs the integration tests.') {
+		testClassesDir = sourceSets.integration.output.classesDir
+		classpath = sourceSets.integration.runtimeClasspath
+	}
+
+	
 	dependencies {
 		compile 'org.slf4j:slf4j-api:1.7.14'
 		compile 'org.slf4j:slf4j-log4j12:1.7.14'
