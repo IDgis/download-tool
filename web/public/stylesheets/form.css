@@ -95,6 +95,11 @@ div.format-choice {
 
 .alert {
 	margin-top: 5px;
-	margin-bottom: 0px
+	margin-bottom: 0px;
 }
+
+.version {
+	margin-top: 10px;
+	color: gray;
+	font-size: 10pt;
 }
