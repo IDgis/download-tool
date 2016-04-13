@@ -14,6 +14,7 @@ import java.net.URL;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -66,8 +67,15 @@ public class DownloadFile implements DownloadSource {
 	@Override
 	public InputStream open() throws IOException {
 		response = httpclient.execute(httpGet);
-	
-		log.debug("Http response: " + response.getStatusLine());
+		
+		StatusLine statusLine = response.getStatusLine();
+		log.debug("http status line: " + statusLine);
+		
+		int statusCode = statusLine.getStatusCode();
+		if(statusCode != 200) {
+			throw new IOException("Unexpected http status code: " + statusCode);
+		}
+		
 		entity = response.getEntity();
 		// do something useful with the response body
 		return entity.getContent();
