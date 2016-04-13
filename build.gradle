@@ -233,7 +233,7 @@ configure([
 		from 'java'
 		copyFile "${distTar.archiveName}", '/opt'
 		runCommand "cd /opt; tar -xvf ${distTar.archiveName}; rm ${distTar.archiveName}; chmod u+x ${project.name}-${project.version}/bin/${project.name}"
-		defaultCommand "/opt/${project.name}/bin/${project.name}"
+		defaultCommand "/opt/${project.name}-${project.version}/bin/${project.name}"
 	}
 
 	task buildImage(type: DockerBuildImage) {
