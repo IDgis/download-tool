@@ -58,36 +58,52 @@ public class DownloadDao {
 		}
 	}
 
-	public DownloadRequestInfo readDownloadRequestInfo(String requestId) throws SQLException{
-		DownloadRequestInfo downloadRequestInfo = null;
-		String sql = "SELECT * FROM request_info WHERE request_id='" + requestId + "'";
-		try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
-			log.debug("readDownloadRequestInfo sql: " + sql); 
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				Timestamp requestTime = rs.getTimestamp("request_time");
-				log.debug("readDownloadRequestInfo requestTime: " + requestTime); 
-				String json = rs.getString("download");
-				String jobId = rs.getString("job_id");
-				String userName = rs.getString("user_name");
-				String userEmailaddress = rs.getString("user_emailaddress");
-				String userFormat = rs.getString("user_format");
-				downloadRequestInfo = new DownloadRequestInfo();
-				downloadRequestInfo.setRequestId(requestId);
-				downloadRequestInfo.setJobId(jobId);
-				downloadRequestInfo.setRequestTime(requestTime);
-				Download download = gson.fromJson(json, Download.class); 
-				downloadRequestInfo.setDownload(download);
-				downloadRequestInfo.setUserName(userName);
-				downloadRequestInfo.setUserEmailAddress(userEmailaddress);
-				downloadRequestInfo.setUserFormat(userFormat);
+	public DownloadRequestInfo readDownloadRequestInfo(String requestId) throws SQLException {
+		log.debug("retrieving download request info: {}", requestId);
+		
+		try(Connection conn = dataSource.getConnection(); 
+			PreparedStatement stmt = conn.prepareStatement(
+				"SELECT request_time, download, job_id, user_name, user_emailaddress, user_format " +
+				"FROM request_info WHERE request_id=?")) {
+			
+			stmt.setString(1, requestId);
+			
+			try(ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()) {
+					Timestamp requestTime = rs.getTimestamp(1);
+					Download download = gson.fromJson(rs.getString(2), Download.class);
+					String jobId = rs.getString(3);
+					String userName = rs.getString(4);
+					String userEmailaddress = rs.getString(5);
+					String userFormat = rs.getString(6);
+					
+					DownloadRequestInfo downloadRequestInfo = new DownloadRequestInfo();
+					downloadRequestInfo.setRequestId(requestId);
+					downloadRequestInfo.setJobId(jobId);
+					downloadRequestInfo.setRequestTime(requestTime);
+					downloadRequestInfo.setDownload(download);
+					downloadRequestInfo.setUserName(userName);
+					downloadRequestInfo.setUserEmailAddress(userEmailaddress);
+					downloadRequestInfo.setUserFormat(userFormat);
+					
+					if(rs.next()) {
+						throw new IllegalStateException("multiple download request info records found");
+					}
+					
+					log.debug("download request info object found");
+					
+					return downloadRequestInfo;
+				} else {
+					log.warn("download request info object not found");
+					
+					return null;
+				}
 			}
-			rs.close();
-		} catch (SQLException e) {
-			log.error("Exception when executing sql=" + sql);
+		} catch(SQLException e) {
+			log.error("sql exception: {}", e);
+			
 			throw e;
 		}
-		return downloadRequestInfo;
 	}
 	
 	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException{
@@ -104,27 +120,43 @@ public class DownloadDao {
 		}
 	}
 	
-	public DownloadResultInfo readDownloadResultInfo(String requestId) throws SQLException{
-		DownloadResultInfo downloadResultInfo = null;
-		String sql = "SELECT * FROM result_info WHERE request_id='" + requestId + "'";
-		try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
-			log.debug("readDownloadResultInfo sql: " + sql); 
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				Timestamp responseTime = rs.getTimestamp("response_time");
-				log.debug("readDownloadResultInfo responseTime: " + responseTime); 
-				String responseCode = rs.getString("response_code");
-				downloadResultInfo = new DownloadResultInfo();
-				downloadResultInfo.setRequestId(requestId);
-				downloadResultInfo.setResponseCode(responseCode);
-				downloadResultInfo.setResponseTime(responseTime);
+	public DownloadResultInfo readDownloadResultInfo(String requestId) throws SQLException {
+		log.debug("retrieving download result info: {}", requestId);
+		
+		try(Connection conn = dataSource.getConnection(); 
+			PreparedStatement stmt = conn.prepareStatement(
+				"SELECT response_time, response_code FROM result_info WHERE request_id=?")) {
+					
+			stmt.setString(1, requestId);
+			
+			try(ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()) {
+					Timestamp responseTime = rs.getTimestamp(1);
+					String responseCode = rs.getString(2);
+					
+					DownloadResultInfo downloadResultInfo = new DownloadResultInfo();
+					downloadResultInfo.setRequestId(requestId);
+					downloadResultInfo.setResponseCode(responseCode);
+					downloadResultInfo.setResponseTime(responseTime);
+					
+					log.debug("download result info object found");
+					
+					if(rs.next()) {
+						throw new IllegalStateException("multiple download result info records found");
+					}
+					
+					return downloadResultInfo;
+				} else {
+					log.warn("download result info object not found");
+					
+					return null;
+				}
 			}
-			rs.close();
 		} catch (SQLException e) {
-			log.error("Exception when executing sql=" + sql);
+			log.error("sql exception: {}", e);
+			
 			throw e;
 		}
-		return downloadResultInfo;
 	}
 	
 }
