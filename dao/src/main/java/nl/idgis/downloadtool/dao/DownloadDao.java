@@ -106,16 +106,26 @@ public class DownloadDao {
 		}
 	}
 	
-	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException{
-		String sql = "INSERT INTO result_info (request_id, response_time, response_code) VALUES(?, now(), ?);";
-		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-			log.debug("createDownloadResultInfo sql: " + sql); 
-			stmt.setString(1, downloadResultInfo.getRequestId());
-			stmt.setString(2, downloadResultInfo.getResponseCode());
+	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException {
+		log.debug("creating download result info"); 
+		
+		try(Connection conn = dataSource.getConnection();
+			PreparedStatement stmt = conn.prepareStatement(
+				"INSERT INTO result_info(request_info_id, response_time, response_code) " + 
+				"SELECT id, now(), ? FROM request_info WHERE request_id = ?")) {
+			
+			stmt.setString(1, downloadResultInfo.getResponseCode());
+			stmt.setString(2, downloadResultInfo.getRequestId());
+			
 			int count = stmt.executeUpdate();
-			log.debug("createDownloadResultInfo insert #records: " + count); 
+			if(count != 1) {
+				throw new IllegalStateException("unexpected update count: " + count);
+			}
+			
+			log.debug("download result info created"); 
 		} catch (SQLException e) {
-			log.error("Exception when executing sql=" + sql);
+			log.error("sql exception: {}", e);
+			
 			throw e;
 		}
 	}
@@ -125,7 +135,8 @@ public class DownloadDao {
 		
 		try(Connection conn = dataSource.getConnection(); 
 			PreparedStatement stmt = conn.prepareStatement(
-				"SELECT response_time, response_code FROM result_info WHERE request_id=?")) {
+				"SELECT response_time, response_code FROM result_info " + 
+				"WHERE request_info_id = (SELECT id FROM request_info WHERE request_id = ?)")) {
 					
 			stmt.setString(1, requestId);
 			
