@@ -13,7 +13,7 @@ create table request_info(
 	id serial,
 	request_id text,
 	request_time timestamp,
-	download text,
+	download jsonb,
 	job_id text,
 	user_name text,
 	user_emailaddress text,

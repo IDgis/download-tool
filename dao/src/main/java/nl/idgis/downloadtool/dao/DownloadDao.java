@@ -38,7 +38,7 @@ public class DownloadDao {
 	
 	public void createDownloadRequestInfo(DownloadRequestInfo downloadRequestInfo) throws SQLException {
 		String sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_name, user_emailaddress, user_format)  "+
-				"VALUES(?, now(), ?, ?, ?, ?, ?);";
+				"VALUES(?, now(), ?, ?::jsonb, ?, ?, ?);";
 		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			log.debug("createDownloadRequestInfo sql: " + sql); 
 			
