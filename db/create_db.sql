@@ -4,7 +4,7 @@ create database download;
 
 create table request_info(
 	id serial primary key,
-	request_id text,
+	request_id text unique,
 	request_time timestamp,
 	download jsonb,
 	job_id text,
