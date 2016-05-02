@@ -57,7 +57,7 @@ public class DownloadForm extends Controller {
 					new OutputFormat("kml", "KML", "application/vnd.google-earth.kml+xml", "kml"),
 					new OutputFormat("dxf", "DXF", "DXF", "dxf")));
 	
-	private final static Pattern urlPattern = Pattern.compile(".*/(.*)\\.(.*)$");
+	private final static Pattern urlPattern = Pattern.compile(".*/(.*?)(\\?.*)?$");
 	
 	private final WebJarAssets webJarAssets;
 	
@@ -118,9 +118,14 @@ public class DownloadForm extends Controller {
 	private static Optional<AdditionalData> createAdditionalData(String url) {
 		Matcher urlMatcher = urlPattern.matcher(url);
 		if(urlMatcher.matches()) {
+			String name = urlMatcher.group(1).trim();
+			if(name.isEmpty()) {
+				log.warn("url doesn't contain a file name" + url);
+				return Optional.empty();
+			}
+			
 			AdditionalData supplementalInformation = new AdditionalData();
 			supplementalInformation.setName(urlMatcher.group(1));
-			supplementalInformation.setExtension(urlMatcher.group(2));
 			supplementalInformation.setUrl(url);
 			return Optional.of(supplementalInformation);
 		} else {
@@ -189,15 +194,13 @@ public class DownloadForm extends Controller {
 				List<AdditionalData> additionalData = new ArrayList<>();
 
 				AdditionalData stylesheet = new AdditionalData();
-				stylesheet.setName("metadata");
-				stylesheet.setExtension("xsl");
+				stylesheet.setName("metadata.xsl");
 				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
 					.absoluteURL(false, hostname));
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
-				metadata.setName(id);
-				metadata.setExtension("xml");
+				metadata.setName(id + ".xml");
 				metadata.setUrl(routes.Metadata.get(id)
 					.absoluteURL(false, hostname));
 				additionalData.add(metadata);

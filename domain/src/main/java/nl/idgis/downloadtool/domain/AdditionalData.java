@@ -13,8 +13,7 @@ public class AdditionalData implements Serializable {
 	private static final long serialVersionUID = -4617992230934918397L;
 
 	String name; // filename of the additional data
-	String extension; // file extension of the additional data
-	String Url; // url for get request to retrieve the additional data
+	String url; // url for get request to retrieve the additional data
 
 	public String getName() {
 		return name;
@@ -22,22 +21,14 @@ public class AdditionalData implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getExtension() {
-		return extension;
-	}
-
-	public void setExtension(String extension) {
-		this.extension = extension;
-	}
+	}	
 
 	public String getUrl() {
-		return Url;
+		return url;
 	}
 
 	public void setUrl(String url) {
-		Url = url;
+		this.url = url;
 	}
 
 }

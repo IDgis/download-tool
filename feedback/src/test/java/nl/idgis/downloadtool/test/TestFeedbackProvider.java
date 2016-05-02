@@ -61,7 +61,6 @@ public class TestFeedbackProvider   extends EasyMockSupport{
 		download.setFt(ft);
 		AdditionalData additionalData = new AdditionalData();
 		additionalData.setName("someData");
-		additionalData.setExtension("txt");
 		additionalData.setUrl("http://httpbin.org/get");
 		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
 		additionalDataList.add(additionalData);
