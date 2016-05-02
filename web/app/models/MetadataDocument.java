@@ -1,7 +1,11 @@
 package models;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
@@ -9,7 +13,10 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import play.Logger;
+import play.Logger.ALogger;
 import play.libs.XPath;
 
 /**
@@ -18,6 +25,8 @@ import play.libs.XPath;
  *
  */
 public class MetadataDocument {
+	
+	private static final ALogger log = Logger.of(MetadataDocument.class);
 	
 	private final static Map<String, String> NS = namespaces();
 	
@@ -95,5 +104,51 @@ public class MetadataDocument {
 			+ "/gco:CharacterString",
 			document,
 			NS).getTextContent();
+	}
+	
+	public List<String> getSupplementalInformationUrls() {
+		NodeList nl = XPath.selectNodes(
+			"/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:supplementalInformation"
+			+ "/gco:CharacterString",
+			document,
+			NS);
+		
+		ArrayList<String> result = new ArrayList<>();
+		for(int i = 0; i < nl.getLength(); i++) {
+			String text = nl.item(i).getTextContent();
+			
+			// TODO: to be removed when urls in metadata are repaired 
+			text = text.replace('\\', '/');
+			
+			String[] textSplit = text.split("\\|");
+			try {
+				URL url = new URL(textSplit[textSplit.length - 1]);
+				result.add(url.toExternalForm());
+			} catch(MalformedURLException e) {
+				log.warn("couldn't parse supplemental information url", e);
+			}
+		}
+		
+		return result;
+	}
+	
+	public String getBrowseGraphicUrl() {
+		String url = XPath.selectNode("/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:graphicOverview"
+			+ "/gmd:MD_BrowseGraphic"
+			+ "/gmd:fileName"
+			+ "/gco:CharacterString",
+			document,
+			NS).getTextContent();
+		
+		// TODO: to be removed when urls in metadata are repaired 
+		url = url.replace('\\', '/');
+		
+		return url;
 	}
 }
