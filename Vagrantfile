@@ -14,7 +14,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Provision using a shellscript:
   config.vm.provision :shell, path: "scripts/install-software.sh"
-  # config.vm.provision :reload
+  config.vm.provision :reload
   config.vm.provision :shell, path: "scripts/docker-daemon.sh"
   
   # Forward the Docker daemon port:
