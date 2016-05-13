@@ -98,6 +98,10 @@ div.format-choice {
 	margin-bottom: 0px;
 }
 
+p.help-paragraph {
+	margin-top: 20px;
+}
+
 .version {
 	margin-top: 40px;
 	color: gray;
