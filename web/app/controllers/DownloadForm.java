@@ -46,7 +46,7 @@ import nl.idgis.downloadtool.domain.AdditionalData;
 
 public class DownloadForm extends Controller {
 	
-	private final static String STYLESHEET = "datasets/intern/metadata.xsl";
+	private final static String STYLESHEET = "datasets/extern/metadata.xsl";
 	
 	private final static List<OutputFormat> FORMATS = 
 			Collections.unmodifiableList(
