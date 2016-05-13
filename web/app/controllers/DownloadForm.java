@@ -46,7 +46,7 @@ import nl.idgis.downloadtool.domain.AdditionalData;
 
 public class DownloadForm extends Controller {
 	
-	private final static String STYLESHEET = "datasets/intern/metadata.xsl";
+	private final static String STYLESHEET = "datasets/extern/metadata.xsl";
 	
 	private final static List<OutputFormat> FORMATS = 
 			Collections.unmodifiableList(
@@ -200,7 +200,7 @@ public class DownloadForm extends Controller {
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
-				metadata.setName(id + ".xml");
+				metadata.setName("leesmij.xml");
 				metadata.setUrl(routes.Metadata.get(id)
 					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
