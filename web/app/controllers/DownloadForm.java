@@ -3,7 +3,12 @@ package controllers;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.net.URL;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -51,6 +56,8 @@ public class DownloadForm extends Controller {
 					new OutputFormat("gml32", "GML 3.2", "text/xml; subtype=gml/3.2", "gml"),
 					new OutputFormat("kml", "KML", "application/vnd.google-earth.kml+xml", "kml"),
 					new OutputFormat("dxf", "DXF", "DXF", "dxf")));
+	
+	private final static Pattern urlPattern = Pattern.compile(".*/(.*?)(\\?.*)?$");
 	
 	private final WebJarAssets webJarAssets;
 	
@@ -106,6 +113,25 @@ public class DownloadForm extends Controller {
 				return notFound(datasetmissing.render(webJarAssets, id));
 			}
 		});
+	}
+	
+	private static Optional<AdditionalData> createAdditionalData(String url) {
+		Matcher urlMatcher = urlPattern.matcher(url);
+		if(urlMatcher.matches()) {
+			String name = urlMatcher.group(1).trim();
+			if(name.isEmpty()) {
+				log.warn("url doesn't contain a file name" + url);
+				return Optional.empty();
+			}
+			
+			AdditionalData supplementalInformation = new AdditionalData();
+			supplementalInformation.setName(urlMatcher.group(1));
+			supplementalInformation.setUrl(url);
+			return Optional.of(supplementalInformation);
+		} else {
+			log.warn("url has unfamiliar pattern: " + url);
+			return Optional.empty();
+		}
 	}
 	
 	/**
@@ -168,19 +194,28 @@ public class DownloadForm extends Controller {
 				List<AdditionalData> additionalData = new ArrayList<>();
 
 				AdditionalData stylesheet = new AdditionalData();
-				stylesheet.setName("metadata");
-				stylesheet.setExtension("xsl");
+				stylesheet.setName("metadata.xsl");
 				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
 					.absoluteURL(false, hostname));
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
-				metadata.setName(id);
-				metadata.setExtension("xml");
+				metadata.setName(id + ".xml");
 				metadata.setUrl(routes.Metadata.get(id)
 					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
-
+				
+				// add supplemental information
+				for(String url : metadataDocument.getSupplementalInformationUrls()) {
+					log.debug("adding supplemental information: " + url);
+					createAdditionalData(url).ifPresent(additionalData::add);
+				}
+				
+				// add browse graphic
+				String browseGraphicUrl = metadataDocument.getBrowseGraphicUrl();
+				log.debug("adding browse graphic: " + browseGraphicUrl);
+				createAdditionalData(browseGraphicUrl).ifPresent(additionalData::add);
+				
 				Download download = new Download();
 				download.setName(id);
 				download.setFt(ft);

@@ -98,16 +98,15 @@ public class DownloadProcessor {
 				 */
 				WfsFeatureType ft = download.getFt();
 				DownloadSource source = new DownloadWfs(ft);
-				downloadCacheOutputStream = downloadData(source, downloadCache, ft.getName(), ft.getExtension());
+				downloadCacheOutputStream = downloadData(source, downloadCache, ft.getName() + "." + ft.getExtension());
 				/*
 				 * Download additional data items and put them in downloadCache
 				 */
 				List<AdditionalData> additionalData = download.getAdditionalData();
 				for (AdditionalData data : additionalData) {
-					log.debug("Additional item to downloadCache: " + data.getName() + "." + data.getExtension());
+					log.debug("Additional item to downloadCache: " + data.getName());
 					source = new DownloadFile(data);
-					downloadCacheOutputStream = downloadData(source, downloadCache, data.getName(),
-							data.getExtension());
+					downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -143,7 +142,7 @@ public class DownloadProcessor {
 	 * @throws URISyntaxException
 	 * @throws IOException
 	 */
-	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName, String fileExtension)
+	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName)
 			throws IllegalArgumentException, UnsupportedEncodingException, URISyntaxException, IOException {
 		/*
 		 * Open source stream
@@ -155,7 +154,7 @@ public class DownloadProcessor {
 		/*
 		 * Open destination stream
 		 */
-		OutputStream dstStream = downloadCache.writeItem(fileName + "." + fileExtension);
+		OutputStream dstStream = downloadCache.writeItem(fileName);
 		/*
 		 * Copy from source to destination
 		 */
