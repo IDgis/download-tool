@@ -8,7 +8,9 @@ build/
 .classpath
 .project
 feedback/velocity.log
+feedback/velocity.log.1
 cache/
+.cache-main
 
 docker-compose.override.yml
 web/logs/application.log 
