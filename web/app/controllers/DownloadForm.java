@@ -200,7 +200,7 @@ public class DownloadForm extends Controller {
 				additionalData.add(stylesheet);
 
 				AdditionalData metadata = new AdditionalData();
-				metadata.setName(id + ".xml");
+				metadata.setName("leesmij.xml");
 				metadata.setUrl(routes.Metadata.get(id)
 					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
