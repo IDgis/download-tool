@@ -3,13 +3,13 @@ beanstalk:
   restart: always
   
 downloader_cache_dv:
-  image: downloadtool_downloader:0.9.0
+  image: downloadtool_downloader:latest
   command: ["true"]
   volumes:
     - ./cache:/tmp/cache/
 
 downloader:
-  image: downloadtool_downloader:0.9.0
+  image: downloadtool_downloader:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -24,7 +24,7 @@ downloader:
     - web
 
 feedback_ok:
-  image: downloadtool_feedback:0.9.0
+  image: downloadtool_feedback:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -34,9 +34,17 @@ feedback_ok:
     EMAIL_MESSAGE_TEMPLATE: |
       Geachte $${username}, 
       
-      U kunt bestand $${featuretype}.zip downloaden via de volgende link: 
+      Je kunt bestand $${featuretype}.zip downloaden via de volgende link: 
+      
       $${downloadlink}.
-    EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
+      
+      
+      Deze link is 24 uur bruikbaar.
+      
+      Deze mail is verzonden omdat iemand dit emailadres heeft opgegeven voor een download van een bestand uit het Geoportaal van Overijssel. Mocht jij niet de persoon zijn, die deze download heeft aangevraagd, dan kan je deze mail verder negeren.
+      
+      Zijn er vragen over de download, neem dan contact op met beleidsinformatie@overijssel.nl
+    EMAIL_SUBJECT_TEMPLATE: "Je download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
     DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
@@ -46,7 +54,7 @@ feedback_ok:
     - beanstalk
 
 feedback_error:
-  image: downloadtool_feedback:0.9.0
+  image: downloadtool_feedback:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -56,11 +64,11 @@ feedback_error:
     EMAIL_MESSAGE_TEMPLATE: |
       Geachte $${username}, 
       
-      Uw download $${featuretype} van Geoportaal Overijssel is niet gelukt.
+      Je download $${featuretype} van Geoportaal Overijssel is niet gelukt.
       De foutcode is:
         $${responsecode}
       Neem voor meer informatie contact op met Geoportaal Overijssel.
-    EMAIL_SUBJECT_TEMPLATE: "Uw download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
+    EMAIL_SUBJECT_TEMPLATE: "Je download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
     DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
@@ -74,7 +82,7 @@ db:
   restart: always
 
 web:
-  image: downloadtool_web:0.9.0
+  image: downloadtool_web:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
