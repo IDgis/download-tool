@@ -45,7 +45,7 @@ feedback_ok:
       
       Zijn er vragen over de download, neem dan contact op met beleidsinformatie@overijssel.nl
     EMAIL_SUBJECT_TEMPLATE: "Je download aanvraag '$${featuretype}' van Geoportaal Overijssel staat gereed"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
+    DOWNLOAD_URL: "https://download.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
@@ -69,7 +69,7 @@ feedback_error:
         $${responsecode}
       Neem voor meer informatie contact op met Geoportaal Overijssel.
     EMAIL_SUBJECT_TEMPLATE: "Je download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
-    DOWNLOAD_URL: "https://test.geoportaaloverijssel.nl/download-result"
+    DOWNLOAD_URL: "https://download.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
@@ -87,13 +87,13 @@ web:
   environment:
     BEANSTALK_HOST: beanstalk
     BEANSTALK_DOWNLOAD_QUEUE: downloadRequestTube
-    METADATA_PREFIX: "http://test-metadata.geodataoverijssel.nl/metadata/dataset/"
+    METADATA_PREFIX: "http://metadata.geodataoverijssel.nl/metadata/dataset/"
     DB_USER: postgres
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
     APPLICATION_SECRET: FgZvDqfDukyA9ZmhCBmHTmCoahULjzB4nVzfwFDU7A6wyhNTOHtWN
     ZOOKEEPER_HOST: zookeeper:2181
-    SERVICE_DOMAIN_NAME: localhost
+    SERVICE_DOMAIN_NAME: download.geoportaaloverijssel.nl
     ZIP_CACHEPATH: /tmp/cache
   external_links:
     - base-zookeeper:zookeeper
