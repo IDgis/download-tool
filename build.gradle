@@ -168,7 +168,7 @@ configure([
 			buildImage(DockerBuildImage) {
 				dependsOn createDockerfile
 				inputDir = project.file('build/docker')
-				tag = "${rootProject.name}_${project.name}:${project.version}"
+				tag = "idgis/${rootProject.name}_${project.name}:${project.version}"
 			}
 		}
 		
@@ -239,7 +239,7 @@ configure([
 	task buildImage(type: DockerBuildImage) {
 		dependsOn createDockerfile
 		inputDir = project.file('build/docker')
-		tag = "${rootProject.name}_${project.name}:${project.version}"
+		tag = "idgis/${rootProject.name}_${project.name}:${project.version}"
 	}
 }
 

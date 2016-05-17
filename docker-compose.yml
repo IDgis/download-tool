@@ -3,13 +3,13 @@ beanstalk:
   restart: always
   
 downloader_cache_dv:
-  image: downloadtool_downloader:latest
+  image: idgis/downloadtool_downloader:latest
   command: ["true"]
   volumes:
     - ./cache:/tmp/cache/
 
 downloader:
-  image: downloadtool_downloader:latest
+  image: idgis/downloadtool_downloader:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -24,7 +24,7 @@ downloader:
     - web
 
 feedback_ok:
-  image: downloadtool_feedback:latest
+  image: idgis/downloadtool_feedback:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -54,7 +54,7 @@ feedback_ok:
     - beanstalk
 
 feedback_error:
-  image: downloadtool_feedback:latest
+  image: idgis/downloadtool_feedback:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
@@ -82,7 +82,7 @@ db:
   restart: always
 
 web:
-  image: downloadtool_web:latest
+  image: idgis/downloadtool_web:latest
   restart: always
   environment:
     BEANSTALK_HOST: beanstalk
