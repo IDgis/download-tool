@@ -247,8 +247,23 @@ configure([
 allprojects {
 	afterEvaluate { project ->
 		if(project.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
+			def env = System.env
 			project.docker {
-				url = "http://${dockerHost}:2375"
+				if(env.containsKey('DOCKER_HOST')) {
+					url = "$env.DOCKER_HOST"
+					
+					if(env.containsKey('DOCKER_TLS_VERIFY')) {
+						url = url.replace('tcp', 'https')
+					} else {
+						url = url.replace('tcp', 'http')
+					}
+					
+					if(env.containsKey('DOCKER_CERT_PATH')) {
+						certPath = file "$env.DOCKER_CERT_PATH"
+					}
+				} else {
+					url = "http://${dockerHost}:2375"
+				}
 			}
 		}
 	}
