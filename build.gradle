@@ -151,7 +151,7 @@ configure([
 		tasks {
 			copyTar(Copy) {
 				dependsOn createPlayBinaryTarDist
-				from "${project.buildDir}/distributions/playBinary.tar"
+				from tarTree("${project.buildDir}/distributions/playBinary.tar")
 				into "${project.buildDir}/docker"
 			}
 			
@@ -159,10 +159,10 @@ configure([
 				dependsOn copyTar
 				destFile = project.file('build/docker/Dockerfile')
 				from 'java'
-				copyFile "playBinary.tar", '/opt'
-				runCommand "cd /opt; tar -xvf playBinary.tar; rm playBinary.tar; chmod u+x playBinary/bin/playBinary"
+				copyFile 'playBinary', '/opt'
+				runCommand 'chmod u+x /opt/bin/playBinary'
 				exposePort 9000
-				defaultCommand "/opt/playBinary/bin/playBinary"
+				defaultCommand "/opt/bin/playBinary"
 			}
 			
 			buildImage(DockerBuildImage) {
@@ -223,7 +223,7 @@ configure([
 	
 	task copyTar(type: Copy) {
 		dependsOn distTar
-		from distTar.archivePath
+		from tarTree(distTar.archivePath)
 		into "${project.buildDir}/docker"
 	}
 
@@ -231,9 +231,9 @@ configure([
 		dependsOn copyTar
 		destFile = project.file('build/docker/Dockerfile')
 		from 'java'
-		copyFile "${distTar.archiveName}", '/opt'
-		runCommand "cd /opt; tar -xvf ${distTar.archiveName}; rm ${distTar.archiveName}; chmod u+x ${project.name}-${project.version}/bin/${project.name}"
-		defaultCommand "/opt/${project.name}-${project.version}/bin/${project.name}"
+		copyFile "${project.name}-${project.version}", '/opt'
+		runCommand "chmod u+x /opt/bin/${project.name}"
+		defaultCommand "/opt/bin/${project.name}"
 	}
 
 	task buildImage(type: DockerBuildImage) {
