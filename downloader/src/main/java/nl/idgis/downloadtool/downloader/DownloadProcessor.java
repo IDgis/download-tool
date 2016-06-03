@@ -50,7 +50,7 @@ public class DownloadProcessor {
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 
 	private final String cachePath;
-	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_mislukt.info";
+	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 
 	public DownloadProcessor(String cachePath) {
 		super();
@@ -123,7 +123,18 @@ public class DownloadProcessor {
 				for (AdditionalData data : additionalData) {
 					log.debug("Additional item to downloadCache: " + data.getName());
 					source = new DownloadFile(data);
-					downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
+					try {
+						downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
+					} catch (IOException ioe) {
+						// write exception message into entry in zip
+						log.debug("Error: '" + ioe.getMessage() + "' write exception message into entry in zip");
+						downloadCacheOutputStream = downloadCache
+								.writeItem(additionalDataFailedFilename.replace(FILENAME_PLACEHOLDER, data.getName()));
+						InputStream stream = new ByteArrayInputStream(
+								ioe.getMessage().getBytes(StandardCharsets.UTF_8));
+						copyStreams(stream, downloadCacheOutputStream);
+						stream.close();
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -161,11 +172,6 @@ public class DownloadProcessor {
 	 */
 	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName)
 			throws IllegalArgumentException, UnsupportedEncodingException, URISyntaxException, IOException {
-		/*
-		 * Open destination stream
-		 */
-		OutputStream dstStream = null;
-		try {
 			/*
 			 * Open source stream
 			 */
@@ -173,7 +179,10 @@ public class DownloadProcessor {
 			// test if at http 200 OK an exceptionreport is send instead of the
 			// expected content
 			testExceptionReport(srcStream);
-			dstStream = downloadCache.writeItem(fileName);
+			/*
+			 * Open destination stream
+			 */
+			OutputStream dstStream = downloadCache.writeItem(fileName);
 			/*
 			 * Copy from source to destination
 			 */
@@ -181,14 +190,6 @@ public class DownloadProcessor {
 			byteCount = copyStreams(srcStream, dstStream);
 			log.debug("Data '" + fileName + "' #bytes: " + byteCount);
 			srcStream.close();
-		} catch (IOException ioe) {
-			// write exception message into entry in zip
-			log.debug("Error: '" + ioe.getMessage() + "' write exception message into entry in zip");
-			dstStream = downloadCache.writeItem(additionalDataFailedFilename.replace(FILENAME_PLACEHOLDER, fileName));
-			InputStream stream = new ByteArrayInputStream(ioe.getMessage().getBytes(StandardCharsets.UTF_8));
-			copyStreams(stream, dstStream);
-			stream.close();
-		}
 		return dstStream;
 	}
 
@@ -301,7 +302,7 @@ public class DownloadProcessor {
 		
 		String addDataFailedFilename = System.getenv("ADDITIONALDATA_FAILED_FILENAME");
 		if (addDataFailedFilename == null){
-			addDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_mislukt.info";
+			addDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 		}
 		
 		try {

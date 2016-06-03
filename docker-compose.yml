@@ -17,7 +17,7 @@ downloader:
     BEANSTALK_FEEDBACKOK_QUEUE: feedbackOkTube
     BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
     ZIP_CACHEPATH: /tmp/cache
-    ADDITIONALDATA_FAILED_FILENAME: Download_X_filename_X_mislukt.info
+    ADDITIONALDATA_FAILED_FILENAME: Download_X_filename_X_mislukt.txt
   volumes_from:
     - downloader_cache_dv
   links:
