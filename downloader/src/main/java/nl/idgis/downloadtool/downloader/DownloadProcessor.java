@@ -44,7 +44,7 @@ public class DownloadProcessor {
 
 	private static final int BUF_SIZE = 4096;
 
-	private static final String FILENAME_PLACEHOLDER = "##filename##";
+	private static final String FILENAME_PLACEHOLDER = "X_filename_X";
 
 	private DownloadQueue queueClient;
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
@@ -72,9 +72,9 @@ public class DownloadProcessor {
 
 	/**
 	 * If an additional download fails, then use this string as the filename in the zip.<br>
-	 * @param additionalDataFailedFilename filename of the form "prefix##filename##postfix". <br>
-	 * ##filename## will be replaced by the original filename.<br>
-	 * e.g. "Download_##filename##_mislukt" wordt "Download_MetaData_mislukt"
+	 * @param additionalDataFailedFilename filename of the form "prefixX_filename_Xpostfix". <br>
+	 * X_filename_X will be replaced by the original filename.<br>
+	 * e.g. "Download_X_filename_X_mislukt" wordt "Download_MetaData_mislukt"
 	 */
 	private void setAddDataFailedFilename(String additionalDataFailedFilename) {
 		this.additionalDataFailedFilename = additionalDataFailedFilename;
