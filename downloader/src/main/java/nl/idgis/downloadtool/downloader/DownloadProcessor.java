@@ -1,11 +1,13 @@
 package nl.idgis.downloadtool.downloader;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -42,10 +44,13 @@ public class DownloadProcessor {
 
 	private static final int BUF_SIZE = 4096;
 
+	private static final String FILENAME_PLACEHOLDER = "##filename##";
+
 	private DownloadQueue queueClient;
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 
 	private final String cachePath;
+	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_mislukt.info";
 
 	public DownloadProcessor(String cachePath) {
 		super();
@@ -65,6 +70,18 @@ public class DownloadProcessor {
 		this.errorFeedbackQueue = queueClient;
 	}
 
+	/**
+	 * If an additional download fails, then use this string as the filename in the zip.<br>
+	 * @param additionalDataFailedFilename filename of the form "prefix##filename##postfix". <br>
+	 * ##filename## will be replaced by the original filename.<br>
+	 * e.g. "Download_##filename##_mislukt" wordt "Download_MetaData_mislukt"
+	 */
+	private void setAddDataFailedFilename(String additionalDataFailedFilename) {
+		this.additionalDataFailedFilename = additionalDataFailedFilename;
+	}
+
+
+	
 	/**
 	 * Perform downloads using downloadRequest as input.<br>
 	 * 1. a cache file is opened.<br>
@@ -145,22 +162,33 @@ public class DownloadProcessor {
 	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName)
 			throws IllegalArgumentException, UnsupportedEncodingException, URISyntaxException, IOException {
 		/*
-		 * Open source stream
-		 */
-		BufferedInputStream srcStream = new BufferedInputStream(source.open());
-		// test if at http 200 OK an exceptionreport is send instead of the
-		// expected content
-		testExceptionReport(srcStream);
-		/*
 		 * Open destination stream
 		 */
-		OutputStream dstStream = downloadCache.writeItem(fileName);
-		/*
-		 * Copy from source to destination
-		 */
-		long byteCount = copyStreams(srcStream, dstStream);
-		log.debug("Data '" + fileName + "' #bytes: " + byteCount);
-		srcStream.close();
+		OutputStream dstStream = null;
+		try {
+			/*
+			 * Open source stream
+			 */
+			BufferedInputStream srcStream = new BufferedInputStream(source.open());
+			// test if at http 200 OK an exceptionreport is send instead of the
+			// expected content
+			testExceptionReport(srcStream);
+			dstStream = downloadCache.writeItem(fileName);
+			/*
+			 * Copy from source to destination
+			 */
+			long byteCount;
+			byteCount = copyStreams(srcStream, dstStream);
+			log.debug("Data '" + fileName + "' #bytes: " + byteCount);
+			srcStream.close();
+		} catch (IOException ioe) {
+			// write exception message into entry in zip
+			log.debug("Error: '" + ioe.getMessage() + "' write exception message into entry in zip");
+			dstStream = downloadCache.writeItem(additionalDataFailedFilename.replace(FILENAME_PLACEHOLDER, fileName));
+			InputStream stream = new ByteArrayInputStream(ioe.getMessage().getBytes(StandardCharsets.UTF_8));
+			copyStreams(stream, dstStream);
+			stream.close();
+		}
 		return dstStream;
 	}
 
@@ -271,6 +299,11 @@ public class DownloadProcessor {
 		String feedbackOkTubeName = getEnv("BEANSTALK_FEEDBACKOK_QUEUE");
 		String feedbackErrorTubeName = getEnv("BEANSTALK_FEEDBACKERROR_QUEUE");
 		
+		String addDataFailedFilename = System.getenv("ADDITIONALDATA_FAILED_FILENAME");
+		if (addDataFailedFilename == null){
+			addDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_mislukt.info";
+		}
+		
 		try {
 			log.info("start loop " + path);
 			DownloadProcessor dlp = new DownloadProcessor(path);
@@ -282,6 +315,8 @@ public class DownloadProcessor {
 			dlp.setDownloadQueueClient(downloadQueueClient);
 			dlp.setFeedbackQueue(feedbackOkQueueClient);
 			dlp.setErrorFeedbackQueue(feedbackErrorQueueClient);
+			
+			dlp.setAddDataFailedFilename(addDataFailedFilename);
 
 			for (;;) {
 				log.debug("processDownloadRequest");
