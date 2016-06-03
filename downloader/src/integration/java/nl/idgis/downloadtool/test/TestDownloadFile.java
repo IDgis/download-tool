@@ -24,8 +24,7 @@ public class TestDownloadFile {
 	@Before
 	public void setUp() throws Exception {
 		AdditionalData additionalData  = new AdditionalData();
-		additionalData.setName("someFile");
-		additionalData.setExtension("someExt");
+		additionalData.setName("someFile.someExt");
 		additionalData.setUrl(URL);
 		downloadSource = new DownloadFile(additionalData);
 	}
