@@ -64,21 +64,91 @@ public class TestProcessor  extends EasyMockSupport {
 	 * @throws Exception 
 	 */
 	@Test
-	public void testOK() throws Exception {
-		DownloadRequest downloadRequest = new DownloadRequest("testrequest3");
+	public void testOK_WFS() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestOkWfs");
 		Download download = new Download();
 		download.setName("download");
 		WfsFeatureType ft = new WfsFeatureType();
 		ft.setCrs("EPSG:28992");
 		ft.setName("Featuretype");
 		ft.setExtension("kml");
-		ft.setServiceUrl("http://httpbin.org/post");
+		ft.setServiceUrl("http://httpbin.org/get");
 		ft.setServiceVersion("2.0.0");
 		ft.setWfsMimetype("KML");
 		download.setFt(ft);
 		AdditionalData additionalData = new AdditionalData();
 		additionalData.setName("someData.txt");
 		additionalData.setUrl("http://httpbin.org/get");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalData);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		downloadRequest.setConvertToMimetype("KML");
+		
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	@Test
+	public void testNOK_WFS() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestNokWfs");
+		Download download = new Download();
+		download.setName("download");
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("Featuretype");
+		ft.setExtension("kml");
+		ft.setServiceUrl("http://httpbin.org/post"); // wfs request is GET
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype("KML");
+		download.setFt(ft);
+		AdditionalData additionalData = new AdditionalData();
+		additionalData.setName("someData.txt");
+		additionalData.setUrl("http://httpbin.org/get");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalData);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		downloadRequest.setConvertToMimetype("KML");
+		
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		errorFeedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(errorFeedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(errorFeedbackQueueMock);
+	}
+
+	@Test
+	public void testNOK_DATA() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestNokData");
+		Download download = new Download();
+		download.setName("download");
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("Featuretype");
+		ft.setExtension("kml");
+		ft.setServiceUrl("http://httpbin.org/get");
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype("KML");
+		download.setFt(ft);
+		AdditionalData additionalData = new AdditionalData();
+		additionalData.setName("someData.txt");
+		additionalData.setUrl("http://httpbin.org/post"); //Data is GET request
 		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
 		additionalDataList.add(additionalData);
 		download.setAdditionalData(additionalDataList);
