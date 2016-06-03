@@ -1,6 +1,3 @@
-/**
- * 
- */
 package nl.idgis.downloadtool.test;
 
 import static org.easymock.EasyMock.anyObject;
@@ -67,22 +64,91 @@ public class TestProcessor  extends EasyMockSupport {
 	 * @throws Exception 
 	 */
 	@Test
-	public void testOK() throws Exception {
-		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
+	public void testOK_WFS() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestOkWfs");
 		Download download = new Download();
 		download.setName("download");
 		WfsFeatureType ft = new WfsFeatureType();
 		ft.setCrs("EPSG:28992");
 		ft.setName("Featuretype");
 		ft.setExtension("kml");
-		ft.setServiceUrl("http://httpbin.org/post");
+		ft.setServiceUrl("http://httpbin.org/get");
 		ft.setServiceVersion("2.0.0");
 		ft.setWfsMimetype("KML");
 		download.setFt(ft);
 		AdditionalData additionalData = new AdditionalData();
-		additionalData.setName("someData");
-		additionalData.setExtension("txt");
+		additionalData.setName("someData.txt");
 		additionalData.setUrl("http://httpbin.org/get");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalData);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		downloadRequest.setConvertToMimetype("KML");
+		
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+	@Test
+	public void testNOK_WFS() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestNokWfs");
+		Download download = new Download();
+		download.setName("download");
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("Featuretype");
+		ft.setExtension("kml");
+		ft.setServiceUrl("http://httpbin.org/post"); // wfs request is GET
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype("KML");
+		download.setFt(ft);
+		AdditionalData additionalData = new AdditionalData();
+		additionalData.setName("someData.txt");
+		additionalData.setUrl("http://httpbin.org/get");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalData);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		downloadRequest.setConvertToMimetype("KML");
+		
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		errorFeedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(errorFeedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(errorFeedbackQueueMock);
+	}
+
+	@Test
+	public void testNOK_DATA() throws Exception {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestNokData");
+		Download download = new Download();
+		download.setName("download");
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("Featuretype");
+		ft.setExtension("kml");
+		ft.setServiceUrl("http://httpbin.org/get");
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype("KML");
+		download.setFt(ft);
+		AdditionalData additionalData = new AdditionalData();
+		additionalData.setName("someData.txt");
+		additionalData.setUrl("http://httpbin.org/post"); //Data is GET request
 		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
 		additionalDataList.add(additionalData);
 		download.setAdditionalData(additionalDataList);
@@ -118,7 +184,7 @@ public class TestProcessor  extends EasyMockSupport {
 	}
 
 	private DownloadRequest makeRequestStrooizout(String mimetype, String extension) {
-		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
+		DownloadRequest downloadRequest = new DownloadRequest("testrequest2");
 		Download download = new Download();
 		download.setName("strooiroutes" + mimetype);
 		WfsFeatureType ft = new WfsFeatureType();
@@ -130,13 +196,11 @@ public class TestProcessor  extends EasyMockSupport {
 		ft.setWfsMimetype(mimetype);
 		download.setFt(ft);
 		AdditionalData additionalDataLayer = new AdditionalData();
-		additionalDataLayer.setName("strooiroutes");
-		additionalDataLayer.setExtension("lyr");
+		additionalDataLayer.setName("strooiroutes.lyr");
 		additionalDataLayer
 				.setUrl("http://gisopenbaar.overijssel.nl/GeoPortal/MIS4GIS/lyr/strooiroutes%20provincie_arc.lyr");
 		AdditionalData additionalDataMetadata = new AdditionalData();
-		additionalDataMetadata.setName("metadata");
-		additionalDataMetadata.setExtension("xml");
+		additionalDataMetadata.setName("metadata.xml");
 		additionalDataMetadata.setUrl(
 				"http://acc-metadata.geodataoverijssel.nl/metadata/dataset/cd349c2f-b2fe-4ed6-b2b9-a00639ebcebb.xml");
 		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
@@ -186,7 +250,7 @@ public class TestProcessor  extends EasyMockSupport {
 	 * @return
 	 */
 	private DownloadRequest makeRequestRayongrenzen(String mimetype, String extension) {
-		DownloadRequest downloadRequest = new DownloadRequest("3.14159");
+		DownloadRequest downloadRequest = new DownloadRequest("testrequest1");
 		Download download = new Download();
 		download.setName("Rayongrenzen" + "_" + extension);
 		WfsFeatureType ft = new WfsFeatureType();
@@ -198,13 +262,11 @@ public class TestProcessor  extends EasyMockSupport {
 		ft.setWfsMimetype(mimetype);
 		download.setFt(ft);
 		AdditionalData additionalDataLayer = new AdditionalData();
-		additionalDataLayer.setName("Rayongrenzen");
-		additionalDataLayer.setExtension("lyr");
+		additionalDataLayer.setName("Rayongrenzen.lyr");
 		additionalDataLayer
 				.setUrl("http://gisopenbaar.overijssel.nl/GeoPortal/MIS4GIS/lyr/rayonwk_polygon.lyr");
 		AdditionalData additionalDataMetadata = new AdditionalData();
-		additionalDataMetadata.setName("metadata");
-		additionalDataMetadata.setExtension("xml");
+		additionalDataMetadata.setName("metadata.xml");
 		additionalDataMetadata.setUrl(
 				"http://test-metadata.geodataoverijssel.nl/metadata/dataset/7e03c460-f8b1-4ada-97e7-1ad2dfe98be8.xml");
 		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
@@ -250,4 +312,56 @@ public class TestProcessor  extends EasyMockSupport {
 		verify(feedbackQueueMock);
 	}	
 	
+	/**
+	 * Fill wfsMimetype with null to test correct behaviour in processor.
+	 * @param extension
+	 * @return
+	 */
+	private DownloadRequest makeRequestOppWater(String mimetype, String extension) {
+		DownloadRequest downloadRequest = new DownloadRequest("testrequestB3OppWater");
+		Download download = new Download();
+		download.setName("B3OppWater" + "_" + extension);
+		WfsFeatureType ft = new WfsFeatureType();
+		ft.setCrs("EPSG:28992");
+		ft.setName("B3_Oppervlaktewateren");
+		ft.setExtension(extension);
+		ft.setServiceUrl("http://test-services.geodataoverijssel.nl/geoserver/B35_waterlopen/wfs");
+		ft.setServiceVersion("2.0.0");
+		ft.setWfsMimetype(mimetype);
+		download.setFt(ft);
+		AdditionalData additionalDataLayer = new AdditionalData();
+		additionalDataLayer.setName("B3_Oppervlaktewateren.lyr");
+		additionalDataLayer
+				.setUrl("http://gisopenbaar.overijssel.nl/GeoPortal/MIS4GIS/lyr/WRONG_polygon.lyr");
+		AdditionalData additionalDataMetadata = new AdditionalData();
+		additionalDataMetadata.setName("metadata.xml");
+		additionalDataMetadata.setUrl(
+				"http://test-metadata.geodataoverijssel.nl/metadata/dataset/12345.xml");
+		List<AdditionalData> additionalDataList = new ArrayList<AdditionalData>();
+		additionalDataList.add(additionalDataLayer);
+		additionalDataList.add(additionalDataMetadata);
+		download.setAdditionalData(additionalDataList);
+		downloadRequest.setDownload(download);
+		return downloadRequest;
+	}
+
+
+	@Test
+	public void testOppWaterGML3() throws Exception {
+		DownloadRequest downloadRequest = makeRequestOppWater("gml32", "gml");
+		downloadRequest.setConvertToMimetype("gml32");
+		expect(queueClientMock.receiveDownloadRequest()).andReturn(downloadRequest);
+		queueClientMock.deleteDownloadRequest(downloadRequest);
+		replay(queueClientMock);
+		
+		feedbackQueueMock.sendFeedback(anyObject(Feedback.class));
+		replay(feedbackQueueMock);
+		
+		downloadProcessor.processDownloadRequest();
+		
+		verify(queueClientMock);
+		verify(feedbackQueueMock);
+	}
+
+
 }
