@@ -95,7 +95,7 @@ public class DownloadWfs implements DownloadSource {
 		
 		int statusCode = statusLine.getStatusCode();
 		if(statusCode != 200) {
-			throw new IOException("Unexpected http status code: " + statusCode);
+			throw new IOException(statusLine.toString() + " : " + uri.toString());
 		}
 		
 		entity = response.getEntity();
