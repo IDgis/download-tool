@@ -1,5 +1,7 @@
 @(webJarAssets: WebJarAssets)(content: Html)
 
+@import play.mvc.Http
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -7,6 +9,9 @@
 		<title>Geoportaal Overijssel</title>
 		<link href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet">
 		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
+		@if("1".equals(Http.Context.current().request().getHeader("GeoPublisher-trusted"))) {
+			<link href='@routes.Assets.at("stylesheets/form-intern.css")' rel="stylesheet">
+		}
 	</head>
 	<body>
 		<div class="logo">

@@ -1,0 +1,15 @@
+h1.header {
+	background-color: #255c9f;
+}
+
+.button {
+	background-color: #255c9f;
+}
+
+.button:hover {
+	background-color: #0096D2;
+}
+
+.button:focus {
+	background-color: #0096D2;
+}
