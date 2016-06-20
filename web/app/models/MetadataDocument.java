@@ -5,8 +5,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -45,6 +47,26 @@ public class MetadataDocument {
 	
 	public Document getDocument() {
 		return document;
+	}
+	
+	public Set<String> getUseLimitation() {
+		NodeList nodeList = XPath.selectNodes(
+			"/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:resourceConstraints"
+			+ "/gmd:MD_Constraints"
+			+ "/gmd:useLimitation"
+			+ "/gco:CharacterString",
+			document,
+			NS);
+		
+		HashSet<String> useLimitation = new HashSet<String>();
+		for(int i = 0; i < nodeList.getLength(); i++) {
+			useLimitation.add(nodeList.item(i).getTextContent());
+		}
+		
+		return Collections.unmodifiableSet(useLimitation);
 	}
 	
 	public String getWFSUrl() {
