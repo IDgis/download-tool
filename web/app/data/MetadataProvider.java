@@ -38,10 +38,17 @@ public class MetadataProvider {
 			.get()
 			.map(response -> {
 				if(response.getStatus() == 200) {
-					return Optional.of(new MetadataDocument(response.asXml()));
-				} else {
-					return Optional.empty();
-				}
+					MetadataDocument metadataDocument = new MetadataDocument(response.asXml());
+					
+					String requiredUseLimitation = config.getString("metadata.required-use-limitation");
+					if(requiredUseLimitation == null 
+						|| metadataDocument.getUseLimitation()
+							.contains(requiredUseLimitation)) {
+						return Optional.of(metadataDocument);
+					}
+				} 
+				
+				return Optional.empty();
 			});
 	}
 }

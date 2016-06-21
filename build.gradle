@@ -20,7 +20,7 @@ apply plugin: 'org.ajoberstar.grgit'
 
 def repo = Grgit.open(project.file('.'))
 def describe = repo.describe()
-if(describe && describe.startsWith('v')) {
+if(!hasProperty('latest') && describe && describe.startsWith('v')) {
 	version = describe.substring(1)
 } else {
 	version = 'latest'
@@ -113,12 +113,11 @@ configure([
 }	
 
 // play projects
-configure([
-	project(':web')]) {
+project(':web') {
 	
 	apply plugin: 'java-base'
 	apply plugin: 'play'
-	apply plugin: 'com.bmuschko.docker-remote-api'
+	apply plugin: DockerRemoteConfig
 	apply plugin: 'eclipse'
 	
 	repositories {
@@ -213,7 +212,7 @@ configure([
 	project(':downloader')]) {
 	
 	apply plugin: 'application'
-	apply plugin: 'com.bmuschko.docker-remote-api'
+	apply plugin: DockerRemoteConfig
 	
 	dependencies {
 		compile project(':dao')
@@ -246,7 +245,7 @@ configure([
 // configure docker plugin
 allprojects {
 	afterEvaluate { project ->
-		if(project.plugins.hasPlugin('com.bmuschko.docker-remote-api')) {
+		if(project.plugins.hasPlugin(DockerRemoteConfig)) {
 			def env = System.env
 			project.docker {
 				if(env.containsKey('DOCKER_HOST')) {
