@@ -20,7 +20,7 @@ apply plugin: 'org.ajoberstar.grgit'
 
 def repo = Grgit.open(project.file('.'))
 def describe = repo.describe()
-if(describe && describe.startsWith('v')) {
+if(!hasProperty('latest') && describe && describe.startsWith('v')) {
 	version = describe.substring(1)
 } else {
 	version = 'latest'
