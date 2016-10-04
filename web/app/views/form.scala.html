@@ -39,7 +39,8 @@
 					<div class="checkbox">
 						@for(outputFormat <- info.outputFormats) {
 		 					<label>
-								<input type="radio" name="format" value="@outputFormat.name()" @if(formatField.value == outputFormat.name()) { checked }>
+								<input type="radio" name="format" value="@outputFormat.name()"
+								 @if(formatField.value == outputFormat.name() || outputFormat.name() == "shp") { checked }>
 									<span>
 										<strong>@outputFormat.title</strong>
 									</span>
