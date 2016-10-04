@@ -68,7 +68,7 @@ feedback_error:
       Je download $${featuretype} van Geoportaal Overijssel is niet gelukt.
       De foutcode is:
         $${responsecode}
-      Neem voor meer informatie contact op met Geoportaal Overijssel.
+      Neem voor meer informatie contact op met beleidsinformatie@overijssel.nl.
     EMAIL_SUBJECT_TEMPLATE: "Je download aanvraag '$${featuretype}' van Geoportaal Overijssel is niet gelukt"
     DOWNLOAD_URL: "https://download.geoportaaloverijssel.nl/download-result"
     DB_USER: postgres
