@@ -18,6 +18,9 @@ downloader:
     BEANSTALK_FEEDBACKERROR_QUEUE: feedbackErrorTube
     ZIP_CACHEPATH: /tmp/cache
     ADDITIONALDATA_FAILED_FILENAME: Download_X_filename_X_mislukt.txt
+    GENERIC_ERROR_MESSAGE: |
+      Er is iets misgegaan bij het downloaden van het huidige bestand. 
+      Helaas is niet meer na te gaan welke fout is opgetreden.
   volumes_from:
     - downloader_cache_dv
   links:
@@ -81,6 +84,8 @@ feedback_error:
 db:
   build: db
   restart: always
+  ports:
+    - "5432:5432"
 
 web:
   image: idgis/downloadtool_web:latest
@@ -93,16 +98,16 @@ web:
     DB_PW: postgres
     DB_URL: "jdbc:postgresql://db:5432/download"
     APPLICATION_SECRET: FgZvDqfDukyA9ZmhCBmHTmCoahULjzB4nVzfwFDU7A6wyhNTOHtWN
-    ZOOKEEPER_HOST: zookeeper:2181
     SERVICE_DOMAIN_NAME: download.geoportaaloverijssel.nl
     ZIP_CACHEPATH: /tmp/cache
-  external_links:
-    - base-zookeeper:zookeeper
+    DOWNLOAD_ACCESS: intern
   links:
     - db
     - beanstalk
   volumes_from:
     - downloader_cache_dv
+  ports:
+    - "9000:9000"
 
 gc:
   build: gc
