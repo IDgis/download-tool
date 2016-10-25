@@ -50,6 +50,7 @@ public class DownloadProcessor {
 	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 
 	private final String cachePath;
+	private String genericErrorMessage;
 	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 
 	public DownloadProcessor(String cachePath) {
@@ -80,6 +81,10 @@ public class DownloadProcessor {
 		this.additionalDataFailedFilename = additionalDataFailedFilename;
 	}
 
+	private void setGenericErrorMessage(String genericErrorMessage) {
+		this.genericErrorMessage = genericErrorMessage;
+	}
+
 
 	
 	/**
@@ -92,6 +97,7 @@ public class DownloadProcessor {
 	 * @param downloadRequest
 	 *            contains all information concerning the downloads requested.
 	 */
+	@SuppressWarnings("resource")
 	public void performDownload(DownloadRequest downloadRequest) throws Exception {
 		if (downloadRequest == null) {
 			throw new IllegalArgumentException("downloadrequest is null");
@@ -125,13 +131,19 @@ public class DownloadProcessor {
 					source = new DownloadFile(data);
 					try {
 						downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
-					} catch (IOException ioe) {
+					} catch (Exception ioe) {
 						// write exception message into entry in zip
 						log.debug("Error: '" + ioe.getMessage() + "' write exception message into entry in zip");
 						downloadCacheOutputStream = downloadCache
 								.writeItem(additionalDataFailedFilename.replace(FILENAME_PLACEHOLDER, data.getName()));
-						InputStream stream = new ByteArrayInputStream(
-								ioe.getMessage().getBytes(StandardCharsets.UTF_8));
+						InputStream stream;
+						if (ioe.getMessage() == null){
+							stream = new ByteArrayInputStream(
+									genericErrorMessage.getBytes(StandardCharsets.UTF_8));
+						} else {
+							stream = new ByteArrayInputStream(
+									ioe.getMessage().getBytes(StandardCharsets.UTF_8));							
+						}
 						copyStreams(stream, downloadCacheOutputStream);
 						stream.close();
 					}
@@ -299,6 +311,10 @@ public class DownloadProcessor {
 		String downloadQueueTubeName = getEnv("BEANSTALK_DOWNLOAD_QUEUE");
 		String feedbackOkTubeName = getEnv("BEANSTALK_FEEDBACKOK_QUEUE");
 		String feedbackErrorTubeName = getEnv("BEANSTALK_FEEDBACKERROR_QUEUE");
+		String genericErrorMessage = getEnv("GENERIC_ERROR_MESSAGE");
+		if (genericErrorMessage == null) {
+			genericErrorMessage = "Er is een onbekende fout opgetreden bij het downloaden van het huidige bestand.";
+		}
 		
 		String addDataFailedFilename = System.getenv("ADDITIONALDATA_FAILED_FILENAME");
 		if (addDataFailedFilename == null){
@@ -316,6 +332,8 @@ public class DownloadProcessor {
 			dlp.setDownloadQueueClient(downloadQueueClient);
 			dlp.setFeedbackQueue(feedbackOkQueueClient);
 			dlp.setErrorFeedbackQueue(feedbackErrorQueueClient);
+			
+			dlp.setGenericErrorMessage(genericErrorMessage);
 			
 			dlp.setAddDataFailedFilename(addDataFailedFilename);
 
