@@ -21,15 +21,15 @@
 	</div>
 	
 	<div id="footer">
-		<p>Deze gegevens worden beschikbaar gesteld door het Geoportaal van Overijssel: 
-			<a target="_blank" href="http://www.geoportaaloverijssel.nl">http://www.geoportaaloverijssel.nl</a>
+		<p>@play.Play.application().configuration().getString("download.footer.intro")
+			<a target="_blank" href="@play.Play.application().configuration().getString("download.portal.url")">@play.Play.application().configuration().getString("download.portal.url")</a>
 		</p>
 		<p>In het Geoportaal staan actuele kaarten en beschrijvingen van die kaarten.</p>
 		<p>Ter referentie zijn vaak ook nog oudere kaarten beschikbaar gesteld.</p>
-		<p>De provincie Overijssel stelt zoveel mogelijk kaarten als "open data" voor iedereen beschikbaar.</p>
-		<p>Heeft u suggesties of vragen? Stuur dan een email naar <a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a></p>
+		<p>@play.Play.application().configuration().getString("download.footer.availability")</p>
+		<p>Heeft u suggesties of vragen? Stuur dan een email naar <a href="mailto:@play.Play.application().configuration().getString("download.email")">@play.Play.application().configuration().getString("download.email")</a></p>
 		<p>Zie proclaimer: 
-			<a target="_blank" href="http://www.overijssel.nl/algemene-onderdelen/proclaimer">http://www.overijssel.nl/algemene-onderdelen/proclaimer</a>
+			<a target="_blank" href="@play.Play.application().configuration().getString("download.footer.proclaimer.url")">@play.Play.application().configuration().getString("download.footer.proclaimer.url")</a>
 		</p>
 	</div>
 	
