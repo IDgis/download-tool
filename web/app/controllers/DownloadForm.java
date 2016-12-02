@@ -245,6 +245,7 @@ public class DownloadForm extends Controller {
 				
 				return ok(feedback.render(
 					webJarAssets,
+					id,
 					metadataDocument.getTitle(),
 					outputFormat,
 					downloadRequest.getEmail()));

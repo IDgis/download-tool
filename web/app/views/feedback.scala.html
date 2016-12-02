@@ -1,4 +1,8 @@
-@(webJarAssets: WebJarAssets, file: String, outputFormat: OutputFormat, email: String)
+@(webJarAssets: WebJarAssets, id: String, file: String, outputFormat: OutputFormat, email: String)
+
+@metadataUrl() = @{
+	play.Play.application().configuration().getString("download.portal.metadata.prefix") + id
+}
 
 @layout(webJarAssets) {
 
@@ -21,6 +25,7 @@
 	</div>
 	
 	<div id="footer">
+		<p>De volledige <a target="_blank" href="@metadataUrl()">metainformatie van dit bestand kunt u hier</a> vinden.</p>
 		<p>@play.Play.application().configuration().getString("download.footer.intro")
 			<a target="_blank" href="@play.Play.application().configuration().getString("download.portal.url")">@play.Play.application().configuration().getString("download.portal.url")</a>
 		</p>
