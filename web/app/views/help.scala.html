@@ -1,20 +1,48 @@
 @(webJarAssets: WebJarAssets)
 
 @layout(webJarAssets) {
-	<p class="title">Gebruikershandleiding</p>
+	<p class="title">Toelichting bij downloaden van bestanden</p>
 	
 	<div class="welcome">
-		<p>Een geldig e-mailadres is in het formaat gebruikersnaam@@voorbeeld. Er wordt gecontroleerd of er een @@ in staat en of daar voor en achter 
-		tekst staat. Alle overige typefouten worden niet gecontroleerd.</p>
-		
-		<p class="help-paragraph">Bij de e-mail wordt een metadata-info bestand meegeleverd. Deze kan alleen in Internet Explorer en Firefox bekeken worden.</p>
-	</div>
-	
-	<div id="footer">
-		<p>De bestanden worden via het Geoportaal van Overijssel beschikbaar gesteld.</p>
-		<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
-		<p>Zijn er suggesties of vragen, neem dan contact op met
-			<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
-		</p>
+		<div>
+			<p>Deze gegevens worden beschikbaar gesteld vanuit het Geoportaal van Overijssel: <a target="_blank" href="http://www.geoportaaloverijssel.nl">http://www.geoportaaloverijssel.nl</a></p>
+			<p>Veel bestanden uit het Geoportaal kan je downloaden.</p>
+			<p>Je kan deze informatie daarna zelf verder bewerken, analyseren of weergeven.</p>
+			<p>Precies zoals jij dat wilt, voor je eigen doeleinden.</p>
+		</div>
+		<div class="help-paragraph">
+			<p>Voor gebruik van dit soort bestanden is speciale software nodig.</p>
+			<p>Dat wordt een GIS genoemd (Geografisch Informatie Systeem). Veel gebruikte systemen zijn Arcgis en QGis.</p>
+			<p>Voor meer informatie over dit soort systemen, zie: <a target="_blank" href="https://nl.wikipedia.org/wiki/Geografisch_informatiesysteem">https://nl.wikipedia.org/wiki/Geografisch_informatiesysteem</a>.</p>
+		</div>
+		<div class="help-paragraph">
+			<p>Bij de download kan je kiezen uit verschillend formaten:</p>
+		</div>
+		<div class="help-paragraph">
+			<p><b>SHP</b> (shape, veel gebruikt open formaat, ontwikkeld door Esri)</p>
+			<p><b>GML</b> (Geography Markup Language, een open standaard voor GIS data)</p>
+			<p><b>KML</b> (Keyhole Markup Language, te gebruiken in Google Earth)</p>
+			<p><b>DXF</b> (Drawing exchange format, veel gebruikt formaat voor AutoCad)</p>
+		</div>
+		<div class="help-paragraph">
+			<p>Je kunt zelf kiezen welk bestandsformaat het beste past bij de software die jij gebruikt.</p>
+		</div>
+		<div class="help-paragraph">
+			<p>Heb je niet de beschikking over dergelijke GIS-software, maar wil je toch kaarten zien die gemaakt zijn door de provincie Overijssel?</p>
+			<p>Dat kan, omdat er ook veel pdf-bestanden beschikbaar gesteld worden.</p>
+			<p>Kijk daarvoor verder in het Geoportaal van Overijssel en selecteer daar alleen "statische kaarten".</p>
+		</div>
+		<div class="help-paragraph">
+			<p>Bij de download wordt de beschrijving van het bestand meegeleverd. Dit staat in het bestand leesmij.xml.</p>
+			<p>Open je dit bestand in Internet Explorer of Firefox dan wordt de beschrijving het beste weergeven (met opmaak).</p>
+			<p>Een aantal andere browsers laten alleen de technische versie (xml) zien als je dit bestand opent.</p>
+		</div>
+		<div id="footer">
+			<p>In het Geoportaal van Overijssel staan actuele kaarten en beschrijvingen van die kaarten.</p>
+			<p>Ter referentie zijn vaak ook nog oudere kaarten beschikbaar gesteld.</p>
+			<p>De provincie Overijssel stelt zoveel mogelijk kaarten als 'open data' voor iedereen beschikbaar.</p>
+			<p>Heeft u suggesties of vragen? Stuur dan een email naar <a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a></p>
+			<p>Zie proclaimer: <a target="_blank" href="http://www.overijssel.nl/algemene-onderdelen/proclaimer">http://www.overijssel.nl/algemene-onderdelen/proclaimer</a></p>
+		</div>
 	</div>
 }
