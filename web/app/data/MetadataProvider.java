@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import app.controllers.String;
 import models.MetadataDocument;
 
 import play.Configuration;
@@ -32,9 +33,16 @@ public class MetadataProvider {
 	 * @param id metadata document id
 	 * @return retrieved metadata document or empty
 	 */
-	public Promise<Optional<MetadataDocument>> get(String id) {		
+	public Promise<Optional<MetadataDocument>> get(String id) {
+		String access = config.getString("download.access");
+		String trustedHeaderValue = "0";
+		if("intern".equals(access)) {
+			trustedHeaderValue = "1";
+		}
+
 		return ws.url(config.getString("metadata.url") + id + ".xml")
 			.setFollowRedirects(true)
+			.setHeader(config.getString("download.trusted.header"), trustedHeaderValue)
 			.get()
 			.map(response -> {
 				if(response.getStatus() == 200) {
