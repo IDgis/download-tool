@@ -13,7 +13,6 @@ import java.net.URL;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.auth.AuthScope;
@@ -53,12 +52,12 @@ public class DownloadFile implements DownloadSource {
 	 * @throws UnsupportedEncodingException
 	 * @throws URISyntaxException 
 	 */
-	public DownloadFile(AdditionalData additionalData, String downloadTrustedHeader, String downloadAccess) throws MalformedURLException,
+	public DownloadFile(AdditionalData additionalData) throws MalformedURLException,
 			UnsupportedEncodingException, URISyntaxException {
 		String serviceUrl = additionalData.getUrl();
 		uri = new URL(serviceUrl.replace(" ", "%20")).toURI();
 		httpGet = new HttpGet(uri);
-		httpGet.addHeader(downloadTrustedHeader, "intern".equals(downloadAccess)?"1":"0");
+
 		// no authentication foreseen
 		String userAuth = null;
 		String pwAuth = null;

@@ -53,9 +53,6 @@ public class DownloadProcessor {
 	private String genericErrorMessage;
 	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 
-	private String trustedHeader;
-	private String access;
-	
 	public DownloadProcessor(String cachePath) {
 		super();
 		this.cachePath = cachePath;
@@ -87,15 +84,9 @@ public class DownloadProcessor {
 	private void setGenericErrorMessage(String genericErrorMessage) {
 		this.genericErrorMessage = genericErrorMessage;
 	}
+
+
 	
-	public void setTrustedHeader(String trustedHeader) {
-		this.trustedHeader = trustedHeader;
-	}
-
-	public void setAccess(String access) {
-		this.access = access;
-	}
-
 	/**
 	 * Perform downloads using downloadRequest as input.<br>
 	 * 1. a cache file is opened.<br>
@@ -137,7 +128,7 @@ public class DownloadProcessor {
 				List<AdditionalData> additionalData = download.getAdditionalData();
 				for (AdditionalData data : additionalData) {
 					log.debug("Additional item to downloadCache: " + data.getName());
-					source = new DownloadFile(data, trustedHeader, access);
+					source = new DownloadFile(data);
 					try {
 						downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
 					} catch (Exception ioe) {
@@ -330,9 +321,6 @@ public class DownloadProcessor {
 			addDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 		}
 		
-		String trustedHeader = getEnv("DOWNLOAD_TRUSTED_HEADER");
-		String trustedAccess = getEnv("DOWNLOAD_ACCESS");
-		
 		try {
 			log.info("start loop " + path);
 			DownloadProcessor dlp = new DownloadProcessor(path);
@@ -348,10 +336,6 @@ public class DownloadProcessor {
 			dlp.setGenericErrorMessage(genericErrorMessage);
 			
 			dlp.setAddDataFailedFilename(addDataFailedFilename);
-			
-			dlp.setAccess(trustedAccess);
-			dlp.setTrustedHeader(trustedHeader);
-			
 
 			for (;;) {
 				log.debug("processDownloadRequest");
