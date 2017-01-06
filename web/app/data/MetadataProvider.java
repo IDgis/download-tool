@@ -1,5 +1,7 @@
 package data;
 
+import java.net.URL;
+import java.net.MalformedURLException;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -26,6 +28,19 @@ public class MetadataProvider {
 		this.ws = ws;
 	}
 	
+	public String getTrustedHeader() {
+		return config.getString("download.trusted.header");
+	}
+	
+	public String getTrustedValue() {
+		String access = config.getString("download.access");
+		if("intern".equals(access)) {
+			return "1";
+		} else {
+			return "0";
+		}
+	}
+	
 	/**
 	 * Get metadata document.
 	 * 
@@ -33,29 +48,28 @@ public class MetadataProvider {
 	 * @return retrieved metadata document or empty
 	 */
 	public Promise<Optional<MetadataDocument>> get(String id) {
-		String access = config.getString("download.access");
-		String trustedHeaderValue = "0";
-		if("intern".equals(access)) {
-			trustedHeaderValue = "1";
-		}
+		try {
+			URL url = new URL(config.getString("metadata.url") + id + ".xml");
+			return ws.url(url.toExternalForm())
+				.setFollowRedirects(true)
+				.setHeader(getTrustedHeader(), getTrustedValue())
+				.get()
+				.map(response -> {
+					if(response.getStatus() == 200) {
+						MetadataDocument metadataDocument = new MetadataDocument(url, response.asXml());
 
-		return ws.url(config.getString("metadata.url") + id + ".xml")
-			.setFollowRedirects(true)
-			.setHeader(config.getString("download.trusted.header"), trustedHeaderValue)
-			.get()
-			.map(response -> {
-				if(response.getStatus() == 200) {
-					MetadataDocument metadataDocument = new MetadataDocument(response.asXml());
-					
-					String requiredUseLimitation = config.getString("metadata.required-use-limitation");
-					if(requiredUseLimitation == null 
-						|| metadataDocument.getUseLimitation()
-							.contains(requiredUseLimitation)) {
-						return Optional.of(metadataDocument);
-					}
-				} 
-				
-				return Optional.empty();
-			});
+						String requiredUseLimitation = config.getString("metadata.required-use-limitation");
+						if(requiredUseLimitation == null 
+							|| metadataDocument.getUseLimitation()
+								.contains(requiredUseLimitation)) {
+							return Optional.of(metadataDocument);
+						}
+					} 
+
+					return Optional.empty();
+				});
+		} catch(MalformedURLException e) {
+			return Promise.throwing(e);
+		}
 	}
 }

@@ -57,6 +57,8 @@ public class DownloadFile implements DownloadSource {
 		String serviceUrl = additionalData.getUrl();
 		uri = new URL(serviceUrl.replace(" ", "%20")).toURI();
 		httpGet = new HttpGet(uri);
+		additionalData.getHeaders().entrySet().forEach(entry -> 
+			httpGet.setHeader(entry.getKey(), entry.getValue()));
 
 		// no authentication foreseen
 		String userAuth = null;
