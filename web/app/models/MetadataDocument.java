@@ -9,6 +9,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
@@ -16,6 +19,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
 
 import play.Logger;
 import play.Logger.ALogger;
@@ -32,9 +36,12 @@ public class MetadataDocument {
 	
 	private final static Map<String, String> NS = namespaces();
 	
+	private final URL url;
+	
 	private final Document document;
 
-	public MetadataDocument(Document document) {
+	public MetadataDocument(URL url, Document document) {
+		this.url = url;
 		this.document = document;
 	}
 	
@@ -43,6 +50,10 @@ public class MetadataDocument {
 		ns.put("gmd", "http://www.isotc211.org/2005/gmd");
 		ns.put("gco", "http://www.isotc211.org/2005/gco");
 		return Collections.unmodifiableMap(ns);
+	}
+	
+	public URL getUrl() {
+		return url;
 	}
 	
 	public Document getDocument() {
@@ -172,5 +183,35 @@ public class MetadataDocument {
 		url = url.replace('\\', '/');
 		
 		return url;
+	}
+	
+	public Optional<URL> getStylesheet() throws MalformedURLException {
+		NodeList children = document.getChildNodes();
+		for(int i = 0; i < children.getLength(); i++) {
+			Node n = children.item(i);
+			if(n.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+				ProcessingInstruction pi = (ProcessingInstruction)n;
+				if("xml-stylesheet".equals(pi.getTarget())) {
+					String data = pi.getData();
+					
+					Pattern p = Pattern.compile("(.*?)=.*?\"(.*?)\"");
+					Matcher m = p.matcher(data);
+					
+					Map<String, String> kvp = new HashMap<>();
+					while(m.find()) {
+						String key = m.group(1).trim();
+						String value = m.group(2).trim();
+						
+						kvp.put(key, value);
+					}
+					
+					if(kvp.containsKey("href")) {
+						return Optional.of(new URL(url, kvp.get("href")));
+					}
+				}
+			}
+		}
+		
+		return Optional.empty();
 	}
 }

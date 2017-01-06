@@ -1,5 +1,7 @@
 package controllers;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -8,8 +10,10 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.net.URL;
 import java.util.ArrayList;
+
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
@@ -45,8 +49,6 @@ import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
 
 public class DownloadForm extends Controller {
-	
-	private final static String STYLESHEET = "datasets/extern/metadata.xsl";
 	
 	private final static List<OutputFormat> FORMATS = 
 			Collections.unmodifiableList(
@@ -192,18 +194,30 @@ public class DownloadForm extends Controller {
 				
 				// add metadata document and stylesheet
 				List<AdditionalData> additionalData = new ArrayList<>();
-
-				AdditionalData stylesheet = new AdditionalData();
-				stylesheet.setName("metadata.xsl");
-				stylesheet.setUrl(routes.WebJarAssets.at(webJarAssets.locate(STYLESHEET))
-					.absoluteURL(false, hostname));
-				additionalData.add(stylesheet);
-
+				
 				AdditionalData metadata = new AdditionalData();
 				metadata.setName("leesmij.xml");
 				metadata.setUrl(routes.Metadata.get(id)
 					.absoluteURL(false, hostname));
 				additionalData.add(metadata);
+				
+				try {
+					metadataDocument.getStylesheet().ifPresent(stylesheetUrl -> {
+						log.debug("adding stylesheet: " + stylesheetUrl);
+
+						AdditionalData stylesheet = new AdditionalData();
+						stylesheet.setName("metadata.xsl");
+						stylesheet.setUrl(stylesheetUrl.toExternalForm());
+
+						Map<String, String> stylesheetHeaders = new HashMap<>();
+						stylesheetHeaders.put(metadataProvider.getTrustedHeader(), metadataProvider.getTrustedValue());
+						stylesheet.setHeaders(stylesheetHeaders);
+
+						additionalData.add(stylesheet);
+					});
+				} catch(MalformedURLException e) {
+					throw new RuntimeException(e);
+				}
 				
 				// add supplemental information
 				for(String url : metadataDocument.getSupplementalInformationUrls()) {
