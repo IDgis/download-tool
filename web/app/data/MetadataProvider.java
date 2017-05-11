@@ -61,7 +61,8 @@ public class MetadataProvider {
 						String requiredUseLimitation = config.getString("metadata.required-use-limitation");
 						if(requiredUseLimitation == null 
 							|| metadataDocument.getUseLimitation()
-								.contains(requiredUseLimitation)) {
+								.contains(requiredUseLimitation)
+							|| "intern".equals(config.getString("download.access"))) {
 							return Optional.of(metadataDocument);
 						}
 					} 
