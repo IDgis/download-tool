@@ -1,7 +1,7 @@
 @(webJarAssets: WebJarAssets, id: String, info: DownloadInfo, form: Form[DownloadRequest])
 
 @metadataUrl() = @{
-	play.Play.application().configuration().getString("download.portal.metadata.prefix") + id
+	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
 }
 
 @fieldErrors(field: Form.Field) = {

@@ -1,7 +1,7 @@
 @(webJarAssets: WebJarAssets, id: String, file: String, outputFormat: OutputFormat, email: String)
 
 @metadataUrl() = @{
-	play.Play.application().configuration().getString("download.portal.metadata.prefix") + id
+	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
 }
 
 @layout(webJarAssets) {
