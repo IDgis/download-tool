@@ -75,7 +75,7 @@ public class DownloadRaster extends Controller {
 						return ok(bytes).as("image/tiff");
 					} catch (IOException ioe) {
 						log.debug(ioe.getMessage());
-						return notFound(datasetmissing.render(webJarAssets, identification));
+						return notFound(datasetmissing.render(webJarAssets, fileIdentification));
 					}
 				} else {
 					return notFound(datasetmissing.render(webJarAssets, fileIdentification));
