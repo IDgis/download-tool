@@ -1,20 +1,29 @@
 @(webJarAssets: WebJarAssets)(content: Html)
 
+@config() = @{
+	play.Play.application().configuration()
+}
+
+@clientConfig() = @{
+	play.Play.application().configuration()
+		.getConfig(play.Play.application().configuration().getString("download.client"))
+}
+
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta content="text/html" charset="utf-8">
-		<title>Geoportaal Overijssel</title>
+		<title>Download bestand</title>
 		<link href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet">
 		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
-		@if("intern".equals(play.Play.application().configuration().getString("download.access"))) {
+		@if("intern".equals(config().getString("download.access"))) {
 			<link href='@routes.Assets.at("stylesheets/form-intern.css")' rel="stylesheet">
 		}
 	</head>
 	<body>
 		<div class="logo">
-			<a href="http://www.overijssel.nl">
-				<img src='@routes.Assets.at("images/logo_overijssel.png")' alt="Responsive image"></img>
+			<a href='@clientConfig().getString("url")'>
+				<img src='@routes.Assets.at(clientConfig().getString("logo"))' alt="Responsive image"></img>
 			</a>
 		</div>
 

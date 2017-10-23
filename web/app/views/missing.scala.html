@@ -1,5 +1,10 @@
 @(webJarAssets: WebJarAssets)
 
+@clientConfig() = @{
+	play.Play.application().configuration()
+		.getConfig(play.Play.application().configuration().getString("download.client"))
+}
+
 @layout(webJarAssets) {
 	<p class="title">404 Niet gevonden</p>
 	
@@ -8,10 +13,8 @@
 	</div>
 	
 	<div id="footer">
-		<p>De bestanden worden via het Geoportaal van Overijssel beschikbaar gesteld.</p>
-		<p>De gegevens zijn gemaakt voor eigen (intern) gebruik door de provincie Overijssel.</p>
-		<p>Zijn er suggesties of vragen, neem dan contact op met
-			<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
-		</p>
+		@Html(clientConfig().getString("portal.intro"))
+		@Html(clientConfig().getString("portal.internal"))
+		@Html(clientConfig().getString("suggestions"))
 	</div>
 }
