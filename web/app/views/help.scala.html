@@ -1,12 +1,17 @@
 @(webJarAssets: WebJarAssets)
 
+@clientConfig() = @{
+	play.Play.application().configuration()
+		.getConfig(play.Play.application().configuration().getString("download.client"))
+}
+
 @layout(webJarAssets) {
 	<p class="title">Toelichting bij downloaden van bestanden</p>
 	
 	<div class="welcome">
 		<div>
-			<p>Deze gegevens worden beschikbaar gesteld vanuit het Geoportaal van Overijssel: <a target="_blank" href="http://www.geoportaaloverijssel.nl">http://www.geoportaaloverijssel.nl</a></p>
-			<p>Veel bestanden uit het Geoportaal kan je downloaden.</p>
+			@Html(clientConfig().getString("help.intro"))
+			@Html(clientConfig().getString("help.download"))
 			<p>Je kan deze informatie daarna zelf verder bewerken, analyseren of weergeven.</p>
 			<p>Precies zoals jij dat wilt, voor je eigen doeleinden.</p>
 		</div>
@@ -28,9 +33,9 @@
 			<p>Je kunt zelf kiezen welk bestandsformaat het beste past bij de software die jij gebruikt.</p>
 		</div>
 		<div class="help-paragraph">
-			<p>Heb je niet de beschikking over dergelijke GIS-software, maar wil je toch kaarten zien die gemaakt zijn door de provincie Overijssel?</p>
-			<p>Dat kan, omdat er ook veel pdf-bestanden beschikbaar gesteld worden.</p>
-			<p>Kijk daarvoor verder in het Geoportaal van Overijssel en selecteer daar alleen "statische kaarten".</p>
+			@Html(clientConfig().getString("help.static.maps.1"))
+			@Html(clientConfig().getString("help.static.maps.2"))
+			@Html(clientConfig().getString("help.static.maps.3"))
 		</div>
 		<div class="help-paragraph">
 			<p>Bij de download wordt de beschrijving van het bestand meegeleverd. Dit staat in het bestand leesmij.xml.</p>
@@ -38,11 +43,11 @@
 			<p>Een aantal andere browsers laten alleen de technische versie (xml) zien als je dit bestand opent.</p>
 		</div>
 		<div id="footer">
-			<p>In het Geoportaal van Overijssel staan actuele kaarten en beschrijvingen van die kaarten.</p>
-			<p>Ter referentie zijn vaak ook nog oudere kaarten beschikbaar gesteld.</p>
-			<p>De provincie Overijssel stelt zoveel mogelijk kaarten als 'open data' voor iedereen beschikbaar.</p>
-			<p>Heeft u suggesties of vragen? Stuur dan een email naar <a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a></p>
-			<p>Zie proclaimer: <a target="_blank" href="http://www.overijssel.nl/algemene-onderdelen/proclaimer">http://www.overijssel.nl/algemene-onderdelen/proclaimer</a></p>
+			@Html(clientConfig().getString("portal.maps.current"))
+			@Html(clientConfig().getString("portal.maps.old"))
+			@Html(clientConfig().getString("opendata"))
+			@Html(clientConfig().getString("suggestions"))
+			@Html(clientConfig().getString("proclaimer"))
 		</div>
 	</div>
 }

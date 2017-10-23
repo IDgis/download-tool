@@ -1,5 +1,10 @@
 @(webJarAssets: WebJarAssets, id: String)
 
+@clientConfig() = @{
+	play.Play.application().configuration()
+		.getConfig(play.Play.application().configuration().getString("download.client"))
+}
+
 @layout(webJarAssets) {
 	<p class="title">404 Niet gevonden</p>
 	
@@ -12,8 +17,6 @@
 		<p>Hiervoor kunnen meerdere redenen zijn. 
 		Een niet voorzien technisch probleem. 
 		Of misschien heb je onvoldoende rechten om de download uit te voeren.</p>
-		<p>Neem voor vragen contact op met 
-			<a href="mailto:beleidsinformatie@@overijssel.nl">beleidsinformatie@@overijssel.nl</a>
-		</p>
+		@Html(clientConfig().getString("questions"))
 	</div>
 }

@@ -1,5 +1,10 @@
 @(webJarAssets: WebJarAssets, id: String, file: String, outputFormat: OutputFormat, email: String)
 
+@clientConfig() = @{
+	play.Play.application().configuration()
+		.getConfig(play.Play.application().configuration().getString("download.client"))
+}
+
 @metadataUrl() = @{
 	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
 }
@@ -26,16 +31,12 @@
 	
 	<div id="footer">
 		<p>De volledige <a target="_blank" href="@metadataUrl()">metainformatie van dit bestand kunt u hier</a> vinden.</p>
-		<p>@play.Play.application().configuration().getString("download.footer.intro")
-			<a target="_blank" href="@play.Play.application().configuration().getString("download.portal.url")">@play.Play.application().configuration().getString("download.portal.url")</a>
-		</p>
-		<p>In het Geoportaal staan actuele kaarten en beschrijvingen van die kaarten.</p>
-		<p>Ter referentie zijn vaak ook nog oudere kaarten beschikbaar gesteld.</p>
-		<p>@play.Play.application().configuration().getString("download.footer.availability")</p>
-		<p>Heeft u suggesties of vragen? Stuur dan een email naar <a href="mailto:@play.Play.application().configuration().getString("download.email")">@play.Play.application().configuration().getString("download.email")</a></p>
-		<p>Zie proclaimer: 
-			<a target="_blank" href="@play.Play.application().configuration().getString("download.footer.proclaimer.url")">@play.Play.application().configuration().getString("download.footer.proclaimer.url")</a>
-		</p>
+		@Html(clientConfig().getString("portal.intro"))
+		@Html(clientConfig().getString("portal.maps.current"))
+		@Html(clientConfig().getString("portal.maps.old"))
+		@Html(clientConfig().getString("opendata"))
+		@Html(clientConfig().getString("suggestions"))
+		@Html(clientConfig().getString("proclaimer"))
 	</div>
 	
 }
