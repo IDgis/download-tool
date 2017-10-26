@@ -1,6 +1,10 @@
 package controllers;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,6 +12,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -46,7 +56,7 @@ public class DownloadRaster extends Controller {
 		this.dataSource = dataSource;
 	}
 	
-	public Result get(String fileIdentification) throws SQLException, IOException {
+	public Result get(String fileIdentification) {
 		
 		String sql = "select identification, source_dataset_id, name from publisher.dataset where metadata_file_identification = ?;";
 		
@@ -65,15 +75,24 @@ public class DownloadRaster extends Controller {
 					
 					String filePath = rasterDirectory + identification + ".tif";
 					
-					Path path = Paths.get(filePath);
-					
 					try {
-						byte[] bytes = Files.readAllBytes(path);
+						Path p = Paths.get(filePath);
+						InputStream inputStream = new FileInputStream(p.toFile());
+						
+						byte[] buffer = new byte[8192];
+						int bytesRead;
+						ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
+						while((bytesRead = inputStream.read(buffer)) != -1) {
+							byteOutput.write(buffer, 0, bytesRead);
+						}
+						byte[] bytes = byteOutput.toByteArray();
+						
+						inputStream.close();
 						
 						response().setHeader("Content-Disposition", "attachment; filename=" + name + ".tif");
 						
 						return ok(bytes).as("image/tiff");
-					} catch (IOException ioe) {
+					} catch (Exception ioe) {
 						log.debug(ioe.getMessage());
 						return notFound(datasetmissing.render(webJarAssets, fileIdentification));
 					}
