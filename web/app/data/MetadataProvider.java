@@ -57,16 +57,17 @@ public class MetadataProvider {
 				.map(response -> {
 					if(response.getStatus() == 200) {
 						MetadataDocument metadataDocument = new MetadataDocument(url, response.asXml());
-
-						String requiredUseLimitation = config.getString("metadata.required-use-limitation");
-						if(requiredUseLimitation == null 
-							|| metadataDocument.getUseLimitation()
-								.contains(requiredUseLimitation)
+						
+						String confidentialPath = config.getString("metadata.confidential-path");
+						String dataPublicValue = config.getString("metadata.data-public-value");
+						if(dataPublicValue == null 
+							|| metadataDocument.getresourceConstraints(confidentialPath)
+								.contains(dataPublicValue)
 							|| "intern".equals(config.getString("download.access"))) {
 							return Optional.of(metadataDocument);
 						}
 					} 
-
+					
 					return Optional.empty();
 				});
 		} catch(MalformedURLException e) {

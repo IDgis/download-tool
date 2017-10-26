@@ -60,17 +60,8 @@ public class MetadataDocument {
 		return document;
 	}
 	
-	public Set<String> getUseLimitation() {
-		NodeList nodeList = XPath.selectNodes(
-			"/gmd:MD_Metadata"
-			+ "/gmd:identificationInfo"
-			+ "/gmd:MD_DataIdentification"
-			+ "/gmd:resourceConstraints"
-			+ "/gmd:MD_Constraints"
-			+ "/gmd:useLimitation"
-			+ "/gco:CharacterString",
-			document,
-			NS);
+	public Set<String> getresourceConstraints(String path) {
+		NodeList nodeList = XPath.selectNodes(path, document, NS);
 		
 		HashSet<String> useLimitation = new HashSet<String>();
 		for(int i = 0; i < nodeList.getLength(); i++) {
