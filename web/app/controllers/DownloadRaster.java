@@ -89,7 +89,9 @@ public class DownloadRaster extends Controller {
 						
 						inputStream.close();
 						
-						response().setHeader("Content-Disposition", "attachment; filename=" + name + ".tif");
+						response().setHeader("Content-Disposition", "attachment; filename=\"" + 
+								name + 
+								".tif\"");
 						
 						return ok(bytes).as("image/tiff");
 					} catch (Exception ioe) {
