@@ -157,7 +157,7 @@ project(':web') {
 			createDockerfile(Dockerfile) {
 				dependsOn copyTar
 				destFile = project.file('build/docker/Dockerfile')
-				from 'java'
+				from 'java:8'
 				copyFile 'playBinary', '/opt'
 				runCommand 'chmod u+x /opt/bin/playBinary'
 				exposePort 9000
@@ -229,7 +229,7 @@ configure([
 	task createDockerfile(type: Dockerfile) {
 		dependsOn copyTar
 		destFile = project.file('build/docker/Dockerfile')
-		from 'java'
+		from 'java:8'
 		copyFile "${project.name}-${project.version}", '/opt'
 		runCommand "chmod u+x /opt/bin/${project.name}"
 		defaultCommand "/opt/bin/${project.name}"
