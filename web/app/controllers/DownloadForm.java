@@ -54,10 +54,12 @@ public class DownloadForm extends Controller {
 			Collections.unmodifiableList(
 				Arrays.asList(
 					new OutputFormat("shp", "SHP", "SHAPE-ZIP", "zip"),
+					new OutputFormat("csv", "CSV", "csv", "csv"),
+					new OutputFormat("dxf", "DXF", "DXF", "dxf"),
+					new OutputFormat("geojson", "GeoJSON", "application/json", "json"),
 					new OutputFormat("gml21", "GML 2.1", "text/xml; subtype=gml/2.1.2", "gml"),
 					new OutputFormat("gml32", "GML 3.2", "text/xml; subtype=gml/3.2", "gml"),
-					new OutputFormat("kml", "KML", "application/vnd.google-earth.kml+xml", "kml"),
-					new OutputFormat("dxf", "DXF", "DXF", "dxf")));
+					new OutputFormat("kml", "KML", "application/vnd.google-earth.kml+xml", "kml")));
 	
 	private final static Pattern urlPattern = Pattern.compile(".*/(.*?)(\\?.*)?$");
 	
