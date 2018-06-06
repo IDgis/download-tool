@@ -8,14 +8,14 @@ import play.data.validation.Constraints;
  */
 public class DownloadRequest {	
 	
-	@Constraints.Required
+	@Constraints.Required(message = "Je moet een keuze maken uit een van de formaten")
 	private String format;
 	
-	@Constraints.Required
+	@Constraints.Required(message = "Vul je eigen naam in")
 	private String name;
 	
-	@Constraints.Email
-	@Constraints.Required
+	@Constraints.Email(message = "Het ingevulde e-mailadres is niet correct")
+	@Constraints.Required(message = "Vul hier je e-mailadres in, waarheen de downloadlink moet worden gestuurd")
 	private String email;
 
 	public String getFormat() {
