@@ -5,8 +5,8 @@
 		.getConfig(play.Play.application().configuration().getString("download.client"))
 }
 
-@layout(webJarAssets) {
-	<p class="title">404 Niet gevonden</p>
+@layout("Download bestand is gestopt", webJarAssets) {
+	<p class="title">Foutmelding: 404 Niet gevonden</p>
 	
 	<div class="welcome">
 		<p>Je bent bezig met het downloaden van de dataset met id: @(id).xml</p>
