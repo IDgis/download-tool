@@ -18,8 +18,9 @@ body.background-acceptance {
 	background-color:#f3f7d4;
 }
 
-div {
-	display: block;
+div.paragraph {
+	margin-top: 10px;
+	margin-bottom: 10px;
 }
 
 p {
