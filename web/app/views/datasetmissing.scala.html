@@ -5,18 +5,32 @@
 		.getConfig(play.Play.application().configuration().getString("download.client"))
 }
 
-@layout(webJarAssets) {
-	<p class="title">404 Niet gevonden</p>
+@layout("Download bestand is gestopt", webJarAssets) {
+	<p class="title">Foutmelding: 404 Niet gevonden</p>
 	
 	<div class="welcome">
-		<p>Je bent bezig met het downloaden van de dataset met id: @(id).xml</p>
+		<div class="paragraph">
+			<p>Er is een fout opgetreden.</p>
+			<p>De download van het bestand is gestopt.</p>
+		</div>
+		<div class="paragraph">
+			<p>Je was bezig met het downloaden van de dataset: @(id).xml</p>
+		</div>
+		<div class="paragraph">
+			<p>Deze actie kan niet succesvol worden afgerond.</p>
+			<p>Hiervoor kunnen meerdere redenen zijn:</p>
+		</div>
+		<div class="paragraph">
+			<ul>
+				<li><p>Een niet voorzien technisch probleem.</p></li>
+				<li><p>Onvoldoende rechten om de download uit te voeren.</p></li>
+				<li><p>Een verouderde downloadlink.</p></li>
+			</ul>
+		</div>
 	</div>
 	
 	<div id="footer">
-		<p>Deze dataset kan echter nu niet worden gedownload.</p>
-		<p>Hiervoor kunnen meerdere redenen zijn. 
-		Een niet voorzien technisch probleem. 
-		Of misschien heb je onvoldoende rechten om de download uit te voeren.</p>
+		@Html(clientConfig().getString("search"))
 		@Html(clientConfig().getString("questions"))
 	</div>
 }

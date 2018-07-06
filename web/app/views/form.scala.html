@@ -9,8 +9,8 @@
 	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
 }
 
-@displayNedstat() = @{
-	play.Play.application().configuration().getString("display.nedstat") == "true"
+@displayStatsAnalytics() = @{
+	play.Play.application().configuration().getString("display.stats.analytics") == "true"
 }
 
 @fieldErrors(field: Form.Field) = {
@@ -33,7 +33,7 @@
 	</div>
 }
 
-@layout(webJarAssets) {
+@layout("Download bestand", webJarAssets) {
 	<p class="title">@info.title</p>
 	
 	<div class="welcome">
@@ -74,7 +74,7 @@
 	 	
 	 	@simpleField(
 	 		field = form("email"),
-	 		inputType = "email", 
+	 		inputType = "text", 
 	 		label = "E-mailadres",
 	 		placeholder = "E-mailadres",
 	 		title = "Vul e-mailadres in")
@@ -98,7 +98,16 @@
 			@Html(clientConfig().getString("proclaimer"))
 		</div>
 		
-		@if(displayNedstat()) {
+		@if(displayStatsAnalytics()) {
+			<!-- Global site tag (gtag.js) - Google Analytics -->
+			<script async src="https://www.googletagmanager.com/gtag/js?id=UA-120806736-1"></script>
+			<script>
+				window.dataLayer = window.dataLayer || [];
+				function gtag(){dataLayer.push(arguments);}
+				gtag('js', new Date());
+				gtag('config', 'UA-120806736-1');
+			</script>
+			
 			<!-- Begin Nedstat Pro code v2.005f -->
 			<script language="javascript" type="text/javascript">
 				var t='http://m1.nedstatpro.net/nl/nedstatpro.gif?name=provinci18_3';

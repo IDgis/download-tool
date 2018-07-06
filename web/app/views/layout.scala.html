@@ -1,4 +1,4 @@
-@(webJarAssets: WebJarAssets)(content: Html)
+@(title: String, webJarAssets: WebJarAssets)(content: Html)
 
 @config() = @{
 	play.Play.application().configuration()
@@ -13,7 +13,7 @@
 <html>
 	<head>
 		<meta content="text/html" charset="utf-8">
-		<title>Download bestand</title>
+		<title>@title</title>
 		<link href='@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))' rel="stylesheet">
 		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
 		@if("intern".equals(config().getString("download.access"))) {
@@ -28,7 +28,7 @@
 		</div>
 
 		<div class="titlebar">
-			<h1 class="header">Download bestand</h1>
+			<h1 class="header">@title</h1>
 		</div>
 
 		@content
