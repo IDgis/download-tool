@@ -67,6 +67,10 @@ div.welcome {
 	padding: 10px 0;
 }
 
+p.data-information {
+	margin-top: 15px;
+}
+
 div.format-choice {
 	font-size: 18px;
 }
