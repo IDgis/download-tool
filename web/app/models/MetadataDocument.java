@@ -130,6 +130,17 @@ public class MetadataDocument {
 			NS).getTextContent();
 	}
 	
+	public String getDescription() {
+		return XPath.selectNode(
+			"/gmd:MD_Metadata"
+			+ "/gmd:identificationInfo"
+			+ "/gmd:MD_DataIdentification"
+			+ "/gmd:abstract"
+			+ "/gco:CharacterString",
+			document,
+			NS).getTextContent();
+	}
+	
 	public List<String> getSupplementalInformationUrls() {
 		NodeList nl = XPath.selectNodes(
 			"/gmd:MD_Metadata"

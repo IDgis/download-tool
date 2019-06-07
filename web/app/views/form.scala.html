@@ -36,9 +36,14 @@
 @layout("Download bestand", webJarAssets) {
 	<p class="title">@info.title</p>
 	
+	<div class="metadata-information">
+		<img src=@info.browseGraphicUrl />
+		<p>@info.description</p>
+		<p id="metadata-link">De volledige <a target="_blank" href="@metadataUrl()">metainformatie van dit bestand kunt u hier</a> vinden.</p>
+	</div>
+	
 	<div class="welcome">
-		<p>Om dit bestand te downloaden vul je onderstaande velden in.</p>
-		<p>Klik daarna op download.</p>
+		<p>Om dit bestand te downloaden vul je onderstaande velden in. Klik daarna op download.</p>
 		<p>Je krijgt dan een download-link in de mailbox.</p>
 		<p class="data-information">
 			De gegevens die u invoert kunnen worden gebruikt voor onderzoeksdoeleinden om onze dienstverlening 
@@ -94,7 +99,6 @@
 		</div>
 		
 		<div id="footer">
-			<p>De volledige <a target="_blank" href="@metadataUrl()">metainformatie van dit bestand kunt u hier</a> vinden.</p>
 			@Html(clientConfig().getString("portal.intro"))
 			@Html(clientConfig().getString("portal.maps.current"))
 			@Html(clientConfig().getString("portal.maps.old"))
