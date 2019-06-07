@@ -110,7 +110,9 @@ public class DownloadForm extends Controller {
 					webJarAssets,
 					id,
 					new DownloadInfo(
-						metadataDocument.getTitle(), 
+						metadataDocument.getTitle(),
+						metadataDocument.getBrowseGraphicUrl(),
+						metadataDocument.getDescription(),
 						FORMATS),
 					Form.form(DownloadRequest.class)));
 			} else {
@@ -159,6 +161,8 @@ public class DownloadForm extends Controller {
 							id,
 							new DownloadInfo(
 								metadataDocument.getTitle(), 
+								metadataDocument.getBrowseGraphicUrl(), 
+								metadataDocument.getDescription(), 
 								FORMATS),
 							downloadRequestForm));
 				}

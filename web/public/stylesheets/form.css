@@ -61,10 +61,23 @@ p.title {
 	margin-bottom: 25px;
 }
 
+div.metadata-information img {
+	float: left;
+	width: 200px;
+	height: 200px;
+	margin-right: 15px;
+	margin-bottom: 15px;
+}
+
+#metadata-link {
+	margin-top: 10px;
+}
+
 div.welcome {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	padding: 10px 0;
+	clear: both;
 }
 
 p.data-information {
@@ -118,5 +131,5 @@ div.help-paragraph {
 }
 
 #footer {
-	margin-top: 60px;
+	margin-top: 45px;
 }
