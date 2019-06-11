@@ -54,6 +54,7 @@ public class DownloadForm extends Controller {
 			Collections.unmodifiableList(
 				Arrays.asList(
 					new OutputFormat("shp", "SHP", "SHAPE-ZIP", "zip"),
+					new OutputFormat("geopackage", "Geopackage", "geopackage", "gpkg"),
 					new OutputFormat("csv", "CSV", "csv", "csv"),
 					new OutputFormat("dxf", "DXF", "DXF", "dxf"),
 					new OutputFormat("geojson", "GeoJSON", "application/json", "json"),
