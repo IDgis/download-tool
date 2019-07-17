@@ -113,7 +113,9 @@ public class DownloadForm extends Controller {
 					new DownloadInfo(
 						metadataDocument.getTitle(),
 						metadataDocument.getBrowseGraphicUrl(),
-						metadataDocument.getDescription(),
+						metadataDocument.getDescription().length() > 640 ?
+								metadataDocument.getDescription().substring(0, 640) + "..." :
+								metadataDocument.getDescription(),
 						FORMATS),
 					Form.form(DownloadRequest.class)));
 			} else {
