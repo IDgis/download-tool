@@ -54,10 +54,10 @@ public class DownloadForm extends Controller {
 			Collections.unmodifiableList(
 				Arrays.asList(
 					new OutputFormat("shp", "SHP", "SHAPE-ZIP", "zip"),
-					new OutputFormat("geopackage", "Geopackage", "geopackage", "gpkg"),
 					new OutputFormat("csv", "CSV", "csv", "csv"),
 					new OutputFormat("dxf", "DXF", "DXF", "dxf"),
 					new OutputFormat("geojson", "GeoJSON", "application/json", "json"),
+					new OutputFormat("geopackage", "Geopackage", "geopackage", "gpkg"),
 					new OutputFormat("gml21", "GML 2.1", "text/xml; subtype=gml/2.1.2", "gml"),
 					new OutputFormat("gml32", "GML 3.2", "text/xml; subtype=gml/3.2", "gml"),
 					new OutputFormat("kml", "KML", "application/vnd.google-earth.kml+xml", "kml")));
@@ -113,7 +113,9 @@ public class DownloadForm extends Controller {
 					new DownloadInfo(
 						metadataDocument.getTitle(),
 						metadataDocument.getBrowseGraphicUrl(),
-						metadataDocument.getDescription(),
+						metadataDocument.getDescription().length() > 640 ?
+								metadataDocument.getDescription().substring(0, 640) + "..." :
+								metadataDocument.getDescription(),
 						FORMATS),
 					Form.form(DownloadRequest.class)));
 			} else {
