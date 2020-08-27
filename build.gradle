@@ -167,7 +167,7 @@ project(':web') {
 				runCommand 'chmod u+x /opt/bin/playBinary'
 				if(project.hasProperty('importRootCA')) {
 					copyFile 'rootCA.crt', '/opt'
-					runCommand '/usr/lib/jvm/zulu-8-amd64/bin/keytool -import -alias server -keystore /usr/lib/jvm/zulu-8-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
+					runCommand 'keytool -import -alias server -keystore /usr/lib/jvm/zulu8-ca-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
 				}
 				exposePort 9000
 				defaultCommand "/opt/bin/playBinary"
@@ -251,7 +251,7 @@ configure([
 		runCommand "chmod u+x /opt/bin/${project.name}"
 		if(project.hasProperty('importRootCA')) {
 			copyFile 'rootCA.crt', '/opt'
-			runCommand '/usr/lib/jvm/zulu-8-amd64/bin/keytool -import -alias server -keystore /usr/lib/jvm/zulu-8-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
+			runCommand 'keytool -import -alias server -keystore /usr/lib/jvm/zulu8-ca-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
 		}
 		defaultCommand "/opt/bin/${project.name}"
 	}
