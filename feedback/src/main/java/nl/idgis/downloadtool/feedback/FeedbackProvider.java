@@ -256,8 +256,10 @@ public class FeedbackProvider {
 				fbp.processFeedback();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.info("end loop: " + e.getMessage());
+			log.error("end loop", e);
+
+			// ensure the JVM actually terminates
+			System.exit(1);
 		}
 
 	}
