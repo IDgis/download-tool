@@ -105,7 +105,6 @@ project(':web') {
 	apply plugin: 'eclipse'
 	
 	repositories {
-		jcenter()
 		maven {
 			name "typesafe-maven-release"
 			url "https://repo.typesafe.com/typesafe/maven-releases"
@@ -115,6 +114,7 @@ project(':web') {
 			url "https://repo.typesafe.com/typesafe/ivy-releases"
 			layout "ivy"
 		}
+		mavenCentral()
 	}
 	
 	model {
