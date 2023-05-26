@@ -269,7 +269,9 @@ allprojects {
 						certPath = file "$env.DOCKER_CERT_PATH"
 					}
 				} else {
-					url = "http://${dockerHost}:2375"
+					if (project.properties.containsKey("dockerHost")) {
+						url = "http://${dockerHost}:2375"
+					}
 				}
 			}
 		}
