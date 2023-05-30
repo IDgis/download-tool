@@ -106,6 +106,13 @@ project(':web') {
 	
 	repositories {
 		maven {
+			url = "https://maven.pkg.github.com/IDgis/sysadmin"
+			credentials {
+				username = System.getenv("GITHUB_USER") ?: ghUser
+				password = System.getenv("GITHUB_TOKEN") ?: ghKey
+			}
+		}
+		maven {
 			name "typesafe-maven-release"
 			url "https://repo.typesafe.com/typesafe/maven-releases"
 		}
@@ -114,7 +121,6 @@ project(':web') {
 			url "https://repo.typesafe.com/typesafe/ivy-releases"
 			layout "ivy"
 		}
-		mavenCentral()
 	}
 	
 	model {
@@ -199,6 +205,17 @@ project(':web') {
 		play 'org.webjars:webjars-play_2.11:2.4.0-2'
 		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
 		play 'com.typesafe.play:play-java-jdbc_2.11:2.4.6'
+		
+		play project(':domain')
+		play project(':dao')
+		play project(':queue')
+		play 'org.webjars:bootstrap:3.3.6'
+		play ("nl.idgis.sys:provisioning-registration:1.1.6-SNAPSHOT") {
+			exclude module: "ch.qos.logback"
+			exclude module: "logback-classic"
+		}
+		
+		play 'org.springframework:spring-jdbc:4.2.5.RELEASE'
 	}
 }
 
@@ -209,6 +226,16 @@ configure([
 	
 	apply plugin: 'application'
 	apply plugin: DockerRemoteConfig
+	
+	repositories {
+		maven {
+			url = "https://maven.pkg.github.com/IDgis/idgis-commons"
+			credentials {
+				username = System.getenv("GITHUB_USER") ?: ghUser
+				password = System.getenv("GITHUB_TOKEN") ?: ghKey
+			}
+		}
+	}
 	
 	dependencies {
 		compile project(':dao')
@@ -278,25 +305,9 @@ allprojects {
 	}
 }
 
-project('web') {
-	dependencies {
-		play project(':domain')
-		play project(':dao')
-		play project(':queue')
-		play 'org.webjars:bootstrap:3.3.6'
-		play ("nl.idgis.sys:provisioning-registration:1.1.3-SNAPSHOT") {
-			exclude module: "ch.qos.logback"
-			exclude module: "logback-classic"
-		}
-		
-		play 'org.springframework:spring-jdbc:4.2.5.RELEASE'
-	}
-}
-
 project(':dao') {
 	dependencies {
 		compile project(':domain')
-		compile 'nl.idgis.commons:commons-utils:0.0.14'
 		compile 'org.postgresql:postgresql:9.4.1208.jre7'
 		compile 'com.google.code.gson:gson:2.5'
 	}
@@ -313,7 +324,7 @@ project(':queue') {
 project(':feedback') {
 
 	dependencies {		
-		compile 'nl.idgis.commons:commons-utils:0.0.14'	
+		compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'	
 		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
 	}
 
@@ -321,12 +332,10 @@ project(':feedback') {
 }
 
 project(':downloader') {
-
+	
 	dependencies {
 		compile 'org.apache.httpcomponents:httpclient:4.3.1'
-		compile 'nl.idgis.commons:commons-cache:0.0.14'
-		compile 'nl.idgis.commons:commons-convert:0.0.14'
-		compile 'nl.idgis.commons:commons-utils:0.0.14'
+		compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
