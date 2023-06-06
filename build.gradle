@@ -321,7 +321,7 @@ project(':queue') {
 project(':feedback') {
 
 	dependencies {		
-		compile 'nl.idgis.commons:commons-utils:0.0.15-SNAPSHOT'	
+		compile 'nl.idgis.commons:commons-utils:0.0.15'	
 		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
 	}
 
@@ -332,7 +332,7 @@ project(':downloader') {
 	
 	dependencies {
 		compile 'org.apache.httpcomponents:httpclient:4.3.1'
-		compile 'nl.idgis.commons:commons-cache:0.0.15-SNAPSHOT'
+		compile 'nl.idgis.commons:commons-cache:0.0.15'
 	}
 
 	mainClassName = 'nl.idgis.downloadtool.downloader.DownloadProcessor'
