@@ -6,6 +6,7 @@ build/
 .vagrant
 .classpath
 .project
+.idea
 feedback/velocity.log
 feedback/velocity.log.1
 cache/
@@ -21,3 +22,5 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 docker/*.crt
+
+build.sh
