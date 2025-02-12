@@ -8,6 +8,9 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -209,6 +212,14 @@ public class DownloadProcessor {
 			performDownload(downloadRequest);
 		} catch (Exception e) {
 			e.printStackTrace();
+			
+			try {
+				Path p = Paths.get(getEnv("ZIP_CACHEPATH") + "/" + downloadRequest.getRequestId() + "_ERROR.txt");
+				Files.createFile(p);
+				Files.write(p, e.getMessage().getBytes());
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 		
 		try {
