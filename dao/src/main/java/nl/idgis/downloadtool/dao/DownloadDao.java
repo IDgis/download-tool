@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
+import nl.idgis.downloadtool.domain.DownloadResultInfo;
 /**
  * @author Rob
  *
@@ -52,6 +53,44 @@ public class DownloadDao {
 		} catch (SQLException e) {
 			log.error("Exception when executing sql=" + sql);
 			throw e;
+		}
+	}
+	
+	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException {
+		log.debug("creating download result info"); 
+		
+		try(Connection conn = dataSource.getConnection();
+			PreparedStatement stmt = conn.prepareStatement(
+				"INSERT INTO result_info(request_info_id, response_time, response_code) " + 
+				"SELECT id, now(), ? FROM request_info WHERE request_id = ?")) {
+			
+			int count, retriesLeft = 3;
+			long sleepTime = 500;
+			for (;;) {
+				stmt.setString(1, downloadResultInfo.getResponseCode());
+				stmt.setString(2, downloadResultInfo.getRequestId());
+				count = stmt.executeUpdate();
+				if (count != 1) {
+					if (retriesLeft > 0) {
+						log.debug("request info not found, retrying");
+						Thread.sleep(sleepTime);
+						
+						sleepTime *= 2;
+						retriesLeft--;
+					} else {
+						throw new IllegalStateException("request info not found");
+					}
+				} else {
+					log.debug("download result info created");
+					return;
+				}
+			}
+		} catch (SQLException e) {
+			log.error("sql exception: {}", e);
+			
+			throw e;
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }
