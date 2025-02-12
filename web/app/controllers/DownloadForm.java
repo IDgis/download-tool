@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import java.net.URL;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
@@ -265,17 +266,32 @@ public class DownloadForm extends Controller {
 				log.debug("store information about this job in the database: " + requestInfo.getRequestId());
 				downloadDao.createDownloadRequestInfo(requestInfo);
 				
-				
-				return ok(feedback.render(
-					webJarAssets,
-					id,
-					metadataDocument.getTitle(),
-					outputFormat
-				));
+				return redirect(controllers.routes.DownloadForm.lobby(requestId));
 			} else {
 				return notFound(datasetmissing.render(webJarAssets, id));
 			}
 		});
+	}
+	
+	public Result lobby(String id) {
+		try {
+			DownloadRequestInfo info = downloadDao.readDownloadRequestInfo(id);
+			
+			OutputFormat outputFormat = 
+					FORMATS.stream()
+						.filter(format -> format.mimeType().equals(info.getUserFormat()))
+						.findAny()
+						.get();
+			
+			return ok(feedback.render(
+				webJarAssets,
+				id,
+				info.getDownload().getFt().getName(),
+				outputFormat
+			));
+		} catch (SQLException sqle) {
+			return notFound(datasetmissing.render(webJarAssets, id));
+		}
 	}
 	
 	public Result help() {

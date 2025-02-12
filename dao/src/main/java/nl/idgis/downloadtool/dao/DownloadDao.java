@@ -56,6 +56,46 @@ public class DownloadDao {
 		}
 	}
 	
+	public DownloadRequestInfo readDownloadRequestInfo(String requestId) throws SQLException {
+		log.debug("retrieving download request info: {}", requestId);
+		
+		try(Connection conn = dataSource.getConnection(); 
+			PreparedStatement stmt = conn.prepareStatement(
+				"SELECT download, user_format " +
+				"FROM request_info WHERE request_id = ?")) {
+			
+			stmt.setString(1, requestId);
+			
+			try(ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()) {
+					Download download = gson.fromJson(rs.getString(1), Download.class);
+					String userFormat = rs.getString(2);
+					
+					DownloadRequestInfo downloadRequestInfo = new DownloadRequestInfo();
+					downloadRequestInfo.setRequestId(requestId);
+					downloadRequestInfo.setDownload(download);
+					downloadRequestInfo.setUserFormat(userFormat);
+					
+					if(rs.next()) {
+						throw new IllegalStateException("multiple download request info records found");
+					}
+					
+					log.debug("download request info object found");
+					
+					return downloadRequestInfo;
+				} else {
+					log.warn("download request info object not found");
+					
+					return null;
+				}
+			}
+		} catch(SQLException e) {
+			log.error("sql exception: {}", e);
+			
+			throw e;
+		}
+	}
+	
 	public void createDownloadResultInfo(DownloadResultInfo downloadResultInfo) throws SQLException {
 		log.debug("creating download result info"); 
 		
