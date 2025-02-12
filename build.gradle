@@ -59,7 +59,6 @@ configure([
 	project(':dao'),
 	project(':domain'),
 	project(':queue'),
-	project(':feedback'),
 	project(':downloader')]) {
 	
 	apply plugin: 'java'
@@ -228,7 +227,6 @@ project(':web') {
 
 // application projects
 configure([
-	project(':feedback'),
 	project(':downloader')]) {
 	
 	apply plugin: 'application'
@@ -316,16 +314,6 @@ project(':queue') {
 		compile 'com.google.code.gson:gson:2.5'
 		compile 'com.dinstone:beanstalkc:2.2.0'
 	}
-}
-
-project(':feedback') {
-
-	dependencies {		
-		compile 'nl.idgis.commons:commons-utils:0.0.15'	
-		compile 'org.springframework:spring-jdbc:3.2.2.RELEASE'
-	}
-
-	mainClassName = 'nl.idgis.downloadtool.feedback.FeedbackProvider'
 }
 
 project(':downloader') {

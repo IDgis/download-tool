@@ -10,8 +10,6 @@ import java.sql.Timestamp;
  */
 public class DownloadResultInfo {
 
-	private long id; // unique pk
-
 	private String requestId; // unique logische sleutel
 
 	private Timestamp responseTime; // not null
@@ -20,12 +18,6 @@ public class DownloadResultInfo {
 
 	public DownloadResultInfo() {
 		super();
-	}
-
-	public DownloadResultInfo(Feedback feedback) {
-		super();
-		setRequestId(feedback.getRequestId());
-		setResponseCode(feedback.getResultCode());
 	}
 
 	public String getRequestId() {

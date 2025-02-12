@@ -183,7 +183,7 @@ public class DownloadForm extends Controller {
 				WfsFeatureType ft = new WfsFeatureType();
 				ft.setServiceUrl(metadataDocument.getWFSUrl());
 
-				QName featureTypeName =metadataDocument.getFeatureTypeName();
+				QName featureTypeName = metadataDocument.getFeatureTypeName();
 				String namespaceURI = featureTypeName.getNamespaceURI();
 				String namespacePrefix = featureTypeName.getPrefix();
 
@@ -259,8 +259,8 @@ public class DownloadForm extends Controller {
 				// store information about this job in the database
 				DownloadRequestInfo requestInfo = new DownloadRequestInfo(
 						requestId,
-						(jobId==null?"":jobId.toString()), 
-						downloadRequest.getName(), downloadRequest.getEmail(), outputFormat.mimeType(), 
+						jobId == null ? "" : jobId.toString(),
+						outputFormat.mimeType(), 
 						download);
 				log.debug("store information about this job in the database: " + requestInfo.getRequestId());
 				downloadDao.createDownloadRequestInfo(requestInfo);
@@ -270,8 +270,8 @@ public class DownloadForm extends Controller {
 					webJarAssets,
 					id,
 					metadataDocument.getTitle(),
-					outputFormat,
-					downloadRequest.getEmail()));
+					outputFormat
+				));
 			} else {
 				return notFound(datasetmissing.render(webJarAssets, id));
 			}

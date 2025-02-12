@@ -37,8 +37,8 @@ public class DownloadDao {
 	}
 	
 	public void createDownloadRequestInfo(DownloadRequestInfo downloadRequestInfo) throws SQLException {
-		String sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_name, user_emailaddress, user_format)  "+
-				"VALUES(?, now(), ?, ?::jsonb, ?, ?, ?);";
+		String sql = "INSERT INTO request_info (request_id, request_time, job_id, download, user_format)  "+
+				"VALUES(?, now(), ?, ?::jsonb, ?);";
 		try (Connection conn = dataSource.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
 			log.debug("createDownloadRequestInfo sql: " + sql); 
 			
@@ -46,9 +46,7 @@ public class DownloadDao {
 			stmt.setString(2, downloadRequestInfo.getJobId());
 			String json = gson.toJson(downloadRequestInfo.getDownload());
 			stmt.setString(3, json);
-			stmt.setString(4, downloadRequestInfo.getUserName());
-			stmt.setString(5, downloadRequestInfo.getUserEmailAddress());
-			stmt.setString(6, downloadRequestInfo.getUserFormat());
+			stmt.setString(4, downloadRequestInfo.getUserFormat());
 			
 			int count = stmt.executeUpdate();
 			log.debug("createDownloadRequestInfo insert #records: " + count); 
@@ -63,8 +61,8 @@ public class DownloadDao {
 		
 		try(Connection conn = dataSource.getConnection(); 
 			PreparedStatement stmt = conn.prepareStatement(
-				"SELECT request_time, download, job_id, user_name, user_emailaddress, user_format " +
-				"FROM request_info WHERE request_id=?")) {
+				"SELECT request_time, download, job_id, user_format " +
+				"FROM request_info WHERE request_id = ?")) {
 			
 			stmt.setString(1, requestId);
 			
@@ -73,17 +71,13 @@ public class DownloadDao {
 					Timestamp requestTime = rs.getTimestamp(1);
 					Download download = gson.fromJson(rs.getString(2), Download.class);
 					String jobId = rs.getString(3);
-					String userName = rs.getString(4);
-					String userEmailaddress = rs.getString(5);
-					String userFormat = rs.getString(6);
+					String userFormat = rs.getString(4);
 					
 					DownloadRequestInfo downloadRequestInfo = new DownloadRequestInfo();
 					downloadRequestInfo.setRequestId(requestId);
 					downloadRequestInfo.setJobId(jobId);
 					downloadRequestInfo.setRequestTime(requestTime);
 					downloadRequestInfo.setDownload(download);
-					downloadRequestInfo.setUserName(userName);
-					downloadRequestInfo.setUserEmailAddress(userEmailaddress);
 					downloadRequestInfo.setUserFormat(userFormat);
 					
 					if(rs.next()) {

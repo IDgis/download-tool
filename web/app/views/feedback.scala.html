@@ -1,4 +1,4 @@
-@(webJarAssets: WebJarAssets, id: String, file: String, outputFormat: OutputFormat, email: String)
+@(webJarAssets: WebJarAssets, id: String, file: String, outputFormat: OutputFormat)
 
 @clientConfig() = @{
 	play.Play.application().configuration()
@@ -19,7 +19,6 @@
 		<p>
 			<b>Het bestand is:</b> <span>@file</span><br>
 			<b>Het formaat is:</b> <span>@outputFormat.title</span><br>
-			<b>E-mail adres is:</b> <span>@email</span>
 		</p> <br>
 
 		<p>Je krijgt zo snel mogelijk een e-mail met een download-link.<br>
