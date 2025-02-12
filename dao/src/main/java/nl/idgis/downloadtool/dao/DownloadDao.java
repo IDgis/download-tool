@@ -19,7 +19,6 @@ import com.google.gson.Gson;
 
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
-import nl.idgis.downloadtool.domain.DownloadResultInfo;
 /**
  * @author Rob
  *
