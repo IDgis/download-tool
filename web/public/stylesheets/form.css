@@ -88,6 +88,10 @@ div.format-choice {
 	font-size: 18px;
 }
 
+#download-button {
+	margin-left: 20px;
+}
+
 .button {
 	background-color: #831625;
 	color: #ffffff;
