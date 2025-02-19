@@ -209,6 +209,7 @@ project(':web') {
 	
 	dependencies {
 		play 'org.webjars:webjars-play_2.11:2.4.0-2'
+		play 'org.webjars:dojo:1.17.2'
 		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
 		play 'com.typesafe.play:play-java-jdbc_2.11:2.4.6'
 		

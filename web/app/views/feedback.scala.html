@@ -9,23 +9,25 @@
 	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
 }
 
-@layout("Download bestand", webJarAssets) {
+@layout("Download bestand", webJarAssets, routes.Assets.at("javascripts/feedback.js").url) {
 
 	<p class="title">@file</p>
 	
 	<div class="info">
-		<p>Je download verzoek is in goede orde ontvangen. De download wordt nu voor je klaargezet.</p> <br>
+		<p>Je download verzoek is in goede orde ontvangen. De download wordt nu voor je klaargezet.</p> <br/>
 		
 		<p>
-			<b>Het bestand is:</b> <span>@file</span><br>
-			<b>Het formaat is:</b> <span>@outputFormat.title</span><br>
-		</p> <br>
+			<b>Het bestand is:</b> <span>@file</span><br/>
+			<b>Het formaat is:</b> <span>@outputFormat.title</span><br/>
+		</p> <br/>
 
-		<p>Je krijgt zo snel mogelijk een e-mail met een download-link.<br>
-		
-		Via deze link kun je de download van het bestand uitvoeren. <br> <br>
-		Deze link blijft 24 uur bruikbaar.<br>
-		Je kunt nu dit scherm sluiten.</p> <br>
+		<p>Wanneer de data klaar staat krijg je hieronder de download link te zien. <br/>
+		Mocht de data niet opgehaald kunnen worden dan krijg je dit ook te zien. <br/>
+		Je kunt deze pagina sluiten en later weer openen. De data wordt 24 uur bewaard
+		om gedownload te worden.</p> <br/>
+	</div>
+	<div id="feedback-container">
+		<p id="js-feedback"></p>
 	</div>
 	
 	<div id="footer">
@@ -38,4 +40,5 @@
 		@Html(clientConfig().getString("proclaimer"))
 	</div>
 	
+	<input id="js-request-id" type="hidden" data-request-id="@id" />
 }

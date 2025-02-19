@@ -1,53 +1,59 @@
 package controllers;
 
-import java.util.Map;
-import java.util.HashMap;
+/*
+import java.net.URL;
+*/
+
+import java.net.MalformedURLException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
-
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.sql.SQLException;
 
 import javax.inject.Inject;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
-import data.MetadataProvider;
+import com.google.gson.Gson;
 
+import data.MetadataProvider;
 import models.DownloadInfo;
 import models.DownloadRequest;
+import models.DownloadStatus;
 import models.MetadataDocument;
 import models.OutputFormat;
-
-import play.data.Form;
-import play.mvc.Controller;
-import play.mvc.Result;
-import play.libs.F.Promise;
-import play.db.Database;
-import play.Configuration;
-import play.Logger;
-import play.Logger.ALogger;
-
-import views.html.form;
-import views.html.help;
-import views.html.feedback;
-import views.html.datasetmissing;
-
+import nl.idgis.downloadtool.dao.DownloadDao;
+import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
-import nl.idgis.downloadtool.dao.DownloadDao;
-import nl.idgis.downloadtool.domain.AdditionalData;
+import play.Configuration;
+import play.Logger;
+import play.Logger.ALogger;
+import play.Routes;
+import play.data.Form;
+import play.db.Database;
+import play.libs.F.Promise;
+import play.mvc.Controller;
+import play.mvc.Result;
+import util.Cache;
+import views.html.form;
+import views.html.help;
+import views.html.feedback;
+import views.html.datasetmissing;
 
 public class DownloadForm extends Controller {
 	
@@ -75,6 +81,10 @@ public class DownloadForm extends Controller {
 	
 	private final String hostname;
 	
+	private final String downloadUrlPrefix;
+	
+	private final Path cache;
+	
 	private static final ALogger log = Logger.of(DownloadForm.class);
 	
 	@Inject
@@ -93,8 +103,11 @@ public class DownloadForm extends Controller {
 		}
 		
 		this.hostname = hostname + ":" + config.getString("play.server.http.port");
+		this.downloadUrlPrefix = config.getString("download.url.prefix");
 		
 		log.debug("generating absolute urls with hostname: " + this.hostname);
+		
+		cache = Cache.get(config);
 	}
 	
 	/**
@@ -294,7 +307,33 @@ public class DownloadForm extends Controller {
 		}
 	}
 	
+	public Result status(String id) {
+		String zipName = id + ".zip";
+		String errorName = id + "_ERROR.txt";
+		
+		Path zipFile = cache.resolve(zipName);
+		Path errorFile = cache.resolve(errorName);
+		DownloadStatus status;
+		if(Files.exists(zipFile)) {
+			String url = downloadUrlPrefix + "/" + id;
+			status = new DownloadStatus(true, true, url);
+		} else if(Files.exists(errorFile)) {
+			status = new DownloadStatus(true, false, null);
+		} else {
+			status = new DownloadStatus(false, null, null);
+		}
+		
+		Gson gson = new Gson();
+		return ok(gson.toJson(status)).as("application/json");
+	}
+	
 	public Result help() {
 		return ok(help.render(webJarAssets));
+	}
+	
+	public Result jsRoutes() {
+		return ok (Routes.javascriptRouter ("jsRoutes",
+			controllers.routes.javascript.DownloadForm.status()
+		)).as ("text/javascript");
 	}
 }

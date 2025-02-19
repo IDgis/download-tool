@@ -1,11 +1,13 @@
 GET		/download/vector/*id			controllers.DownloadForm.get(id: String)
 POST	/download/vector/*id			controllers.DownloadForm.post(id: String)
 GET		/download/lobby/*id				controllers.DownloadForm.lobby(id: String)
+GET		/download/status/*id			controllers.DownloadForm.status(id: String)
 GET		/download/raster/*id			controllers.DownloadRaster.get(id: String)
 
 GET		/download-result/*id			controllers.DownloadResult.get(id: String)
 GET		/metadata/*id					controllers.Metadata.get(id: String)
 GET		/help							controllers.DownloadForm.help()
 
+GET		/routes.js						controllers.DownloadForm.jsRoutes()
 GET		/assets/*file					controllers.Assets.at(path="/public", file)
 GET		/webjars/*file					controllers.WebJarAssets.at(file)
