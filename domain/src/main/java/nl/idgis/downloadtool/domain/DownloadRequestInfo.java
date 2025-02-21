@@ -22,11 +22,6 @@ public class DownloadRequestInfo {
 	private String jobId; // identifies the queue job_id
 
 	private String userFormat; // mime type the user wants to receive the data
-								// in (shp, kml, gml or dxf)
-
-	public DownloadRequestInfo() {
-		super();
-	}
 
 	public DownloadRequestInfo(
 			String requestId, 

@@ -1,9 +1,5 @@
 package controllers;
 
-/*
-import java.net.URL;
-*/
-
 import java.net.MalformedURLException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -37,6 +33,7 @@ import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequestInfo;
+import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
@@ -54,6 +51,7 @@ import views.html.form;
 import views.html.help;
 import views.html.feedback;
 import views.html.datasetmissing;
+import views.html.error;
 
 public class DownloadForm extends Controller {
 	
@@ -286,45 +284,62 @@ public class DownloadForm extends Controller {
 		});
 	}
 	
-	public Result lobby(String id) {
+	public Result lobby(String id) throws SQLException {
 		try {
 			DownloadRequestInfo info = downloadDao.readDownloadRequestInfo(id);
 			
-			OutputFormat outputFormat = 
-					FORMATS.stream()
-						.filter(format -> format.mimeType().equals(info.getUserFormat()))
-						.findAny()
-						.get();
+			if(info != null) {
+				OutputFormat outputFormat = 
+						FORMATS.stream()
+							.filter(format -> format.mimeType().equals(info.getUserFormat()))
+							.findAny()
+							.get();
+				
+				return ok(feedback.render(
+					webJarAssets,
+					id,
+					info.getDownload().getFt().getName(),
+					outputFormat
+				));
+			}
 			
-			return ok(feedback.render(
-				webJarAssets,
-				id,
-				info.getDownload().getFt().getName(),
-				outputFormat
-			));
-		} catch (SQLException sqle) {
 			return notFound(datasetmissing.render(webJarAssets, id));
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+			throw sqle;
 		}
 	}
 	
 	public Result status(String id) {
-		String zipName = id + ".zip";
-		String errorName = id + "_ERROR.txt";
-		
-		Path zipFile = cache.resolve(zipName);
-		Path errorFile = cache.resolve(errorName);
-		DownloadStatus status;
-		if(Files.exists(zipFile)) {
-			String url = downloadUrlPrefix + "/" + id;
-			status = new DownloadStatus(true, true, url);
-		} else if(Files.exists(errorFile)) {
-			status = new DownloadStatus(true, false, null);
-		} else {
-			status = new DownloadStatus(false, null, null);
+		try {
+			String zipName = id + ".zip";
+			String errorName = id + "_ERROR.txt";
+			
+			Path zipFile = cache.resolve(zipName);
+			Path errorFile = cache.resolve(errorName);
+			
+			DownloadRequestInfo requestInfo = downloadDao.readDownloadRequestInfo(id);
+			DownloadResultInfo resultInfo = downloadDao.readDownloadResultInfo(id);
+			DownloadStatus status;
+			if(requestInfo == null) {
+				status = new DownloadStatus(false, null, null, null, null);
+			} else if(resultInfo == null) {
+				status = new DownloadStatus(true, false, false, null, null);
+			} else if(Files.exists(zipFile)) {
+				String url = downloadUrlPrefix + "/" + id;
+				status = new DownloadStatus(true, false, true, true, url);
+			} else if(Files.exists(errorFile)) {
+				status = new DownloadStatus(true, false, true, false, null);
+			} else {
+				status = new DownloadStatus(true, true, null, null, null);
+			}
+			
+			Gson gson = new Gson();
+			return ok(gson.toJson(status)).as("application/json");
+		} catch(SQLException sqle) {
+			sqle.printStackTrace();
+			return internalServerError();
 		}
-		
-		Gson gson = new Gson();
-		return ok(gson.toJson(status)).as("application/json");
 	}
 	
 	public Result help() {

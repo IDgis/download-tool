@@ -71,10 +71,12 @@ public class DownloadDao {
 					Download download = gson.fromJson(rs.getString(1), Download.class);
 					String userFormat = rs.getString(2);
 					
-					DownloadRequestInfo downloadRequestInfo = new DownloadRequestInfo();
-					downloadRequestInfo.setRequestId(requestId);
-					downloadRequestInfo.setDownload(download);
-					downloadRequestInfo.setUserFormat(userFormat);
+					DownloadRequestInfo downloadRequestInfo = new DownloadRequestInfo(
+						requestId, 
+						null, 
+						userFormat, 
+						download
+					);
 					
 					if(rs.next()) {
 						throw new IllegalStateException("multiple download request info records found");
@@ -131,6 +133,39 @@ public class DownloadDao {
 			throw e;
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public DownloadResultInfo readDownloadResultInfo(String requestId) throws SQLException {
+		log.debug("retrieving download result info: {}", requestId);
+		
+		try(Connection conn = dataSource.getConnection(); 
+			PreparedStatement stmt = conn.prepareStatement(
+				"SELECT response_code FROM result_info " + 
+				"WHERE request_info_id = (SELECT id FROM request_info WHERE request_id = ?)")) {
+					
+			stmt.setString(1, requestId);
+			
+			try(ResultSet rs = stmt.executeQuery()) {
+				if(rs.next()) {
+					String responseCode = rs.getString(1);
+					DownloadResultInfo downloadResultInfo = new DownloadResultInfo(requestId, responseCode);
+					
+					log.debug("download result info object found");
+					
+					if(rs.next()) {
+						throw new IllegalStateException("multiple download result info records found");
+					}
+					
+					return downloadResultInfo;
+				} else {
+					log.warn("download result info object not found");
+					return null;
+				}
+			}
+		} catch (SQLException e) {
+			log.error("sql exception: {}", e);
+			throw e;
 		}
 	}
 }

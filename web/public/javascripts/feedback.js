@@ -15,20 +15,27 @@ require([
 			xhr(jsRoutes.controllers.DownloadForm.status(id).url, {
 				handleAs: "json"
 			}).then(function(data) {
-				if(data["ready"]) {
+				let html;
+				if(!data["exists"]) {
+					html = "De opgevraagde data is onbekend";
+				} else if(data["expired"]) {
+					html = "De data is verlopen";
+				} else if(data["ready"]) {
 					if(data["success"]) {
-						const html = 'De data staat klaar: <a href="' + data["url"] + '">' + data["url"] + '</a>';
-						domAttr.set(nodeFeedback, "innerHTML", html);
+						html = 'De data staat klaar: <a href="' + data["url"] + '">' + data["url"] + '</a>';
 					} else {
-						const html = 'Het ophalen van de data is mislukt';
-						domAttr.set(nodeFeedback, "innerHTML", html);
+						html = "Het ophalen van de data is mislukt";
 					}
 				} else {
-					const html = 'De data staat nog niet klaar';
-					domAttr.set(nodeFeedback, "innerHTML", html);
+					html = "De data staat nog niet klaar";
 					
 					setTimeout(verifyStatus, 5000);
 				}
+				
+				domAttr.set(nodeFeedback, "innerHTML", html);
+			}, function(err){
+				const html = "Er ging iets mis bij het downloaden van het bestand";
+				domAttr.set(nodeFeedback, "innerHTML", html);
 			});
 		}
 });
