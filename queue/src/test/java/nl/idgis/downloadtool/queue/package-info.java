@@ -4,4 +4,4 @@
  * @author Rob
  *
  */
-package nl.idgis.downloadtool.test;
+package nl.idgis.downloadtool.queue;

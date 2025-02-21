@@ -37,7 +37,7 @@
 	</div>
 }
 
-@layout("Download bestand", webJarAssets) {
+@layout("Download bestand", webJarAssets, null) {
 	<p class="title">@info.title</p>
 	
 	<div class="metadata-information">
@@ -47,16 +47,8 @@
 	</div>
 	
 	<div class="welcome">
-		<p>Om dit bestand te downloaden vul je onderstaande velden in. Klik daarna op download.</p>
-		<p>Je krijgt dan een download-link in de mailbox.</p>
-		<p>Kan je deze link niet in de inbox vinden controleer dan ook de spam-folder.</p>
-		<p>Het kan zijn dat deze mail onterecht als spam (ongewenste mail) wordt aangezien.</p>
-		
-		<p class="data-information">
-			De gegevens die u invoert kunnen worden gebruikt voor onderzoeksdoeleinden om onze dienstverlening 
-			verder te verbeteren. De gegevens zullen niet met externe organisaties worden gedeeld. Als u gebruik 
-			maakt van deze dienst dan gaan we er van uit dat u akkoord bent met deze voorwaarden.
-		</p>
+		<p>Om dit bestand te downloaden kies het formaat. Klik daarna op download.</p>
+		<p>Je krijgt dan een download-link in het volgende scherm te zien wanneer de data gereed staat.</p>
 	</div>
 	
 	@helper.form(action = routes.DownloadForm.post(id), 'class -> "form-horizontal") {
@@ -81,20 +73,6 @@
 				</div>
 	 		</div>
 	 	}
-	 	
-	 	@simpleField(
-	 		field = form("name"),
-	 		inputType = "text", 
-	 		label = "Naam",
-	 		placeholder = "Naam",
-	 		title = "Vul naam in")
-	 	
-	 	@simpleField(
-	 		field = form("email"),
-	 		inputType = "text", 
-	 		label = "E-mailadres",
-	 		placeholder = "E-mailadres",
-	 		title = "Vul e-mailadres in")
  		
 		<div class="form-group">
  			<div class="col-sm-offset-2 col-sm-10">

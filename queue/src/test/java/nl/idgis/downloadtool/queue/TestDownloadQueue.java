@@ -1,4 +1,4 @@
-package nl.idgis.downloadtool.test;
+package nl.idgis.downloadtool.queue;
 
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertTrue;

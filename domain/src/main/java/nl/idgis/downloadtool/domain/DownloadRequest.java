@@ -30,9 +30,8 @@ public class DownloadRequest implements Serializable {
 	private Download download;
 
 	/**
-	 * @param id
-	 *            unique identifier of this downloadrequest.<br>
-	 *            Equal to Feedback.id
+	 * @param id 
+	 * unique identifier of this downloadrequest
 	 */
 	public DownloadRequest(String id) {
 		super();

@@ -1,4 +1,4 @@
-package nl.idgis.downloadtool.test;
+package nl.idgis.downloadtool.downloader;
 
 import static org.junit.Assert.*;
 

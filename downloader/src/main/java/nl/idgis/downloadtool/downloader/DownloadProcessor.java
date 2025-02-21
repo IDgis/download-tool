@@ -8,26 +8,29 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import nl.idgis.commons.cache.Cache;
 import nl.idgis.commons.cache.ZippedCache;
+import nl.idgis.downloadtool.dao.DownloadDao;
 import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequest;
-import nl.idgis.downloadtool.domain.Feedback;
+import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
-import nl.idgis.downloadtool.queue.FeedbackQueue;
-import nl.idgis.downloadtool.queue.FeedbackQueueClient;
 
 /**
- * The DownloadProcessor receives a DownloadRequest bean, performs downloads and
- * sends a Feedback bean.<br>
+ * The DownloadProcessor receives a DownloadRequest bean and performs downloads.<br>
  * 
  * The result of all downloads is packaged into a single zip file.<br>
  * Every single download has its own name and extension.<br>
@@ -45,30 +48,24 @@ public class DownloadProcessor {
 	private static final int BUF_SIZE = 4096;
 
 	private static final String FILENAME_PLACEHOLDER = "X_filename_X";
-
+	
 	private DownloadQueue queueClient;
-	private FeedbackQueue feedbackQueue, errorFeedbackQueue;
 
 	private final String cachePath;
+	private final DownloadDao downloadDao;
 	private String genericErrorMessage;
 	private String additionalDataFailedFilename = "Download_"+FILENAME_PLACEHOLDER+"_error.txt";
 
-	public DownloadProcessor(String cachePath) {
+	public DownloadProcessor(String cachePath, DownloadDao downloadDao) {
 		super();
 		this.cachePath = cachePath;
+		this.downloadDao = downloadDao;
+		
 		log.debug("downloadpath: " + cachePath);
 	}
 
 	public void setDownloadQueueClient(DownloadQueue queueClient) {
 		this.queueClient = queueClient;
-	}
-
-	public void setFeedbackQueue(FeedbackQueue queueClient) {
-		this.feedbackQueue = queueClient;
-	}
-
-	public void setErrorFeedbackQueue(FeedbackQueue queueClient) {
-		this.errorFeedbackQueue = queueClient;
 	}
 
 	/**
@@ -142,7 +139,7 @@ public class DownloadProcessor {
 									genericErrorMessage.getBytes(StandardCharsets.UTF_8));
 						} else {
 							stream = new ByteArrayInputStream(
-									ioe.getMessage().getBytes(StandardCharsets.UTF_8));							
+									ioe.getMessage().getBytes(StandardCharsets.UTF_8));
 						}
 						copyStreams(stream, downloadCacheOutputStream);
 						stream.close();
@@ -211,28 +208,43 @@ public class DownloadProcessor {
 	 * <code>
 	 * 1. read downloadrequest from queue.<br>
 	 * 2. perform actual download(s).<br>
-	 * 3. when OK then send result to feedback queue.<br>
-	 * 3. when exception occurs, then send result to feedback error queue.<br>
 	 * the result will contain the exception message as result code.<br>
-	 * 4. remove downloadrequest from queue.<br>
+	 * 3. remove downloadrequest from queue.<br>
 	 * </code>
 	 */
 	public void processDownloadRequest() {
 		DownloadRequest downloadRequest = queueClient.receiveDownloadRequest();
-
-		Feedback feedback = new Feedback(downloadRequest == null ? null : downloadRequest.getRequestId());
+		
+		String errorMessage = null;
 		try {
 			performDownload(downloadRequest);
-			feedback.setResultCode("OK");
-			log.debug("Feedback OK: " + feedback);
-			feedbackQueue.sendFeedback(feedback);
-		} catch (Exception e1) {
-			e1.printStackTrace();
-			feedback.setResultCode(e1.getMessage());
-			log.debug("Feedback NOK: " + feedback);
-			errorFeedbackQueue.sendFeedback(feedback);
+		} catch (Exception e) {
+			e.printStackTrace();
+			String msg = e.getMessage();
+			errorMessage = msg;
+			
+			try {
+				Path p = Paths.get(getEnv("ZIP_CACHEPATH") + "/" + downloadRequest.getRequestId() + "_ERROR.txt");
+				Files.createFile(p);
+				Files.write(p, msg.getBytes());
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
-
+		
+		try {
+			DownloadResultInfo info;
+			if(errorMessage == null) {
+				info = new DownloadResultInfo(downloadRequest.getRequestId(), "OK");
+			} else {
+				info = new DownloadResultInfo(downloadRequest.getRequestId(), errorMessage);
+			}
+			this.downloadDao.createDownloadResultInfo(info);
+		} catch (SQLException sqle) {
+			log.error("Exception when trying to insert result into database");
+			sqle.printStackTrace();
+		}
+		
 		try {
 			queueClient.deleteDownloadRequest(downloadRequest);
 		} catch (Exception e) {
@@ -286,9 +298,6 @@ public class DownloadProcessor {
 			throw new IllegalArgumentException("ExceptionReport: " + s);
 		} else if (s.indexOf("FeatureCollection") > 0) {
 			log.trace("found a FeatureCollection: ");
-		} else {
-			// do nothing, in future there may be KML or other formats read from
-			// the source
 		}
 		if (markSupported)
 			fromStream.reset();
@@ -309,9 +318,17 @@ public class DownloadProcessor {
 		String path = getEnv("ZIP_CACHEPATH");		
 		String host = getEnv("BEANSTALK_HOST");
 		String downloadQueueTubeName = getEnv("BEANSTALK_DOWNLOAD_QUEUE");
-		String feedbackOkTubeName = getEnv("BEANSTALK_FEEDBACKOK_QUEUE");
-		String feedbackErrorTubeName = getEnv("BEANSTALK_FEEDBACKERROR_QUEUE");
 		String genericErrorMessage = getEnv("GENERIC_ERROR_MESSAGE");
+		String dbUrl = getEnv("DB_URL");
+		String dbUser = getEnv("DB_USER");
+		String dbPassword = getEnv("DB_PW");
+		
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName("org.postgresql.Driver");
+		dataSource.setUrl(dbUrl);
+		dataSource.setUsername(dbUser);
+		dataSource.setPassword(dbPassword);
+		
 		if (genericErrorMessage == null) {
 			genericErrorMessage = "Er is een onbekende fout opgetreden bij het downloaden van het huidige bestand.";
 		}
@@ -322,16 +339,14 @@ public class DownloadProcessor {
 		}
 		
 		try {
+			DownloadDao downloadDao = new DownloadDao(dataSource);
+			
 			log.info("start loop " + path);
-			DownloadProcessor dlp = new DownloadProcessor(path);
+			DownloadProcessor dlp = new DownloadProcessor(path, downloadDao);
 			// setup queue clients
 			DownloadQueueClient downloadQueueClient = new DownloadQueueClient(host, downloadQueueTubeName);
-			FeedbackQueueClient feedbackOkQueueClient = new FeedbackQueueClient(host, feedbackOkTubeName);
-			FeedbackQueueClient feedbackErrorQueueClient = new FeedbackQueueClient(host, feedbackErrorTubeName);
 
 			dlp.setDownloadQueueClient(downloadQueueClient);
-			dlp.setFeedbackQueue(feedbackOkQueueClient);
-			dlp.setErrorFeedbackQueue(feedbackErrorQueueClient);
 			
 			dlp.setGenericErrorMessage(genericErrorMessage);
 			
@@ -345,7 +360,5 @@ public class DownloadProcessor {
 			e.printStackTrace();
 			log.info("end loop ");
 		}
-
 	}
-
 }
