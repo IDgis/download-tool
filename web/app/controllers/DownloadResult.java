@@ -12,7 +12,7 @@ import play.Logger.ALogger;
 import play.db.Database;
 import play.mvc.Controller;
 import play.mvc.Result;
-
+import util.Cache;
 import views.html.missing;
 
 import nl.idgis.downloadtool.dao.DownloadDao;
@@ -31,19 +31,7 @@ public class DownloadResult extends Controller {
 	public DownloadResult(WebJarAssets webJarAssets, Configuration config, Database database) {
 		this.webJarAssets = webJarAssets;
 		
-		String cachePath = config.getString("cache.path");
-		
-		log.debug("cache.path: " + cachePath);
-		
-		if(cachePath == null) {
-			throw new IllegalArgumentException("cache.path configuration missing");
-		}
-		
-		cache = FileSystems.getDefault().getPath(cachePath);
-		
-		if(!Files.exists(cache)) {
-			throw new IllegalArgumentException("configured cache location doesn't exists");
-		};
+		cache = Cache.get(config);
 		
 		downloadDao = new DownloadDao(database.getDataSource());
 	}

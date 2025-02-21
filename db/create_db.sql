@@ -8,8 +8,6 @@ create table request_info(
 	request_time timestamp,
 	download jsonb,
 	job_id text,
-	user_name text,
-	user_emailaddress text,
 	user_format text
 );
 

@@ -1,5 +1,5 @@
 #!/bin/bash
 
 echo garbage collecting...
-find ${ZIP_CACHEPATH}/* -mtime +14 -exec rm -v {} \;
+find ${ZIP_CACHEPATH}/* -mtime +1 -exec rm -v {} \;
 echo done
