@@ -320,7 +320,7 @@ project(':queue') {
 project(':downloader') {
 	
 	dependencies {
-		compile 'org.apache.httpcomponents:httpclient:4.3.1'
+		compile 'org.apache.httpcomponents:httpclient:4.5.14'
 		compile 'nl.idgis.commons:commons-cache:0.0.15'
 		compile 'org.springframework:spring-jdbc:5.3.39'
 	}
