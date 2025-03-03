@@ -55,7 +55,7 @@ public class DownloadFile implements DownloadSource {
 	public DownloadFile(AdditionalData additionalData) throws MalformedURLException,
 			UnsupportedEncodingException, URISyntaxException {
 		String serviceUrl = additionalData.getUrl();
-		uri = new URL(serviceUrl.replace(" ", "%20")).toURI();
+		uri = new URL(serviceUrl.trim().replace(" ", "%20")).toURI();
 		httpGet = new HttpGet(uri);
 		additionalData.getHeaders().entrySet().forEach(entry -> 
 			httpGet.setHeader(entry.getKey(), entry.getValue()));
