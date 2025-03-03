@@ -125,21 +125,21 @@ public class DownloadProcessor {
 				List<AdditionalData> additionalData = download.getAdditionalData();
 				for (AdditionalData data : additionalData) {
 					log.debug("Additional item to downloadCache: " + data.getName());
-					source = new DownloadFile(data);
 					try {
+						source = new DownloadFile(data);
 						downloadCacheOutputStream = downloadData(source, downloadCache, data.getName());
-					} catch (Exception ioe) {
+					} catch (Exception e) {
 						// write exception message into entry in zip
-						log.debug("Error: '" + ioe.getMessage() + "' write exception message into entry in zip");
+						log.debug("Error: '" + e.getMessage() + "' write exception message into entry in zip");
 						downloadCacheOutputStream = downloadCache
 								.writeItem(additionalDataFailedFilename.replace(FILENAME_PLACEHOLDER, data.getName()));
 						InputStream stream;
-						if (ioe.getMessage() == null){
+						if (e.getMessage() == null){
 							stream = new ByteArrayInputStream(
 									genericErrorMessage.getBytes(StandardCharsets.UTF_8));
 						} else {
 							stream = new ByteArrayInputStream(
-									ioe.getMessage().getBytes(StandardCharsets.UTF_8));
+									e.getMessage().getBytes(StandardCharsets.UTF_8));
 						}
 						copyStreams(stream, downloadCacheOutputStream);
 						stream.close();
@@ -147,7 +147,6 @@ public class DownloadProcessor {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				// downloadCache.rmCache();
 				throw e;
 			} finally {
 				// close downloadcache stream after all downloads have finished
