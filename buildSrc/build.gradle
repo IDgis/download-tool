@@ -4,5 +4,5 @@ repositories {
 }
 
 dependencies {
-	compile 'com.bmuschko:gradle-docker-plugin:3.0.7'
+	compile 'com.bmuschko:gradle-docker-plugin:6.7.0'
 }
