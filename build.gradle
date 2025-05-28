@@ -257,7 +257,7 @@ project(':queue') {
 	dependencies {
 		compile project(':domain')
 		compile 'com.google.code.gson:gson:2.5'
-		compile 'com.dinstone:beanstalkc:2.2.0'
+		compile 'com.dinstone:beanstalkc:2.4.0'
 	}
 }
 
