@@ -200,7 +200,7 @@ project(':web') {
 		play project(':domain')
 		play project(':dao')
 		play project(':queue')
-		play 'org.webjars:bootstrap:3.3.6'
+		play 'org.webjars:bootstrap:5.3.5'
 		play ("nl.idgis.sys:provisioning-registration:1.1.6-SNAPSHOT") {
 			exclude module: "ch.qos.logback"
 			exclude module: "logback-classic"
