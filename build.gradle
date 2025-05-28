@@ -46,10 +46,6 @@ subprojects {
 				password = System.getenv("GITHUB_TOKEN") ?: ghKey
 			}
 		}
-		maven {
-			name = "geotoolkit"
-			url "http://maven.geotoolkit.org/"
-		}
 		mavenCentral()
 	}
 }
@@ -144,11 +140,6 @@ project(':web') {
 		}
 		
 		tasks {
-			copyRootCA(Copy) {
-				from '../docker/rootCA.crt'
-				into "${project.buildDir}/docker"
-			}
-			
 			copyTar(Copy) {
 				dependsOn createPlayBinaryTarDist
 				from tarTree("${project.buildDir}/distributions/playBinary.tar")
@@ -161,19 +152,12 @@ project(':web') {
 				from 'azul/zulu-openjdk:8'
 				copyFile 'playBinary', '/opt'
 				runCommand 'chmod u+x /opt/bin/playBinary'
-				if(project.hasProperty('importRootCA')) {
-					copyFile 'rootCA.crt', '/opt'
-					runCommand 'keytool -import -alias server -keystore /usr/lib/jvm/zulu8-ca-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
-				}
 				exposePort 9000
 				defaultCommand "/opt/bin/playBinary"
 			}
 			
 			buildImage(DockerBuildImage) {
 				dependsOn createDockerfile
-				if(project.hasProperty('importRootCA')) {
-					dependsOn copyRootCA
-				}
 				inputDir = project.file('build/docker')
 				tag = "idgis/${rootProject.name}_${project.name}:${project.version}"
 			}
@@ -238,11 +222,6 @@ configure([
 		compile project(':domain')
 		compile project(':queue')
 	}
-	
-	task copyRootCA(type: Copy) {
-		from '../docker/rootCA.crt'
-		into "${project.buildDir}/docker"
-	}
 			
 	task copyTar(type: Copy) {
 		dependsOn distTar
@@ -256,48 +235,13 @@ configure([
 		from 'azul/zulu-openjdk:8'
 		copyFile "${project.name}-${project.version}", '/opt'
 		runCommand "chmod u+x /opt/bin/${project.name}"
-		if(project.hasProperty('importRootCA')) {
-			copyFile 'rootCA.crt', '/opt'
-			runCommand 'keytool -import -alias server -keystore /usr/lib/jvm/zulu8-ca-amd64/jre/lib/security/cacerts -file /opt/rootCA.crt -storepass changeit -noprompt'
-		}
 		defaultCommand "/opt/bin/${project.name}"
 	}
 
 	task buildImage(type: DockerBuildImage) {
 		dependsOn createDockerfile
-		if(project.hasProperty('importRootCA')) {
-			dependsOn copyRootCA
-		}
 		inputDir = project.file('build/docker')
 		tag = "idgis/${rootProject.name}_${project.name}:${project.version}"
-	}
-}
-
-// configure docker plugin
-allprojects {
-	afterEvaluate { project ->
-		if(project.plugins.hasPlugin(DockerRemoteConfig)) {
-			def env = System.env
-			project.docker {
-				if(env.containsKey('DOCKER_HOST')) {
-					url = "$env.DOCKER_HOST"
-					
-					if(env.containsKey('DOCKER_TLS_VERIFY')) {
-						url = url.replace('tcp', 'https')
-					} else {
-						url = url.replace('tcp', 'http')
-					}
-					
-					if(env.containsKey('DOCKER_CERT_PATH')) {
-						certPath = file "$env.DOCKER_CERT_PATH"
-					}
-				} else {
-					if (project.properties.containsKey("dockerHost")) {
-						url = "http://${dockerHost}:2375"
-					}
-				}
-			}
-		}
 	}
 }
 
