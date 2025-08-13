@@ -248,7 +248,7 @@ configure([
 project(':dao') {
 	dependencies {
 		compile project(':domain')
-		compile 'org.postgresql:postgresql:9.4.1208.jre7'
+		compile 'org.postgresql:postgresql:42.7.7'
 		compile 'com.google.code.gson:gson:2.5'
 	}
 }
