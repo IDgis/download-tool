@@ -9,6 +9,10 @@
 		.getConfig(play.Play.application().configuration().getString("download.client"))
 }
 
+@displayStatsAnalytics() = @{
+	play.Play.application().configuration().getString("display.stats.analytics") == "true"
+}
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -39,5 +43,9 @@
 		@content
 
 		<div class="version">Download-tool: versie @getClass().getPackage().getImplementationVersion()</div>
+		
+		@if(displayStatsAnalytics()) {
+			<script async src=”https://siteimproveanalytics.com/js/siteanalyze_6011273.js”></script>
+		}
 	</body>
 </html>
