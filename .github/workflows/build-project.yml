@@ -1,9 +1,9 @@
-name: Build Gradle project
+name: Build project
 
 on:
   pull_request:
     branches:
-      - master
+      - develop
 
 jobs:
   build:
@@ -24,5 +24,5 @@ jobs:
       - name: Build
         env:
           GITHUB_USER: "github"
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         run: ./gradlew build
