@@ -26,7 +26,7 @@ The `web` module has no automated tests. Every Play API change (Stages 2–8) is
 
 ### `provisioning-registration` is a cross-cutting dependency
 
-`nl.idgis.sys:provisioning-registration` is an IDgis-owned library that uses Play internals directly: `play.libs.F.Promise`, `play.Configuration`, `ApplicationLifecycle`. It requires three coordinated releases aligned with Play migration stages (see Section 5).
+`nl.idgis.sys:provisioning-registration` is an IDgis-owned library that potentially uses Play internals directly: `play.libs.F.Promise`, `play.Configuration`, `ApplicationLifecycle`. Whether new releases are needed — and how many — depends on which APIs the current version actually uses; this must be assessed before each affected stage (see Section 5).
 
 ### Docker base images
 
@@ -77,7 +77,7 @@ Two micro-commits on one branch. Play 2.5 is an intermediate step where `F.Promi
 - `Routes.javascriptRouter(...)` → `JavaScriptReverseRouter.create(...)` in `DownloadForm`
 - `play.http.DefaultHttpErrorHandler` constructor signature changes — adjust `ErrorHandler`
 - `play.api.UsefulException` in `error.scala.html` → `play.api.http.HttpErrorInfo`
-- Update `provisioning-registration` to `2.0.x` (remove `F.Promise` from stop hook → `CompletableFuture.completedFuture(null)`)
+- **Assess `provisioning-registration`**: check whether the current version uses `F.Promise` in its stop hook; if so, a new release is needed that replaces it with `CompletableFuture.completedFuture(null)` before this stage can proceed
 
 ---
 
@@ -115,7 +115,7 @@ Play 2.9 removes all APIs deprecated since 2.6. Second large code-change stage.
 - `play.Logger` / `play.Logger.ALogger` **removed** → `org.slf4j.LoggerFactory.getLogger(X.class)` throughout (`DownloadRaster` already uses SLF4J directly — use it as the pattern)
 - Scala 2.13 required — update platform declaration and all `_2.12` dependency suffixes to `_2.13`
 - `injectedRoutesGenerator` is the only available mode (already enabled — no change)
-- Update `provisioning-registration` to `3.0.x` (`play.Configuration` → `Config`, `play.Logger` → SLF4J)
+- **Assess `provisioning-registration`**: check whether the current version uses `play.Configuration` or `play.Logger`; if so, a new release is needed that replaces them with `com.typesafe.config.Config` and SLF4J respectively before this stage can proceed
 
 ---
 
@@ -145,7 +145,7 @@ The most uncertain stage. Play 3.0 renamed the entire package namespace.
 - `play-java-ws`, `webjars-play`, `play-java-jdbc` group IDs change accordingly
 - Pekko replaces Akka internally (mostly invisible from the Java API, but configuration keys in `application.conf` change)
 - Drop the Typesafe ivy layout repository — Play 3.x artifacts are on Maven Central
-- Update `provisioning-registration` to `4.0.x` (namespace change)
+- **Assess `provisioning-registration`**: check whether the current version uses `com.typesafe.play.*` imports; if so, a new release is needed that updates to the `org.playframework.*` namespace before this stage can proceed
 - **Verify `org.gradle.playframework` plugin Play 3.0 support before starting** (see Risk R1)
 
 ---
@@ -175,9 +175,9 @@ The community plugin has no guaranteed Play 3.0 support. At the time of writing 
 
 ### R3 — `provisioning-registration` blocking each Play stage — MEDIUM
 
-The library requires three coordinated releases. If a release is not ready when a stage starts, the stage is blocked.
+`nl.idgis.sys:provisioning-registration` is an internally controlled library. It is unknown at this point which (if any) of the three Play-sensitive APIs it uses. Before each dependent stage, the library source must be checked: if it uses the removed or replaced API, a new release is required; if the current version is already compatible, no release is needed. If a release is needed and is not ready when a stage starts, that stage is blocked.
 
-**Mitigation:** Prepare each library update as a parallel track ahead of the dependent stage (see Section 5).
+**Mitigation:** Assess the library source against each stage's API changes ahead of time. If a release is needed, prepare it as a parallel track before the dependent stage starts (see Section 5).
 
 ### R4 — `nl.idgis.commons:commons-cache:0.0.15` on Java 17 — LOW/UNKNOWN
 
@@ -214,13 +214,15 @@ Play ties its binary-compatible artifact suffixes to Scala. All `_2.11` and `_2.
 
 ## 5. `provisioning-registration` Release Coordination
 
-Three coordinated releases are required. Each should be prepared and published before its dependent stage starts.
+`nl.idgis.sys:provisioning-registration` is an internally owned library. Whether a new release is needed at each stage depends on which Play APIs the current version actually uses — this must be assessed by inspecting the library source before each stage. Target version numbers are not predetermined.
 
-| Library version | Aligned with | Key changes |
+| Assessed before | Trigger condition | Required change if true |
 |---|---|---|
-| `2.0.x` | Stage 2 (Play 2.6) | `F.Promise` → `CompletableFuture` in stop hook |
-| `3.0.x` | Stage 5 (Play 2.9) | `play.Configuration` → `com.typesafe.config.Config`, `play.Logger` → SLF4J |
-| `4.0.x` | Stage 8 (Play 3.0) | `com.typesafe.play` → `org.playframework` namespace |
+| Stage 2 (Play 2.6) | Library uses `play.libs.F.Promise` | Release that replaces it with `CompletableFuture` in the stop hook |
+| Stage 5 (Play 2.9) | Library uses `play.Configuration` or `play.Logger` | Release that migrates to `com.typesafe.config.Config` and SLF4J |
+| Stage 8 (Play 3.0) | Library uses `com.typesafe.play.*` imports | Release that updates to `org.playframework.*` namespace |
+
+If the current version is already free of the affected API, no release is needed for that stage.
 
 ---
 
