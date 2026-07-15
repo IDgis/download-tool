@@ -48,6 +48,13 @@ subprojects {
 		}
 		mavenCentral()
 	}
+
+	tasks.withType(Jar).configureEach {
+		manifest {
+			attributes("Implementation-Title": project.name)
+			project.version ? attributes("Implementation-Version": project.version) : null
+		}
+	}
 }
 
 // java projects
@@ -93,12 +100,6 @@ configure([
 		testImplementation 'org.easymock:easymock:3.4'
 	}
 
-	jar {
-		manifest {
-			attributes("Implementation-Title": project.name)
-			project.version ? attributes("Implementation-Version": project.version) : null
-		}
-	}
 }
 
 // play projects
