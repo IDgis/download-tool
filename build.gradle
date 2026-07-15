@@ -154,23 +154,23 @@ project(':web') {
 		}
 	}
 
-	task copyTar(type: Copy) {
-		dependsOn 'createPlayBinaryTarDist'
-		from tarTree("${project.buildDir}/distributions/playBinary.tar")
+	task copyTar(type: Copy, group: 'Docker') {
+		dependsOn 'createMainTarDist'
+		from { tarTree(tasks.named('createMainTarDist').get().outputs.files.singleFile) }
 		into "${project.buildDir}/docker"
 	}
 
-	task createDockerfile(type: Dockerfile) {
+	task createDockerfile(type: Dockerfile, group: 'Docker') {
 		dependsOn copyTar
 		destFile = project.file('build/docker/Dockerfile')
 		from 'azul/zulu-openjdk:8'
-		copyFile 'playBinary', '/opt'
-		runCommand 'chmod u+x /opt/bin/playBinary'
+		copyFile 'main', '/opt'
+		runCommand 'chmod u+x /opt/bin/main'
 		exposePort 9000
-		defaultCommand '/opt/bin/playBinary'
+		defaultCommand '/opt/bin/main'
 	}
 
-	task buildImage(type: DockerBuildImage) {
+	task buildImage(type: DockerBuildImage, group: 'Docker') {
 		dependsOn createDockerfile
 		inputDir = project.file('build/docker')
 		images = ["idgis/${rootProject.name}_${project.name}:${project.version}"]
@@ -210,13 +210,13 @@ configure([
 		implementation project(':queue')
 	}
 
-	task copyTar(type: Copy) {
+	task copyTar(type: Copy, group: 'Docker') {
 		dependsOn distTar
-		from tarTree(distTar.archivePath)
+		from tarTree(distTar.archiveFile)
 		into "${project.buildDir}/docker"
 	}
 
-	task createDockerfile(type: Dockerfile) {
+	task createDockerfile(type: Dockerfile, group: 'Docker') {
 		dependsOn copyTar
 		destFile = project.file('build/docker/Dockerfile')
 		from 'azul/zulu-openjdk:8'
@@ -225,7 +225,7 @@ configure([
 		defaultCommand "/opt/bin/${project.name}"
 	}
 
-	task buildImage(type: DockerBuildImage) {
+	task buildImage(type: DockerBuildImage, group: 'Docker') {
 		dependsOn createDockerfile
 		inputDir = project.file('build/docker')
 		images = ["idgis/${rootProject.name}_${project.name}:${project.version}"]
