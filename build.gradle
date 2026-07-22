@@ -65,7 +65,6 @@ configure([
 	project(':downloader')]) {
 
 	apply plugin: 'java-library'
-	apply plugin: 'eclipse'
 
 	sourceSets {
 		integration {
@@ -107,7 +106,6 @@ project(':web') {
 
 	apply plugin: 'org.gradle.playframework'
 	apply plugin: DockerRemoteConfig
-	apply plugin: 'eclipse'
 
 	play {
 		platform {
