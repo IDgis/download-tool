@@ -22,3 +22,7 @@ gradle-app.setting
 docker/*.crt
 
 build.sh
+
+*.iml
+*.ipr
+*.iws
