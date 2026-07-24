@@ -286,15 +286,18 @@ public class DownloadForm extends Controller {
 			DownloadRequestInfo info = downloadDao.readDownloadRequestInfo(id);
 			
 			if(info != null) {
-				OutputFormat outputFormat = 
+				OutputFormat outputFormat =
 						FORMATS.stream()
 							.filter(format -> format.mimeType().equals(info.getUserFormat()))
 							.findAny()
 							.get();
-				
+
+				String metadataId = info.getDownload().getName();
+
 				return ok(feedback.render(
 					webJarAssets,
 					id,
+					metadataId,
 					info.getDownload().getFt().getName(),
 					outputFormat
 				));
