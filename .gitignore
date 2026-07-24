@@ -3,14 +3,12 @@
 bin/
 build/
 .settings
-.vagrant
 .classpath
 .project
 .idea
 cache/
 .cache-main
 
-docker-compose.override.yml
 web/logs/application.log 
 
 # Ignore Gradle GUI config
@@ -18,7 +16,5 @@ gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
-
-docker/*.crt
 
 build.sh
