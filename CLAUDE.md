@@ -1,14 +1,8 @@
 # Migration Project Rules
 
-## Boundaries
-- NEVER commit to git automatically
-- NEVER read .env, .env.*, *.secret, application.conf (prod), or any secrets files
-- NEVER run destructive commands (drop, delete, truncate) without explicit confirmation
-- Only modify files relevant to the current migration stage
-
 ## Current State
-- Stage: 0 (not started)
-- Play: 2.4.6 | Gradle: 2.12 | Java: 8
+- Stage: 1 (complete)
+- Play: 2.4.6 | Gradle: 8.8 | Java: 8
 
 ## Target Stack
 - Gradle: 8.x (intermediate) → 9.x (final)
@@ -26,6 +20,16 @@
 8. Play 2.9 → 3.0              (Gradle 9, Java 17)
 9. Java 17 → 21
 
+## Boundaries
+- NEVER commit to git automatically
+- NEVER read .env, .env.*, *.secret, application.conf (prod), or any secrets files
+- NEVER run destructive commands (drop, delete, truncate) without explicit confirmation
+- Only modify files relevant to the current migration stage
+- Follow stage order strictly. Verify `./gradlew build` after each stage. Update `## Current State` on each merge.
+
 ## Build Verification
 - Always verify with: `./gradlew build` after changes
 - Report errors before proceeding to next step
+
+## Docs
+Stage plans: `docs/superpowers/plans/`
