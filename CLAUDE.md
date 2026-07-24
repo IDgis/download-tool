@@ -32,4 +32,5 @@
 - Report errors before proceeding to next step
 
 ## Docs
-Stage plans: `docs/superpowers/plans/`
+- Stage plans: `docs/superpowers/plans/`
+- Migration spec: `docs/superpowers/specs/2026-06-10-migration-design.md`
