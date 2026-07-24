@@ -1,10 +1,8 @@
 package controllers;
 
 import java.net.MalformedURLException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +49,6 @@ import views.html.form;
 import views.html.help;
 import views.html.feedback;
 import views.html.datasetmissing;
-import views.html.error;
 
 public class DownloadForm extends Controller {
 	
