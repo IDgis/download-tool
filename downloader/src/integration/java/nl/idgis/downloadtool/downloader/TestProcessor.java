@@ -11,7 +11,6 @@ import java.util.List;
 import org.easymock.EasyMockRunner;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
-import org.easymock.MockType;
 import org.easymock.TestSubject;
 import nl.idgis.downloadtool.dao.DownloadDao;
 import org.junit.Test;
