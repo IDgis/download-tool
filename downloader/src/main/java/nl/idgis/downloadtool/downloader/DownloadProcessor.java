@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,8 +170,6 @@ public class DownloadProcessor {
 	 *            to write a new item to with content from source
 	 * @param fileName
 	 *            name of the item in the cache
-	 * @param fileExtension
-	 *            extension of the item in the cache
 	 * @return OutputStream of the cache (which is not closed by this method)
 	 * @throws IllegalArgumentException
 	 *             if an exceptionreport was received
@@ -179,7 +178,7 @@ public class DownloadProcessor {
 	 * @throws IOException
 	 */
 	private OutputStream downloadData(DownloadSource source, Cache downloadCache, String fileName)
-			throws IllegalArgumentException, UnsupportedEncodingException, URISyntaxException, IOException {
+			throws IllegalArgumentException, UnsupportedEncodingException, IOException {
 			/*
 			 * Open source stream
 			 */
@@ -213,6 +212,7 @@ public class DownloadProcessor {
 	 */
 	public void processDownloadRequest() {
 		DownloadRequest downloadRequest = queueClient.receiveDownloadRequest();
+		String requestId = downloadRequest == null ? UUID.randomUUID().toString() : downloadRequest.getRequestId();
 		
 		String errorMessage = null;
 		try {
@@ -223,7 +223,7 @@ public class DownloadProcessor {
 			errorMessage = msg;
 			
 			try {
-				Path p = Paths.get(getEnv("ZIP_CACHEPATH") + "/" + downloadRequest.getRequestId() + "_ERROR.txt");
+				Path p = Paths.get(getEnv("ZIP_CACHEPATH") + "/" + requestId + "_ERROR.txt");
 				Files.createFile(p);
 				Files.write(p, msg.getBytes());
 			} catch (IOException ioe) {
@@ -234,9 +234,9 @@ public class DownloadProcessor {
 		try {
 			DownloadResultInfo info;
 			if(errorMessage == null) {
-				info = new DownloadResultInfo(downloadRequest.getRequestId(), "OK");
+				info = new DownloadResultInfo(requestId, "OK");
 			} else {
-				info = new DownloadResultInfo(downloadRequest.getRequestId(), errorMessage);
+				info = new DownloadResultInfo(requestId, errorMessage);
 			}
 			this.downloadDao.createDownloadResultInfo(info);
 		} catch (SQLException sqle) {

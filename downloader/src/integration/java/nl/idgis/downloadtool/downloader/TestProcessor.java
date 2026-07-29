@@ -1,6 +1,5 @@
 package nl.idgis.downloadtool.downloader;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
@@ -14,6 +13,7 @@ import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;
+import nl.idgis.downloadtool.dao.DownloadDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,7 +23,6 @@ import nl.idgis.downloadtool.domain.AdditionalData;
 import nl.idgis.downloadtool.domain.Download;
 import nl.idgis.downloadtool.domain.DownloadRequest;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
-import nl.idgis.downloadtool.downloader.DownloadProcessor;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 
 /**
@@ -33,12 +32,14 @@ import nl.idgis.downloadtool.queue.DownloadQueue;
 @RunWith(EasyMockRunner.class)
 public class TestProcessor  extends EasyMockSupport {
 	private static final Logger log = LoggerFactory.getLogger(TestProcessor.class);
-	
-	@TestSubject
-	private DownloadProcessor downloadProcessor = new DownloadProcessor(System.getProperty("user.home"));
 
 	@Mock
 	private DownloadQueue queueClientMock;
+
+	private final DownloadDao downloadDaoMock = createMock(DownloadDao.class);
+
+	@TestSubject
+	private final DownloadProcessor downloadProcessor = new DownloadProcessor(System.getProperty("user.home"), downloadDaoMock);
 	
 	/**
 	 * Test method for {@link nl.idgis.downloadtool.downloader.DownloadProcessor#performDownload(nl.idgis.downloadtool.domain.DownloadRequest)}.
@@ -50,6 +51,7 @@ public class TestProcessor  extends EasyMockSupport {
 			downloadProcessor.performDownload(null);
 			fail("Exception expected");
 		} catch (Exception e) {
+			// do nothing
 		}
 	}
 
