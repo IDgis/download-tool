@@ -81,7 +81,7 @@ configure([
 		}
 	}
 
-	sourceSets.integration.compileClasspath += sourceSets.main.output + configurations.integrationImplementation
+	sourceSets.integration.compileClasspath += sourceSets.main.output
 	sourceSets.integration.runtimeClasspath += sourceSets.integration.output + sourceSets.integration.compileClasspath
 
 	tasks.register('integrationTest', Test) {
@@ -89,6 +89,7 @@ configure([
 		description = 'Runs the integration tests.'
 		testClassesDirs = sourceSets.integration.output.classesDirs
 		classpath = sourceSets.integration.runtimeClasspath
+		environment 'ZIP_CACHEPATH', System.getProperty('java.io.tmpdir')
 	}
 
 	dependencies {
