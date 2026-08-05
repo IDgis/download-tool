@@ -17,18 +17,18 @@ import views.html.error;
 
 public class ErrorHandler extends DefaultHttpErrorHandler {
 	
-	private final WebJarAssets webJarAssets;
+	private final Provider<WebJarAssets> webJarAssets;
 
 	@Inject
-	public ErrorHandler(WebJarAssets webJarAssets, Configuration configuration, Environment environment, OptionalSourceMapper sourceMapper, Provider<Router> routes) {
+	public ErrorHandler(Provider<WebJarAssets> webJarAssets, Configuration configuration, Environment environment, OptionalSourceMapper sourceMapper, Provider<Router> routes) {
 		super(configuration, environment, sourceMapper, routes);
-		
+
 		this.webJarAssets = webJarAssets;
 	}
-	
+
 	@Override
 	protected Promise<Result> onProdServerError(RequestHeader request, UsefulException exception) {
-		return Promise.pure(Controller.internalServerError(error.render(webJarAssets, exception)));
+		return Promise.pure(Controller.internalServerError(error.render(webJarAssets.get(), exception)));
 	}
 
 }

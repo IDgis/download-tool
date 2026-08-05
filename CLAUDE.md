@@ -22,7 +22,7 @@
 
 ## Boundaries
 - NEVER commit to git automatically
-- NEVER read .env, .env.*, *.secret, application.conf (prod), or any secrets files
+- NEVER read .env, .env.*, *.secret, or any secrets files
 - NEVER run destructive commands (drop, delete, truncate) without explicit confirmation
 - Only modify files relevant to the current migration stage
 - Follow stage order strictly. Verify `./gradlew build` after each stage. Update `## Current State` on each merge.

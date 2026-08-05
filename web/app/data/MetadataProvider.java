@@ -50,10 +50,10 @@ public class MetadataProvider {
 	public Promise<Optional<MetadataDocument>> get(String id) {
 		try {
 			URL url = new URL(config.getString("metadata.url") + id + ".xml");
-			return ws.url(url.toExternalForm())
+			return Promise.wrap(ws.url(url.toExternalForm())
 				.setFollowRedirects(true)
 				.setHeader(getTrustedHeader(), getTrustedValue())
-				.get()
+				.get())
 				.map(response -> {
 					if(response.getStatus() == 200) {
 						MetadataDocument metadataDocument = new MetadataDocument(url, response.asXml());

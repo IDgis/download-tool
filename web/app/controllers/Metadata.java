@@ -62,13 +62,15 @@ public class Metadata extends Controller {
 				
 				// DOM -> byte[]
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
-				
-				TransformerFactory tf = TransformerFactory.newInstance();
-				Transformer t = tf.newTransformer();
-				t.transform(new DOMSource(document), new StreamResult(output));
-				
-				output.close();
-				
+
+				try {
+					TransformerFactory tf = TransformerFactory.newInstance();
+					Transformer t = tf.newTransformer();
+					t.transform(new DOMSource(document), new StreamResult(output));
+				} catch(Exception e) {
+					throw new RuntimeException(e);
+				}
+
 				return ok(output.toByteArray()).as("application/xml");
 			} else {
 				return notFound();

@@ -272,8 +272,12 @@ public class DownloadForm extends Controller {
 						outputFormat.mimeType(), 
 						download);
 				log.debug("store information about this job in the database: " + requestInfo.getRequestId());
-				downloadDao.createDownloadRequestInfo(requestInfo);
-				
+				try {
+					downloadDao.createDownloadRequestInfo(requestInfo);
+				} catch(SQLException e) {
+					throw new RuntimeException(e);
+				}
+
 				return redirect(controllers.routes.DownloadForm.lobby(requestId));
 			} else {
 				return notFound(datasetmissing.render(webJarAssets, id));

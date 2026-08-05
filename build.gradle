@@ -110,7 +110,7 @@ project(':web') {
 
 	play {
 		platform {
-			playVersion = '2.4.6'
+			playVersion = '2.5.18'
 			scalaVersion = '2.11'
 			javaVersion = JavaVersion.VERSION_1_8
 		}
@@ -172,10 +172,10 @@ project(':web') {
 	}
 
 	dependencies {
-		play 'org.webjars:webjars-play_2.11:2.4.0-2'
+		play 'org.webjars:webjars-play_2.11:2.5.0'
 		play 'org.webjars:dojo:1.17.2'
-		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
-		play 'com.typesafe.play:play-java-jdbc_2.11:2.4.6'
+		play 'com.typesafe.play:play-java-ws_2.11:2.5.18'
+		play 'com.typesafe.play:play-java-jdbc_2.11:2.5.18'
 
 		play project(':domain')
 		play project(':dao')
