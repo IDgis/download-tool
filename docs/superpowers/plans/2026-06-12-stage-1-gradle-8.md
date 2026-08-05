@@ -12,7 +12,7 @@
 
 ### Before you start
 
-- Branch: `migration/stage-1-gradle-8` (cut from `master`)
+- Branch: `migration/stage-1-gradle-8` (cut from `develop` — this repo follows git-flow; `develop` is the integration branch, `master` is release-only)
 - Never commit automatically — per project rules
 - Verify command after all tasks: `./gradlew build`
 

@@ -12,8 +12,8 @@
 
 ### Before you start
 
-- Prerequisite: Stage 6 complete (`./gradlew build` passing on `master`)
-- Branch: `migration/stage-7-gradle-9` (cut from `master`)
+- Prerequisite: Stage 6 complete (`./gradlew build` passing on `develop`)
+- Branch: `migration/stage-7-gradle-9` (cut from `develop` — this repo follows git-flow; `develop` is the integration branch, `master` is release-only)
 - **Check first:** Inspect `org.gradle.playframework` GitHub releases to confirm Gradle 9 support before updating the wrapper.
 - Verify command: `./gradlew build`
 
