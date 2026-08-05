@@ -10,4 +10,4 @@ GET		/help							controllers.DownloadForm.help()
 
 GET		/routes.js						controllers.DownloadForm.jsRoutes()
 GET		/assets/*file					controllers.Assets.at(path="/public", file)
-GET		/webjars/*file					controllers.WebJarAssets.at(file)
+GET		/webjars/*file					org.webjars.play.WebJarAssets.at(file)

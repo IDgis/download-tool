@@ -1,11 +1,11 @@
-@(webJarAssets: WebJarAssets, id: String)
+@(webJarsUtil: org.webjars.play.WebJarsUtil, id: String)
 
 @clientConfig() = @{
 	play.Play.application().configuration()
 		.getConfig(play.Play.application().configuration().getString("download.client"))
 }
 
-@layout("Download bestand is gestopt", webJarAssets, null) {
+@layout("Download bestand is gestopt", webJarsUtil, null) {
 	<p class="title">Foutmelding: 404 Niet gevonden</p>
 	
 	<div class="welcome">

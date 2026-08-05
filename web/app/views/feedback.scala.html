@@ -1,4 +1,4 @@
-@(webJarAssets: WebJarAssets, id: String, metadataId: String, file: String, outputFormat: OutputFormat)
+@(webJarsUtil: org.webjars.play.WebJarsUtil, id: String, metadataId: String, file: String, outputFormat: OutputFormat)
 
 @clientConfig() = @{
 	play.Play.application().configuration()
@@ -9,7 +9,7 @@
 	play.Play.application().configuration().getString("metadata.url") + metadataId + ".xml"
 }
 
-@layout("Download bestand", webJarAssets, routes.Assets.at("javascripts/feedback.js").url) {
+@layout("Download bestand", webJarsUtil, routes.Assets.at("javascripts/feedback.js").url) {
 
 	<p class="title">@file</p>
 	

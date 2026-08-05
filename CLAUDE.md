@@ -1,8 +1,8 @@
 # Migration Project Rules
 
 ## Current State
-- Stage: 1 (complete)
-- Play: 2.4.6 | Gradle: 8.8 | Java: 8
+- Stage: 2 (complete)
+- Play: 2.6.25 | Gradle: 8.8 | Java: 8
 
 ## Target Stack
 - Gradle: 8.x (intermediate) → 9.x (final)
@@ -22,10 +22,13 @@
 
 ## Boundaries
 - NEVER commit to git automatically
-- NEVER read .env, .env.*, *.secret, application.conf (prod), or any secrets files
+- NEVER read .env, .env.*, *.secret, or any secrets files
 - NEVER run destructive commands (drop, delete, truncate) without explicit confirmation
 - Only modify files relevant to the current migration stage
 - Follow stage order strictly. Verify `./gradlew build` after each stage. Update `## Current State` on each merge.
+
+## Editing Files
+- This repo has mixed line endings — many files use Windows CRLF. Never use Python (or similar scripts) for bulk find/replace edits: Python's default text-mode file I/O silently normalizes CRLF to LF, which flips every line of a file in `git diff` even when only a few lines actually changed. Use the Edit tool instead.
 
 ## Build Verification
 - Always verify with: `./gradlew build` after changes

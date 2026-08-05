@@ -1,6 +1,7 @@
 package controllers;
 
 import java.io.ByteArrayOutputStream;
+import java.util.concurrent.CompletionStage;
 
 import javax.inject.Inject;
 import javax.xml.transform.Transformer;
@@ -15,7 +16,6 @@ import org.w3c.dom.Document;
 
 import play.mvc.Result;
 import play.mvc.Controller;
-import play.libs.F.Promise;
 
 import data.MetadataProvider;
 
@@ -35,8 +35,8 @@ public class Metadata extends Controller {
 	 * @param id metadata document id
 	 * @return http response
 	 */
-	public Promise<Result> get(String id) {
-		return metadataProvider.get(id).map(metadataDocument -> {
+	public CompletionStage<Result> get(String id) {
+		return metadataProvider.get(id).thenApply(metadataDocument -> {
 			if(metadataDocument.isPresent()) {
 				Document document = metadataDocument.get().getDocument();
 				
@@ -62,13 +62,15 @@ public class Metadata extends Controller {
 				
 				// DOM -> byte[]
 				ByteArrayOutputStream output = new ByteArrayOutputStream();
-				
-				TransformerFactory tf = TransformerFactory.newInstance();
-				Transformer t = tf.newTransformer();
-				t.transform(new DOMSource(document), new StreamResult(output));
-				
-				output.close();
-				
+
+				try {
+					TransformerFactory tf = TransformerFactory.newInstance();
+					Transformer t = tf.newTransformer();
+					t.transform(new DOMSource(document), new StreamResult(output));
+				} catch(Exception e) {
+					throw new RuntimeException(e);
+				}
+
 				return ok(output.toByteArray()).as("application/xml");
 			} else {
 				return notFound();

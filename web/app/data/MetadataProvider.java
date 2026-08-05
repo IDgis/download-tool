@@ -3,6 +3,8 @@ package data;
 import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import javax.inject.Inject;
 
@@ -10,7 +12,6 @@ import models.MetadataDocument;
 
 import play.Configuration;
 import play.libs.ws.WSClient;
-import play.libs.F.Promise;
 
 /**
  * A component responsible for retrieving metadata documents.
@@ -47,31 +48,33 @@ public class MetadataProvider {
 	 * @param id metadata document id
 	 * @return retrieved metadata document or empty
 	 */
-	public Promise<Optional<MetadataDocument>> get(String id) {
+	public CompletionStage<Optional<MetadataDocument>> get(String id) {
 		try {
 			URL url = new URL(config.getString("metadata.url") + id + ".xml");
 			return ws.url(url.toExternalForm())
 				.setFollowRedirects(true)
 				.setHeader(getTrustedHeader(), getTrustedValue())
 				.get()
-				.map(response -> {
+				.thenApply(response -> {
 					if(response.getStatus() == 200) {
 						MetadataDocument metadataDocument = new MetadataDocument(url, response.asXml());
-						
+
 						String confidentialPath = config.getString("metadata.confidential-path");
 						String dataPublicValue = config.getString("metadata.data-public-value");
-						if(dataPublicValue == null 
+						if(dataPublicValue == null
 							|| metadataDocument.getresourceConstraints(confidentialPath)
 								.contains(dataPublicValue)
 							|| "intern".equals(config.getString("download.access"))) {
 							return Optional.of(metadataDocument);
 						}
-					} 
-					
-					return Optional.empty();
+					}
+
+					return Optional.<MetadataDocument>empty();
 				});
 		} catch(MalformedURLException e) {
-			return Promise.throwing(e);
+			CompletableFuture<Optional<MetadataDocument>> failed = new CompletableFuture<>();
+			failed.completeExceptionally(e);
+			return failed;
 		}
 	}
 }

@@ -110,8 +110,8 @@ project(':web') {
 
 	play {
 		platform {
-			playVersion = '2.4.6'
-			scalaVersion = '2.11'
+			playVersion = '2.6.25'
+			scalaVersion = '2.12'
 			javaVersion = JavaVersion.VERSION_1_8
 		}
 		injectedRoutesGenerator = true
@@ -172,10 +172,11 @@ project(':web') {
 	}
 
 	dependencies {
-		play 'org.webjars:webjars-play_2.11:2.4.0-2'
+		play 'org.webjars:webjars-play_2.12:2.6.3'
 		play 'org.webjars:dojo:1.17.2'
-		play 'com.typesafe.play:play-java-ws_2.11:2.4.6'
-		play 'com.typesafe.play:play-java-jdbc_2.11:2.4.6'
+		play 'com.typesafe.play:play-ahc-ws_2.12:2.6.25'
+		play 'com.typesafe.play:play-java-jdbc_2.12:2.6.25'
+		play 'com.typesafe.play:play-guice_2.12:2.6.25'
 
 		play project(':domain')
 		play project(':dao')
