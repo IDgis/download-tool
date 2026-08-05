@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletionStage;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,8 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import com.google.gson.Gson;
+
+import org.webjars.play.WebJarsUtil;
 
 import data.MetadataProvider;
 import models.DownloadInfo;
@@ -38,12 +41,13 @@ import nl.idgis.downloadtool.queue.DownloadQueueClient;
 import play.Configuration;
 import play.Logger;
 import play.Logger.ALogger;
-import play.Routes;
 import play.data.Form;
+import play.data.FormFactory;
 import play.db.Database;
-import play.libs.F.Promise;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
+import play.routing.JavaScriptReverseRouter;
 import util.Cache;
 import views.html.form;
 import views.html.help;
@@ -66,29 +70,33 @@ public class DownloadForm extends Controller {
 	
 	private final static Pattern urlPattern = Pattern.compile(".*/(.*?)(\\?.*)?$");
 	
-	private final WebJarAssets webJarAssets;
-	
+	private final WebJarsUtil webJarsUtil;
+
 	private final MetadataProvider metadataProvider;
-	
+
 	private final DownloadDao downloadDao;
-	
+
 	private final DownloadQueue queueClient;
-	
+
 	private final String hostname;
-	
+
 	private final String downloadUrlPrefix;
-	
+
 	private final Path cache;
-	
+
+	private final FormFactory formFactory;
+
 	private static final ALogger log = Logger.of(DownloadForm.class);
-	
+
 	@Inject
-	public DownloadForm(WebJarAssets webJarAssets,  MetadataProvider metadataProvider, Database database, Configuration config) {
-		this.webJarAssets = webJarAssets;
+	public DownloadForm(WebJarsUtil webJarsUtil, MetadataProvider metadataProvider,
+			Database database, Configuration config, FormFactory formFactory) {
+		this.webJarsUtil = webJarsUtil;
 		this.metadataProvider = metadataProvider;
 		this.downloadDao = new DownloadDao(database.getDataSource());
 		this.queueClient = new DownloadQueueClient(config.getString("beanstalk.host"), config.getString("beanstalk.queue"));
-		
+		this.formFactory = formFactory;
+
 		String hostname = System.getenv("HOSTNAME");
 		if(hostname == null) {
 			log.warn("HOSTNAME environment variable missing, using 'localhost' instead");
@@ -96,12 +104,12 @@ public class DownloadForm extends Controller {
 		} else {
 			log.debug("using HOSTNAME environment variable value: " + hostname);
 		}
-		
+
 		this.hostname = hostname + ":" + config.getString("play.server.http.port");
 		this.downloadUrlPrefix = config.getString("download.url.prefix");
-		
+
 		log.debug("generating absolute urls with hostname: " + this.hostname);
-		
+
 		cache = Cache.get(config);
 	}
 	
@@ -111,13 +119,13 @@ public class DownloadForm extends Controller {
 	 * @param id metadata document id
 	 * @return http response
 	 */
-	public Promise<Result> get(String id) {
-		return metadataProvider.get(id).map(optionalMetadataDocument -> {
+	public CompletionStage<Result> get(String id) {
+		return metadataProvider.get(id).thenApply(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
 				MetadataDocument metadataDocument = optionalMetadataDocument.get();
 				log.debug("metadataDocument: " + metadataDocument.getTitle());
 				return ok(form.render(
-					webJarAssets,
+					webJarsUtil,
 					id,
 					new DownloadInfo(
 						metadataDocument.getTitle(),
@@ -126,9 +134,9 @@ public class DownloadForm extends Controller {
 								metadataDocument.getDescription().substring(0, 640) + "..." :
 								metadataDocument.getDescription(),
 						FORMATS),
-					Form.form(DownloadRequest.class)));
+					formFactory.form(DownloadRequest.class)));
 			} else {
-				return notFound(datasetmissing.render(webJarAssets, id));
+				return notFound(datasetmissing.render(webJarsUtil, id));
 			}
 		});
 	}
@@ -159,17 +167,18 @@ public class DownloadForm extends Controller {
 	 * @param id metadata document id
 	 * @return http response
 	 */
-	public Promise<Result> post(String id) {
-		return metadataProvider.get(id).map(optionalMetadataDocument -> {
+	public CompletionStage<Result> post(String id) {
+		Http.Request request = request();
+		return metadataProvider.get(id).thenApply(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
 				MetadataDocument metadataDocument = optionalMetadataDocument.get();
-				
-				Form<DownloadRequest> downloadRequestForm =  Form.form(DownloadRequest.class).bindFromRequest();
-					
+
+				Form<DownloadRequest> downloadRequestForm = formFactory.form(DownloadRequest.class).bindFromRequest(request);
+
 				// check if form is filled in correctly
 				if(downloadRequestForm.hasErrors()) {
 					return badRequest(form.render(
-							webJarAssets,
+							webJarsUtil,
 							id,
 							new DownloadInfo(
 								metadataDocument.getTitle(), 
@@ -280,7 +289,7 @@ public class DownloadForm extends Controller {
 
 				return redirect(controllers.routes.DownloadForm.lobby(requestId));
 			} else {
-				return notFound(datasetmissing.render(webJarAssets, id));
+				return notFound(datasetmissing.render(webJarsUtil, id));
 			}
 		});
 	}
@@ -299,7 +308,7 @@ public class DownloadForm extends Controller {
 				String metadataId = info.getDownload().getName();
 
 				return ok(feedback.render(
-					webJarAssets,
+					webJarsUtil,
 					id,
 					metadataId,
 					info.getDownload().getFt().getName(),
@@ -307,7 +316,7 @@ public class DownloadForm extends Controller {
 				));
 			}
 			
-			return notFound(datasetmissing.render(webJarAssets, id));
+			return notFound(datasetmissing.render(webJarsUtil, id));
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 			throw sqle;
@@ -347,12 +356,12 @@ public class DownloadForm extends Controller {
 	}
 	
 	public Result help() {
-		return ok(help.render(webJarAssets));
+		return ok(help.render(webJarsUtil));
 	}
 	
 	public Result jsRoutes() {
-		return ok (Routes.javascriptRouter ("jsRoutes",
+		return ok(JavaScriptReverseRouter.create("jsRoutes",
 			controllers.routes.javascript.DownloadForm.status()
-		)).as ("text/javascript");
+		)).as("text/javascript");
 	}
 }

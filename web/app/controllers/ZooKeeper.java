@@ -16,10 +16,11 @@ import nl.idgis.sys.provisioning.domain.ProxyMappingType;
 import nl.idgis.sys.provisioning.domain.ProxyPath;
 import nl.idgis.sys.provisioning.registration.ServiceRegistration;
 import nl.idgis.sys.provisioning.registration.ServiceRegistrationException;
+import java.util.concurrent.CompletableFuture;
+
 import play.Configuration;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
-import play.libs.F.Promise;
 
 /**
  * The class for the zookeeper entity
@@ -51,7 +52,7 @@ public class ZooKeeper {
 				} catch (Exception e) {
 					Logger.error ("Failed to terminate ZooKeeper registration", e);
 				}
-				return Promise.pure (null);
+				return CompletableFuture.completedFuture (null);
 			});
 		} else {
 			Logger.error("Registering has been unsuccessful");

@@ -1,14 +1,18 @@
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-import controllers.WebJarAssets;
-import play.Configuration;
+import com.typesafe.config.Config;
+
+import org.webjars.play.WebJarsUtil;
+
 import play.Environment;
 import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
 import play.api.routing.Router;
 import play.http.DefaultHttpErrorHandler;
-import play.libs.F.Promise;
 import play.mvc.Controller;
 import play.mvc.Http.RequestHeader;
 import play.mvc.Result;
@@ -16,19 +20,20 @@ import play.mvc.Result;
 import views.html.error;
 
 public class ErrorHandler extends DefaultHttpErrorHandler {
-	
-	private final Provider<WebJarAssets> webJarAssets;
+
+	private final WebJarsUtil webJarsUtil;
 
 	@Inject
-	public ErrorHandler(Provider<WebJarAssets> webJarAssets, Configuration configuration, Environment environment, OptionalSourceMapper sourceMapper, Provider<Router> routes) {
-		super(configuration, environment, sourceMapper, routes);
+	public ErrorHandler(WebJarsUtil webJarsUtil, Config config, Environment environment, OptionalSourceMapper sourceMapper, Provider<Router> routes) {
+		super(config, environment, sourceMapper, routes);
 
-		this.webJarAssets = webJarAssets;
+		this.webJarsUtil = webJarsUtil;
 	}
 
 	@Override
-	protected Promise<Result> onProdServerError(RequestHeader request, UsefulException exception) {
-		return Promise.pure(Controller.internalServerError(error.render(webJarAssets.get(), exception)));
+	protected CompletionStage<Result> onProdServerError(RequestHeader request, UsefulException exception) {
+		return CompletableFuture.completedFuture(
+			Controller.internalServerError(error.render(webJarsUtil, exception)));
 	}
 
 }

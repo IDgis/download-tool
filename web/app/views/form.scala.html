@@ -1,4 +1,4 @@
-@(webJarAssets: WebJarAssets, id: String, info: DownloadInfo, form: Form[DownloadRequest])
+@(webJarsUtil: org.webjars.play.WebJarsUtil, id: String, info: DownloadInfo, form: Form[DownloadRequest])
 
 @clientConfig() = @{
 	play.Play.application().configuration()
@@ -29,7 +29,7 @@
 	</div>
 }
 
-@layout("Download bestand", webJarAssets, null) {
+@layout("Download bestand", webJarsUtil, null) {
 	<p class="title">@info.title</p>
 	
 	<div class="metadata-information">
