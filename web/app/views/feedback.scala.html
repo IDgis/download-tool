@@ -1,15 +1,14 @@
-@(webJarsUtil: org.webjars.play.WebJarsUtil, id: String, metadataId: String, file: String, outputFormat: OutputFormat)
+@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, metadataId: String, file: String, outputFormat: OutputFormat)
 
 @clientConfig() = @{
-	play.Play.application().configuration()
-		.getConfig(play.Play.application().configuration().getString("download.client"))
+	config.getConfig(config.getString("download.client"))
 }
 
 @metadataUrl() = @{
-	play.Play.application().configuration().getString("metadata.url") + metadataId + ".xml"
+	config.getString("metadata.url") + metadataId + ".xml"
 }
 
-@layout("Download bestand", webJarsUtil, routes.Assets.at("javascripts/feedback.js").url) {
+@layout("Download bestand", webJarsUtil, config, routes.Assets.at("javascripts/feedback.js").url) {
 
 	<p class="title">@file</p>
 	

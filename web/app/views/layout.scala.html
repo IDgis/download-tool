@@ -1,16 +1,11 @@
-@(title: String, webJarsUtil: org.webjars.play.WebJarsUtil, jsUrl: String)(content: Html)
-
-@config() = @{
-	play.Play.application().configuration()
-}
+@(title: String, webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, jsUrl: String)(content: Html)
 
 @clientConfig() = @{
-	play.Play.application().configuration()
-		.getConfig(play.Play.application().configuration().getString("download.client"))
+	config.getConfig(config.getString("download.client"))
 }
 
 @displayStatsAnalytics() = @{
-	play.Play.application().configuration().getString("display.stats.analytics") == "true"
+	config.getString("display.stats.analytics") == "true"
 }
 
 <!DOCTYPE html>
@@ -20,7 +15,7 @@
 		<title>@title</title>
 		<link href='@webJarsUtil.locate("css/bootstrap.min.css").url.get' rel="stylesheet">
 		<link href='@routes.Assets.at("stylesheets/form.css")' rel="stylesheet">
-		@if("intern".equals(config().getString("download.access"))) {
+		@if("intern".equals(config.getString("download.access"))) {
 			<link href='@routes.Assets.at("stylesheets/form-intern.css")' rel="stylesheet">
 		}
 		<script src="@webJarsUtil.locate("dojo/dojo.js").url.get" type="text/javascript"></script>
@@ -29,7 +24,7 @@
 			<script src="@jsUrl" type="text/javascript"></script>
 		}
 	</head>
-	<body class='@if(config().getString("deployment.acceptance") == "true") {background-acceptance}'>
+	<body class='@if(config.getString("deployment.acceptance") == "true") {background-acceptance}'>
 		<div class="logo">
 			<a href='@clientConfig().getString("url")'>
 				<img src='@routes.Assets.at(clientConfig().getString("logo"))' alt="Responsive image"></img>

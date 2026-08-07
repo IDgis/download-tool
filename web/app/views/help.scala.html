@@ -1,11 +1,10 @@
-@(webJarsUtil: org.webjars.play.WebJarsUtil)
+@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config)
 
 @clientConfig() = @{
-	play.Play.application().configuration()
-		.getConfig(play.Play.application().configuration().getString("download.client"))
+	config.getConfig(config.getString("download.client"))
 }
 
-@layout("Download bestand", webJarsUtil, null) {
+@layout("Download bestand", webJarsUtil, config, null) {
 	<p class="title">Toelichting bij downloaden van bestanden</p>
 	
 	<div class="welcome">

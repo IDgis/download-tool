@@ -21,6 +21,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import com.google.gson.Gson;
+import com.typesafe.config.Config;
 
 import org.webjars.play.WebJarsUtil;
 
@@ -38,7 +39,6 @@ import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
-import play.Configuration;
 import play.Logger;
 import play.Logger.ALogger;
 import play.data.Form;
@@ -86,16 +86,19 @@ public class DownloadForm extends Controller {
 
 	private final FormFactory formFactory;
 
+	private final Config config;
+
 	private static final ALogger log = Logger.of(DownloadForm.class);
 
 	@Inject
 	public DownloadForm(WebJarsUtil webJarsUtil, MetadataProvider metadataProvider,
-			Database database, Configuration config, FormFactory formFactory) {
+			Database database, Config config, FormFactory formFactory) {
 		this.webJarsUtil = webJarsUtil;
 		this.metadataProvider = metadataProvider;
 		this.downloadDao = new DownloadDao(database.getDataSource());
 		this.queueClient = new DownloadQueueClient(config.getString("beanstalk.host"), config.getString("beanstalk.queue"));
 		this.formFactory = formFactory;
+		this.config = config;
 
 		String hostname = System.getenv("HOSTNAME");
 		if(hostname == null) {
@@ -126,6 +129,7 @@ public class DownloadForm extends Controller {
 				log.debug("metadataDocument: " + metadataDocument.getTitle());
 				return ok(form.render(
 					webJarsUtil,
+					config,
 					id,
 					new DownloadInfo(
 						metadataDocument.getTitle(),
@@ -136,11 +140,11 @@ public class DownloadForm extends Controller {
 						FORMATS),
 					formFactory.form(DownloadRequest.class)));
 			} else {
-				return notFound(datasetmissing.render(webJarsUtil, id));
+				return notFound(datasetmissing.render(webJarsUtil, config, id));
 			}
 		});
 	}
-	
+
 	private static Optional<AdditionalData> createAdditionalData(String url) {
 		Matcher urlMatcher = urlPattern.matcher(url);
 		if(urlMatcher.matches()) {
@@ -179,6 +183,7 @@ public class DownloadForm extends Controller {
 				if(downloadRequestForm.hasErrors()) {
 					return badRequest(form.render(
 							webJarsUtil,
+							config,
 							id,
 							new DownloadInfo(
 								metadataDocument.getTitle(), 
@@ -289,11 +294,11 @@ public class DownloadForm extends Controller {
 
 				return redirect(controllers.routes.DownloadForm.lobby(requestId));
 			} else {
-				return notFound(datasetmissing.render(webJarsUtil, id));
+				return notFound(datasetmissing.render(webJarsUtil, config, id));
 			}
 		});
 	}
-	
+
 	public Result lobby(String id) throws SQLException {
 		try {
 			DownloadRequestInfo info = downloadDao.readDownloadRequestInfo(id);
@@ -309,14 +314,15 @@ public class DownloadForm extends Controller {
 
 				return ok(feedback.render(
 					webJarsUtil,
+					config,
 					id,
 					metadataId,
 					info.getDownload().getFt().getName(),
 					outputFormat
 				));
 			}
-			
-			return notFound(datasetmissing.render(webJarsUtil, id));
+
+			return notFound(datasetmissing.render(webJarsUtil, config, id));
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 			throw sqle;
@@ -356,7 +362,7 @@ public class DownloadForm extends Controller {
 	}
 	
 	public Result help() {
-		return ok(help.render(webJarsUtil));
+		return ok(help.render(webJarsUtil, config));
 	}
 	
 	public Result jsRoutes() {

@@ -8,7 +8,8 @@ import javax.inject.Inject;
 
 import org.webjars.play.WebJarsUtil;
 
-import play.Configuration;
+import com.typesafe.config.Config;
+
 import play.Logger;
 import play.Logger.ALogger;
 import play.db.Database;
@@ -29,9 +30,12 @@ public class DownloadResult extends Controller {
 
 	private final WebJarsUtil webJarsUtil;
 
+	private final Config config;
+
 	@Inject
-	public DownloadResult(WebJarsUtil webJarsUtil, Configuration config, Database database) {
+	public DownloadResult(WebJarsUtil webJarsUtil, Config config, Database database) {
 		this.webJarsUtil = webJarsUtil;
+		this.config = config;
 
 		cache = Cache.get(config);
 
@@ -43,11 +47,10 @@ public class DownloadResult extends Controller {
 
 		Path file = cache.resolve(fileName);
 		if(Files.exists(file)) {
-			response().setContentType("application/zip");
 			response().setHeader("Content-Disposition", "attachment; filename=" + fileName);
-			return ok(file.toFile(), fileName);
+			return ok(file.toFile(), fileName).as("application/zip");
 		} else {
-			return notFound(missing.render(webJarsUtil));
+			return notFound(missing.render(webJarsUtil, config));
 		}
 	}
 }

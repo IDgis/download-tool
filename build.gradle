@@ -110,7 +110,7 @@ project(':web') {
 
 	play {
 		platform {
-			playVersion = '2.6.25'
+			playVersion = '2.7.9'
 			scalaVersion = '2.12'
 			javaVersion = JavaVersion.VERSION_1_8
 		}
@@ -172,20 +172,16 @@ project(':web') {
 	}
 
 	dependencies {
-		play 'org.webjars:webjars-play_2.12:2.6.3'
+		play 'org.webjars:webjars-play_2.12:2.7.3'
 		play 'org.webjars:dojo:1.17.2'
-		play 'com.typesafe.play:play-ahc-ws_2.12:2.6.25'
-		play 'com.typesafe.play:play-java-jdbc_2.12:2.6.25'
-		play 'com.typesafe.play:play-guice_2.12:2.6.25'
+		play 'com.typesafe.play:play-ahc-ws_2.12:2.7.9'
+		play 'com.typesafe.play:play-java-jdbc_2.12:2.7.9'
+		play 'com.typesafe.play:play-guice_2.12:2.7.9'
 
 		play project(':domain')
 		play project(':dao')
 		play project(':queue')
 		play 'org.webjars:bootstrap:3.3.6'
-		play ("nl.idgis.sys:provisioning-registration:1.1.6-SNAPSHOT") {
-			exclude module: "ch.qos.logback"
-			exclude module: "logback-classic"
-		}
 
 		play 'org.springframework:spring-jdbc:4.2.5.RELEASE'
 		play 'com.google.code.gson:gson:2.5'

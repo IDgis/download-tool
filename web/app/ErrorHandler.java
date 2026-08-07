@@ -23,17 +23,20 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
 
 	private final WebJarsUtil webJarsUtil;
 
+	private final Config config;
+
 	@Inject
 	public ErrorHandler(WebJarsUtil webJarsUtil, Config config, Environment environment, OptionalSourceMapper sourceMapper, Provider<Router> routes) {
 		super(config, environment, sourceMapper, routes);
 
 		this.webJarsUtil = webJarsUtil;
+		this.config = config;
 	}
 
 	@Override
 	protected CompletionStage<Result> onProdServerError(RequestHeader request, UsefulException exception) {
 		return CompletableFuture.completedFuture(
-			Controller.internalServerError(error.render(webJarsUtil, exception)));
+			Controller.internalServerError(error.render(webJarsUtil, config, exception)));
 	}
 
 }
