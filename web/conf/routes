@@ -8,6 +8,6 @@ GET		/download-result/*id			controllers.DownloadResult.get(id: String)
 GET		/metadata/*id					controllers.Metadata.get(id: String)
 GET		/help							controllers.DownloadForm.help()
 
-GET		/routes.js						controllers.DownloadForm.jsRoutes(request: play.mvc.Http.Request)
+GET		/routes.js						controllers.DownloadForm.jsRoutes(request: Request)
 GET		/assets/*file					controllers.Assets.at(path="/public", file)
 GET		/webjars/*file					org.webjars.play.WebJarAssets.at(file)
