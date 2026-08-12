@@ -1,6 +1,6 @@
-@(webJarsUtil: org.webjars.play.WebJarsUtil, exception: play.api.UsefulException)
+@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, exception: play.api.UsefulException)
 
-@layout("Download bestand is gestopt", webJarsUtil, null) {
+@layout("Download bestand is gestopt", webJarsUtil, config, null) {
 	<p class="title">500 Interne server fout</p>
 	
 	<div class="welcome">

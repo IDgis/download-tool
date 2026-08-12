@@ -7,8 +7,10 @@ import static play.mvc.Http.Status.INTERNAL_SERVER_ERROR;
 public class SmokeTest {
     @Test
     public void helpPageDoesNotCrash() {
-        Helpers.running(Helpers.fakeApplication(), () -> {
+        play.Application app = Helpers.fakeApplication();
+        Helpers.running(app, () -> {
             play.mvc.Result result = Helpers.route(
+                app,
                 Helpers.fakeRequest("GET", "/help")
             );
             assertNotEquals(INTERNAL_SERVER_ERROR, result.status());

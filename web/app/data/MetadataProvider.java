@@ -10,7 +10,8 @@ import javax.inject.Inject;
 
 import models.MetadataDocument;
 
-import play.Configuration;
+import com.typesafe.config.Config;
+
 import play.libs.ws.WSClient;
 
 /**
@@ -18,13 +19,13 @@ import play.libs.ws.WSClient;
  *
  */
 public class MetadataProvider {
-	
-	private final Configuration config; 
-	
+
+	private final Config config;
+
 	private final WSClient ws;
 
-	@Inject	
-	public MetadataProvider(Configuration config, WSClient ws) {
+	@Inject
+	public MetadataProvider(Config config, WSClient ws) {
 		this.config = config;
 		this.ws = ws;
 	}
@@ -60,7 +61,9 @@ public class MetadataProvider {
 						MetadataDocument metadataDocument = new MetadataDocument(url, response.asXml());
 
 						String confidentialPath = config.getString("metadata.confidential-path");
-						String dataPublicValue = config.getString("metadata.data-public-value");
+						String dataPublicValue = config.hasPath("metadata.data-public-value")
+							? config.getString("metadata.data-public-value")
+							: null;
 						if(dataPublicValue == null
 							|| metadataDocument.getresourceConstraints(confidentialPath)
 								.contains(dataPublicValue)

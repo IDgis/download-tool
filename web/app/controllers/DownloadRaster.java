@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.webjars.play.WebJarsUtil;
 
-import play.Configuration;
+import com.typesafe.config.Config;
+
 import play.mvc.Controller;
 import play.mvc.Result;
 
@@ -37,14 +38,14 @@ public class DownloadRaster extends Controller {
 
 	private final WebJarsUtil webJarsUtil;
 
-	private final Configuration config;
+	private final Config config;
 
 	private final DriverManagerDataSource dataSource;
 
 	private final String rasterDirectory = "/var/lib/geo-publisher/raster/";
 
 	@Inject
-	public DownloadRaster(WebJarsUtil webJarsUtil, Configuration config) {
+	public DownloadRaster(WebJarsUtil webJarsUtil, Config config) {
 		this.webJarsUtil = webJarsUtil;
 		this.config = config;
 		
@@ -89,27 +90,25 @@ public class DownloadRaster extends Controller {
 						byte[] bytes = byteOutput.toByteArray();
 						
 						inputStream.close();
-						
-						response().setHeader("Content-Disposition", "attachment; filename=\"" + 
-								name + 
-								".tif\"");
-						
-						return ok(bytes).as("image/tiff");
+
+						return ok(bytes)
+							.as("image/tiff")
+							.withHeader("Content-Disposition", "attachment; filename=\"" + name + ".tif\"");
 					} catch (Exception ioe) {
 						log.debug(ioe.getMessage());
-						return notFound(datasetmissing.render(webJarsUtil, fileIdentification));
+						return notFound(datasetmissing.render(webJarsUtil, config, fileIdentification));
 					}
 				} else {
-					return notFound(datasetmissing.render(webJarsUtil, fileIdentification));
+					return notFound(datasetmissing.render(webJarsUtil, config, fileIdentification));
 				}
 			} catch(SQLException se) {
 				log.debug(se.getMessage());
-				return notFound(datasetmissing.render(webJarsUtil, fileIdentification));
+				return notFound(datasetmissing.render(webJarsUtil, config, fileIdentification));
 			}
-			
+
 		} catch (SQLException se) {
 			log.debug(se.getMessage());
-			return notFound(datasetmissing.render(webJarsUtil, fileIdentification));
+			return notFound(datasetmissing.render(webJarsUtil, config, fileIdentification));
 		}
 	}
 	
@@ -148,4 +147,4 @@ public class DownloadRaster extends Controller {
 			return true;
 		}
 	}
-}
+}

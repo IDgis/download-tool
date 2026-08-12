@@ -21,6 +21,7 @@ import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 
 import com.google.gson.Gson;
+import com.typesafe.config.Config;
 
 import org.webjars.play.WebJarsUtil;
 
@@ -38,14 +39,15 @@ import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
-import play.Configuration;
 import play.Logger;
 import play.Logger.ALogger;
+import play.api.i18n.Messages;
+import play.api.i18n.MessagesApi;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.Database;
 import play.mvc.Controller;
-import play.mvc.Http;
+import play.mvc.Http.Request;
 import play.mvc.Result;
 import play.routing.JavaScriptReverseRouter;
 import util.Cache;
@@ -86,16 +88,22 @@ public class DownloadForm extends Controller {
 
 	private final FormFactory formFactory;
 
+	private final Config config;
+
+	private final MessagesApi messagesApi;
+
 	private static final ALogger log = Logger.of(DownloadForm.class);
 
 	@Inject
 	public DownloadForm(WebJarsUtil webJarsUtil, MetadataProvider metadataProvider,
-			Database database, Configuration config, FormFactory formFactory) {
+			Database database, Config config, FormFactory formFactory, MessagesApi messagesApi) {
 		this.webJarsUtil = webJarsUtil;
 		this.metadataProvider = metadataProvider;
 		this.downloadDao = new DownloadDao(database.getDataSource());
 		this.queueClient = new DownloadQueueClient(config.getString("beanstalk.host"), config.getString("beanstalk.queue"));
 		this.formFactory = formFactory;
+		this.config = config;
+		this.messagesApi = messagesApi;
 
 		String hostname = System.getenv("HOSTNAME");
 		if(hostname == null) {
@@ -119,13 +127,15 @@ public class DownloadForm extends Controller {
 	 * @param id metadata document id
 	 * @return http response
 	 */
-	public CompletionStage<Result> get(String id) {
+	public CompletionStage<Result> get(String id, Request request) {
+		Messages messages = messagesApi.preferred(request);
 		return metadataProvider.get(id).thenApply(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
 				MetadataDocument metadataDocument = optionalMetadataDocument.get();
 				log.debug("metadataDocument: " + metadataDocument.getTitle());
 				return ok(form.render(
 					webJarsUtil,
+					config,
 					id,
 					new DownloadInfo(
 						metadataDocument.getTitle(),
@@ -134,13 +144,14 @@ public class DownloadForm extends Controller {
 								metadataDocument.getDescription().substring(0, 640) + "..." :
 								metadataDocument.getDescription(),
 						FORMATS),
-					formFactory.form(DownloadRequest.class)));
+					formFactory.form(DownloadRequest.class),
+					messages));
 			} else {
-				return notFound(datasetmissing.render(webJarsUtil, id));
+				return notFound(datasetmissing.render(webJarsUtil, config, id));
 			}
 		});
 	}
-	
+
 	private static Optional<AdditionalData> createAdditionalData(String url) {
 		Matcher urlMatcher = urlPattern.matcher(url);
 		if(urlMatcher.matches()) {
@@ -167,8 +178,8 @@ public class DownloadForm extends Controller {
 	 * @param id metadata document id
 	 * @return http response
 	 */
-	public CompletionStage<Result> post(String id) {
-		Http.Request request = request();
+	public CompletionStage<Result> post(String id, Request request) {
+		Messages messages = messagesApi.preferred(request);
 		return metadataProvider.get(id).thenApply(optionalMetadataDocument -> {
 			if(optionalMetadataDocument.isPresent()) {
 				MetadataDocument metadataDocument = optionalMetadataDocument.get();
@@ -179,13 +190,15 @@ public class DownloadForm extends Controller {
 				if(downloadRequestForm.hasErrors()) {
 					return badRequest(form.render(
 							webJarsUtil,
+							config,
 							id,
 							new DownloadInfo(
-								metadataDocument.getTitle(), 
-								metadataDocument.getBrowseGraphicUrl(), 
-								metadataDocument.getDescription(), 
+								metadataDocument.getTitle(),
+								metadataDocument.getBrowseGraphicUrl(),
+								metadataDocument.getDescription(),
 								FORMATS),
-							downloadRequestForm));
+							downloadRequestForm,
+							messages));
 				}
 				
 				DownloadRequest downloadRequest = downloadRequestForm.get();
@@ -224,8 +237,7 @@ public class DownloadForm extends Controller {
 				
 				AdditionalData metadata = new AdditionalData();
 				metadata.setName("leesmij.xml");
-				metadata.setUrl(routes.Metadata.get(id)
-					.absoluteURL(false, hostname));
+				metadata.setUrl(routes.Metadata.get(id).absoluteURL(false, hostname));
 				additionalData.add(metadata);
 				
 				try {
@@ -289,11 +301,11 @@ public class DownloadForm extends Controller {
 
 				return redirect(controllers.routes.DownloadForm.lobby(requestId));
 			} else {
-				return notFound(datasetmissing.render(webJarsUtil, id));
+				return notFound(datasetmissing.render(webJarsUtil, config, id));
 			}
 		});
 	}
-	
+
 	public Result lobby(String id) throws SQLException {
 		try {
 			DownloadRequestInfo info = downloadDao.readDownloadRequestInfo(id);
@@ -309,14 +321,15 @@ public class DownloadForm extends Controller {
 
 				return ok(feedback.render(
 					webJarsUtil,
+					config,
 					id,
 					metadataId,
 					info.getDownload().getFt().getName(),
 					outputFormat
 				));
 			}
-			
-			return notFound(datasetmissing.render(webJarsUtil, id));
+
+			return notFound(datasetmissing.render(webJarsUtil, config, id));
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 			throw sqle;
@@ -356,11 +369,13 @@ public class DownloadForm extends Controller {
 	}
 	
 	public Result help() {
-		return ok(help.render(webJarsUtil));
+		return ok(help.render(webJarsUtil, config));
 	}
 	
-	public Result jsRoutes() {
+	public Result jsRoutes(Request request) {
 		return ok(JavaScriptReverseRouter.create("jsRoutes",
+			"jQuery.ajax",
+			request.host(),
 			controllers.routes.javascript.DownloadForm.status()
 		)).as("text/javascript");
 	}

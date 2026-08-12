@@ -1,12 +1,11 @@
-@(webJarsUtil: org.webjars.play.WebJarsUtil, id: String, info: DownloadInfo, form: Form[DownloadRequest])
+@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, info: DownloadInfo, form: Form[DownloadRequest], messages: play.api.i18n.Messages)
 
 @clientConfig() = @{
-	play.Play.application().configuration()
-		.getConfig(play.Play.application().configuration().getString("download.client"))
+	config.getConfig(config.getString("download.client"))
 }
 
 @metadataUrl() = @{
-	play.Play.application().configuration().getString("metadata.url") + id + ".xml"
+	config.getString("metadata.url") + id + ".xml"
 }
 
 @fieldErrors(field: Form.Field) = {
@@ -14,7 +13,7 @@
 		<div class="alert alert-danger">
 			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 			<span class="sr-only">Error:</span>
-			@Messages(error.message)
+			@Messages(error.message)(messages)
 		</div>
 	}
 }
@@ -29,7 +28,7 @@
 	</div>
 }
 
-@layout("Download bestand", webJarsUtil, null) {
+@layout("Download bestand", webJarsUtil, config, null) {
 	<p class="title">@info.title</p>
 	
 	<div class="metadata-information">
