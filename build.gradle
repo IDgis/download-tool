@@ -112,7 +112,7 @@ project(':web') {
 		platform {
 			playVersion = '2.8.22'
 			scalaVersion = '2.12'
-			javaVersion = JavaVersion.VERSION_1_8
+			javaVersion = JavaVersion.VERSION_11
 		}
 		injectedRoutesGenerator = true
 	}
@@ -157,7 +157,7 @@ project(':web') {
 		group = 'Docker'
 		dependsOn 'copyTar'
 		destFile = project.file('build/docker/Dockerfile')
-		from 'azul/zulu-openjdk:8'
+		from 'azul/zulu-openjdk:11'
 		copyFile 'main', '/opt'
 		runCommand 'chmod u+x /opt/bin/main'
 		exposePort 9000
@@ -213,7 +213,7 @@ configure([
 		group = 'Docker'
 		dependsOn 'copyTar'
 		destFile = project.file('build/docker/Dockerfile')
-		from 'azul/zulu-openjdk:8'
+		from 'azul/zulu-openjdk:11'
 		copyFile "${project.name}-${project.version}", '/opt'
 		runCommand "chmod u+x /opt/bin/${project.name}"
 		defaultCommand "/opt/bin/${project.name}"
