@@ -90,12 +90,10 @@ public class DownloadRaster extends Controller {
 						byte[] bytes = byteOutput.toByteArray();
 						
 						inputStream.close();
-						
-						response().setHeader("Content-Disposition", "attachment; filename=\"" + 
-								name + 
-								".tif\"");
-						
-						return ok(bytes).as("image/tiff");
+
+						return ok(bytes)
+							.as("image/tiff")
+							.withHeader("Content-Disposition", "attachment; filename=\"" + name + ".tif\"");
 					} catch (Exception ioe) {
 						log.debug(ioe.getMessage());
 						return notFound(datasetmissing.render(webJarsUtil, config, fileIdentification));
@@ -149,4 +147,4 @@ public class DownloadRaster extends Controller {
 			return true;
 		}
 	}
-}
+}

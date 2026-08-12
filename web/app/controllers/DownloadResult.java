@@ -47,8 +47,9 @@ public class DownloadResult extends Controller {
 
 		Path file = cache.resolve(fileName);
 		if(Files.exists(file)) {
-			response().setHeader("Content-Disposition", "attachment; filename=" + fileName);
-			return ok(file.toFile(), fileName).as("application/zip");
+			return ok(file.toFile(), fileName)
+				.as("application/zip")
+				.withHeader("Content-Disposition", "attachment; filename=" + fileName);
 		} else {
 			return notFound(missing.render(webJarsUtil, config));
 		}

@@ -1,4 +1,4 @@
-@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, info: DownloadInfo, form: Form[DownloadRequest])
+@(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, info: DownloadInfo, form: Form[DownloadRequest], messages: play.api.i18n.Messages)
 
 @clientConfig() = @{
 	config.getConfig(config.getString("download.client"))
@@ -13,7 +13,7 @@
 		<div class="alert alert-danger">
 			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 			<span class="sr-only">Error:</span>
-			@Messages(error.message)
+			@Messages(error.message)(messages)
 		</div>
 	}
 }
