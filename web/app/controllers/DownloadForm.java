@@ -39,8 +39,8 @@ import nl.idgis.downloadtool.domain.DownloadResultInfo;
 import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.queue.DownloadQueue;
 import nl.idgis.downloadtool.queue.DownloadQueueClient;
-import play.Logger;
-import play.Logger.ALogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.api.i18n.Messages;
 import play.api.i18n.MessagesApi;
 import play.data.Form;
@@ -92,7 +92,7 @@ public class DownloadForm extends Controller {
 
 	private final MessagesApi messagesApi;
 
-	private static final ALogger log = Logger.of(DownloadForm.class);
+	private static final Logger log = LoggerFactory.getLogger(DownloadForm.class);
 
 	@Inject
 	public DownloadForm(WebJarsUtil webJarsUtil, MetadataProvider metadataProvider,

@@ -8,11 +8,13 @@
 
 **Tech Stack:** Gradle 9.x, Play 2.9.x, Java 17
 
+> **Additional finding (Stage 5 execution, 2026-08-12): this stage is blocked transitively even though it doesn't touch Play version at all.** Checked Gradle's own compatibility docs directly: **Gradle 9.0 requires JVM 17 minimum just to launch its daemon** — separate from whatever bytecode the project targets. This project has no Gradle toolchain configured anywhere (confirmed while investigating an unrelated `javaVersion`-doesn't-enforce-anything issue during Stage 4), so without one, whichever JDK launches the Gradle 9 daemon also ends up running compilation *and* test execution. Since Java 17 itself is blocked behind Play 2.9 (see Stage 5's plan — Play 2.8.x's own docs cap it at Java 11, and Play 2.9 has no Gradle plugin support at all), this stage can't be reached before Stage 5 unblocks, regardless of what Task 1's plugin-compatibility check finds. `org.gradle.playframework:0.16.0` (latest as of this check) *does* claim Gradle 9 compatibility per its own changelog, for what it's worth once this stage is actually reachable — but that's moot until Stage 5 resolves.
+
 ---
 
 ### Before you start
 
-- Prerequisite: Stage 6 complete (`./gradlew build` passing on `develop`)
+- Prerequisite: Stage 6 complete (`./gradlew build` passing on `develop`) — **Stage 6 is itself blocked behind Stage 5**, see above and Stage 5's plan banner.
 - Branch: `migration/stage-7-gradle-9` (cut from `develop` — this repo follows git-flow; `develop` is the integration branch, `master` is release-only)
 - **Check first:** Inspect `org.gradle.playframework` GitHub releases to confirm Gradle 9 support before updating the wrapper.
 - Verify command: `./gradlew build`

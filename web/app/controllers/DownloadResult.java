@@ -10,8 +10,8 @@ import org.webjars.play.WebJarsUtil;
 
 import com.typesafe.config.Config;
 
-import play.Logger;
-import play.Logger.ALogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.db.Database;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -22,7 +22,7 @@ import nl.idgis.downloadtool.dao.DownloadDao;
 
 public class DownloadResult extends Controller {
 
-	private static final ALogger log = Logger.of(DownloadResult.class);
+	private static final Logger log = LoggerFactory.getLogger(DownloadResult.class);
 
 	private final Path cache;
 

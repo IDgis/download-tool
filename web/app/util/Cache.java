@@ -8,12 +8,12 @@ import com.typesafe.config.Config;
 
 import controllers.DownloadResult;
 
-import play.Logger;
-import play.Logger.ALogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Cache {
 
-	private static final ALogger log = Logger.of(Cache.class);
+	private static final Logger log = LoggerFactory.getLogger(Cache.class);
 
 	static public Path get(Config config) {
 		String cachePath = config.getString("cache.path");
