@@ -5,7 +5,7 @@
 }
 
 @metadataUrl() = @{
-	config.getString("metadata.url") + id + ".xml"
+	config.getString("metadata.html-prefix") + id + ".xml"
 }
 
 @fieldErrors(field: Form.Field) = {

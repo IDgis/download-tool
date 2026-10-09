@@ -5,7 +5,7 @@
 }
 
 @metadataUrl() = @{
-	config.getString("metadata.url") + metadataId + ".xml"
+	config.getString("metadata.html-prefix") + metadataId + ".xml"
 }
 
 @layout("Download bestand", webJarsUtil, config, routes.Assets.at("javascripts/feedback.js").url) {
