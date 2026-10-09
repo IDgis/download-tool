@@ -51,7 +51,7 @@ public class MetadataProvider {
 	 */
 	public CompletionStage<Optional<MetadataDocument>> get(String id) {
 		try {
-			URL url = new URL(config.getString("metadata.url") + id + ".xml");
+			URL url = new URL(config.getString("metadata.xml-prefix") + id + ".xml");
 			return ws.url(url.toExternalForm())
 				.setFollowRedirects(true)
 				.setHeader(getTrustedHeader(), getTrustedValue())
