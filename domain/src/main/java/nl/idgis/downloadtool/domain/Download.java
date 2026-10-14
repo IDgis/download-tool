@@ -14,13 +14,12 @@ import java.util.List;
 public class Download implements Serializable {
 	private static final long serialVersionUID = 1012331026914569758L;
 
-	private String name; // name of the zip file where all individual downloads
-							// are packaged
+	private String name; // metadata document id of the dataset being downloaded
 	private WfsFeatureType ft; // description of the featuretype to download
 	private List<AdditionalData> additionalData; // list of non-conversion data
 
 	/**
-	 * @return name of the zip file where all individual downloads are packaged
+	 * @return metadata document id of the dataset being downloaded
 	 */
 	public String getName() {
 		return name;

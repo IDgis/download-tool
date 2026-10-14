@@ -11,14 +11,13 @@ class DockerRemoteConfig implements Plugin<Project> {
 		def env = System.env
 			project.docker {
 				if(env.containsKey('DOCKER_HOST')) {
-					url = "$env.DOCKER_HOST"
-	
+					def dockerUrl = "$env.DOCKER_HOST"
 					if(env.containsKey('DOCKER_TLS_VERIFY')) {
-						url = url.replace('tcp', 'https')
+						url = dockerUrl.replace('tcp', 'https')
 					} else {
-						url = url.replace('tcp', 'http')
+						url = dockerUrl.replace('tcp', 'http')
 					}
-	
+
 					if(env.containsKey('DOCKER_CERT_PATH')) {
 						certPath = project.file "$env.DOCKER_CERT_PATH"
 					}

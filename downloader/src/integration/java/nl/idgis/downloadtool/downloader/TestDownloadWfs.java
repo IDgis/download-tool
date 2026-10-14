@@ -16,7 +16,7 @@ import nl.idgis.downloadtool.domain.WfsFeatureType;
 import nl.idgis.downloadtool.downloader.DownloadWfs;
 
 public class TestDownloadWfs {
-	private static final String URL = "http://httpbin.org/get";
+	private static final String URL = "https://httpbingo.org/get";
 	private static final Logger log = LoggerFactory.getLogger(TestDownloadFile.class);
 	DownloadWfs downloadSource;
 	
@@ -34,8 +34,7 @@ public class TestDownloadWfs {
 		wfsFeatureType.setServiceUrl(URL);
 		wfsFeatureType.setServiceVersion("2.0.0");
 		wfsFeatureType.setWfsMimetype("KML");
-		
-		
+
 		try {
 			downloadSource = new DownloadWfs(wfsFeatureType);
 			InputStream is = downloadSource.open();
@@ -54,7 +53,7 @@ public class TestDownloadWfs {
 				log.debug("--------------------------------------");
 			}
 			assertTrue("Downloadresponse expected!", 
-					result.indexOf("http://httpbin.org/get?REQUEST=GetFeature&service=WFS&version=2.0.0&TYPENAME=ProtectedSites") > -1);
+					result.indexOf("https://httpbingo.org/get?REQUEST=GetFeature&service=WFS&version=2.0.0&TYPENAME=ProtectedSites") > -1);
 
 		} catch (Exception e) {
 			e.printStackTrace();

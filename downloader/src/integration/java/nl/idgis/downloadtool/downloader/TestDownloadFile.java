@@ -17,7 +17,7 @@ import nl.idgis.downloadtool.downloader.DownloadFile;
 import nl.idgis.downloadtool.downloader.DownloadSource;
 
 public class TestDownloadFile {
-	private static final String URL = "http://httpbin.org/get";
+	private static final String URL = "https://httpbingo.org/get";
 	private static final Logger log = LoggerFactory.getLogger(TestDownloadFile.class);
 	DownloadSource downloadSource;
 	

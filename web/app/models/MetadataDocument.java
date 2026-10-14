@@ -21,8 +21,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 
-import play.Logger;
-import play.Logger.ALogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.libs.XPath;
 
 /**
@@ -32,7 +32,7 @@ import play.libs.XPath;
  */
 public class MetadataDocument {
 	
-	private static final ALogger log = Logger.of(MetadataDocument.class);
+	private static final Logger log = LoggerFactory.getLogger(MetadataDocument.class);
 	
 	private final static Map<String, String> NS = namespaces();
 	

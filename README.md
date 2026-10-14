@@ -20,11 +20,9 @@ Stappen:
 | project | description |
 | --- | --- |
 | dao            | CRUD methoden database | 
-| db             | docker: postgresql 9.x database |
 | domain         | domein objecten: message beans, database tabellen  |
 | downloader     | docker: downloader met processor, downloaderWfs, downloadFile, packager |
 |                | dependencies: idgis.commons.cache voor zip packager |  
-| gc             | docker: Garbage collection: opruimen van gedownloade zip bestanden |
 | queue          | docker: queue client met beanstalk daemon |
 | web            | docker: play applicatie |
 |                | DownloadForm, MetadataProvider |
@@ -32,11 +30,10 @@ Stappen:
 
 ### Docker containers en images
 
-| image | container | beschrijving |
-| --- | --- | --- | 
-| beanstalk | schickling/beanstalkd | queue daemon |
-| downloader | downloader | downloaderWfs, downloadFile, packager | 
-| db | db | database met tabellen request\_info en result\_info |
-| gc | gc | disk volume voor tijdelijke opslag zip files | 
-| web | play application | web formulier, metadata provider, download proxy | 
-| cache | downloader | disk volume voor tijdelijke opslag zip files | 
+| image | container                | beschrijving |
+| --- |--------------------------| --- | 
+| beanstalk | schickling/beanstalkd    | queue daemon |
+| downloader | downloader               | downloaderWfs, downloadFile, packager | 
+| db | db                       | database met tabellen request\_info en result\_info |
+| gc | gc                       | disk volume voor tijdelijke opslag zip files | 
+| web | web.intern en web.extern | web formulier, metadata provider, download proxy | 
