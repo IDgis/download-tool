@@ -1,9 +1,5 @@
 @(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, metadataId: String, file: String, outputFormat: OutputFormat)
 
-@clientConfig() = @{
-	config.getConfig(config.getString("download.client"))
-}
-
 @metadataUrl() = @{
 	config.getString("metadata.html-prefix") + metadataId + ".xml"
 }
@@ -31,12 +27,12 @@
 	
 	<div id="footer">
 		<p>De volledige <a target="_blank" href="@metadataUrl()">metainformatie van dit bestand kunt u hier</a> vinden.</p>
-		@Html(clientConfig().getString("portal.intro"))
-		@Html(clientConfig().getString("portal.maps.current"))
-		@Html(clientConfig().getString("portal.maps.old"))
-		@Html(clientConfig().getString("opendata"))
-		@Html(clientConfig().getString("suggestions"))
-		@Html(clientConfig().getString("proclaimer"))
+		@Html(util.ClientConfig.getString(config, "portal.intro"))
+		@Html(util.ClientConfig.getString(config, "portal.maps.current"))
+		@Html(util.ClientConfig.getString(config, "portal.maps.old"))
+		@Html(util.ClientConfig.getString(config, "opendata"))
+		@Html(util.ClientConfig.getString(config, "suggestions"))
+		@Html(util.ClientConfig.getString(config, "proclaimer"))
 	</div>
 	
 	<input id="js-request-id" type="hidden" data-request-id="@id" />

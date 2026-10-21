@@ -1,9 +1,5 @@
 @(title: String, webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, jsUrl: String)(content: Html)
 
-@clientConfig() = @{
-	config.getConfig(config.getString("download.client"))
-}
-
 @displayStatsAnalytics() = @{
 	config.getString("display.stats.analytics") == "true"
 }
@@ -26,8 +22,8 @@
 	</head>
 	<body class='@if(config.getString("deployment.acceptance") == "true") {background-acceptance}'>
 		<div class="logo">
-			<a href='@clientConfig().getString("url")'>
-				<img src='@routes.Assets.at(clientConfig().getString("logo"))' alt="Responsive image"></img>
+			<a href='@util.ClientConfig.getString(config, "url")'>
+				<img src='@routes.Assets.at(util.ClientConfig.getString(config, "logo"))' alt="Responsive image"></img>
 			</a>
 		</div>
 
