@@ -1,16 +1,12 @@
 @(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config)
 
-@clientConfig() = @{
-	config.getConfig(config.getString("download.client"))
-}
-
 @layout("Download bestand", webJarsUtil, config, null) {
 	<p class="title">Toelichting bij downloaden van bestanden</p>
 	
 	<div class="welcome">
 		<div>
-			@Html(clientConfig().getString("help.intro"))
-			@Html(clientConfig().getString("help.download"))
+			@Html(util.ClientConfig.getString(config, "help.intro"))
+			@Html(util.ClientConfig.getString(config, "help.download"))
 			<p>Je kan deze informatie daarna zelf verder bewerken, analyseren of weergeven.</p>
 			<p>Precies zoals jij dat wilt, voor je eigen doeleinden.</p>
 		</div>
@@ -35,9 +31,9 @@
 			<p>Je kunt zelf kiezen welk bestandsformaat het beste past bij de software die jij gebruikt.</p>
 		</div>
 		<div class="help-paragraph">
-			@Html(clientConfig().getString("help.static.maps.1"))
-			@Html(clientConfig().getString("help.static.maps.2"))
-			@Html(clientConfig().getString("help.static.maps.3"))
+			@Html(util.ClientConfig.getString(config, "help.static.maps.1"))
+			@Html(util.ClientConfig.getString(config, "help.static.maps.2"))
+			@Html(util.ClientConfig.getString(config, "help.static.maps.3"))
 		</div>
 		<div class="help-paragraph">
 			<p>Bij de download wordt de beschrijving van het bestand meegeleverd. Dit staat in het bestand leesmij.xml.</p>
@@ -45,11 +41,11 @@
 			<p>Een aantal andere browsers laten alleen de technische versie (xml) zien als je dit bestand opent.</p>
 		</div>
 		<div id="footer">
-			@Html(clientConfig().getString("portal.maps.current"))
-			@Html(clientConfig().getString("portal.maps.old"))
-			@Html(clientConfig().getString("opendata"))
-			@Html(clientConfig().getString("suggestions"))
-			@Html(clientConfig().getString("proclaimer"))
+			@Html(util.ClientConfig.getString(config, "portal.maps.current"))
+			@Html(util.ClientConfig.getString(config, "portal.maps.old"))
+			@Html(util.ClientConfig.getString(config, "opendata"))
+			@Html(util.ClientConfig.getString(config, "suggestions"))
+			@Html(util.ClientConfig.getString(config, "proclaimer"))
 		</div>
 	</div>
 }

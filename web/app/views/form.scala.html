@@ -1,9 +1,5 @@
 @(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String, info: DownloadInfo, form: Form[DownloadRequest], messages: play.api.i18n.Messages)
 
-@clientConfig() = @{
-	config.getConfig(config.getString("download.client"))
-}
-
 @metadataUrl() = @{
 	config.getString("metadata.html-prefix") + id + ".xml"
 }
@@ -75,12 +71,12 @@
 		</div>
 		
 		<div id="footer">
-			@Html(clientConfig().getString("portal.intro"))
-			@Html(clientConfig().getString("portal.maps.current"))
-			@Html(clientConfig().getString("portal.maps.old"))
-			@Html(clientConfig().getString("opendata"))
-			@Html(clientConfig().getString("suggestions"))
-			@Html(clientConfig().getString("proclaimer"))
+			@Html(util.ClientConfig.getString(config, "portal.intro"))
+			@Html(util.ClientConfig.getString(config, "portal.maps.current"))
+			@Html(util.ClientConfig.getString(config, "portal.maps.old"))
+			@Html(util.ClientConfig.getString(config, "opendata"))
+			@Html(util.ClientConfig.getString(config, "suggestions"))
+			@Html(util.ClientConfig.getString(config, "proclaimer"))
 		</div>
 	}
 }

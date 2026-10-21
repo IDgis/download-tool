@@ -1,9 +1,5 @@
 @(webJarsUtil: org.webjars.play.WebJarsUtil, config: com.typesafe.config.Config, id: String)
 
-@clientConfig() = @{
-	config.getConfig(config.getString("download.client"))
-}
-
 @layout("Download bestand is gestopt", webJarsUtil, config, null) {
 	<p class="title">Foutmelding: 404 Niet gevonden</p>
 	
@@ -29,7 +25,7 @@
 	</div>
 	
 	<div id="footer">
-		@Html(clientConfig().getString("search"))
-		@Html(clientConfig().getString("questions"))
+		@Html(util.ClientConfig.getString(config, "search"))
+		@Html(util.ClientConfig.getString(config, "questions"))
 	</div>
 }
